@@ -1,2 +1,2 @@
 # form-binder-java
-port of `form-binder`, a micro data binding and validating framework
+java port of [`form-binder`](https://github.com/tminglei/form-binder), a micro data binding and validating framework
