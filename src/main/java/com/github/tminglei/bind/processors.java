@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 import static com.github.tminglei.bind.FrameworkUtils.*;
 
 /**
- * Created by tminglei on 6/21/15.
+ * pre-defined pre-processors/err-processors
  */
 public interface processors {
 
@@ -43,30 +43,44 @@ public interface processors {
     default framework.PreProcessor changePrefix(String from, String to) {
         return (prefix, data, options) -> {
             return data.entrySet().stream()
-                .map(e -> new String[] {
-                    e.getKey().replaceFirst("^" + from, to),
-                    e.getValue()
+                .map(e -> new String[]{
+                        e.getKey().replaceFirst("^" + from, to),
+                        e.getValue()
                 }).collect(Collectors.toMap(
-                    e -> e[0],
-                    e -> e[1]
-                ));
+                            e -> e[0],
+                            e -> e[1]
+                    ));
         };
     }
 
     /////////////////////////////////  pre-defined post err-processors  /////////////////////
 
-    default Function<List<framework.ErrMessage>, Map<String, List<String>>>
+    default Function<List<Map.Entry<String, String>>, Map<String, List<String>>>
                 foldErrs() {
         return (errs) -> {
             return errs.stream()
                 .collect(Collectors.groupingBy(
-                    framework.ErrMessage::getTarget,
-                    HashMap::new,
-                    Collectors.mapping(
-                        framework.ErrMessage::getMessage,
-                        Collectors.toList()
-                    )
+                        Map.Entry::getKey,
+                        HashMap::new,
+                        Collectors.mapping(
+                            Map.Entry::getValue,
+                            Collectors.toList()
+                        )
                 ));
         };
+    }
+
+    default Function<List<Map.Entry<String, String>>, Map<String, Object>>
+                errsTree() {
+        return ((errors) -> {
+            Map<String, Object> root = new HashMap<>();
+            Map<String, Object> workList = mmap(entry("", root));
+            for(Map.Entry<String, String> error : errors) {
+                String name = error.getKey().replaceAll("\\[", ".").replaceAll("\\]", "");
+                List<String> workObj = (List<String>) workObject(workList, name + "._errors", true);
+                workObj.add(error.getValue());
+            }
+            return root;
+        });
     }
 }

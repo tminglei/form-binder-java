@@ -8,9 +8,13 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
- * Created by tminglei on 6/21/15.
+ * utilities for framework internal usages
  */
 public class FrameworkUtils {
+    public static final String  NAME_ERR_PREFIX = "name: ";
+    public static final Pattern PATTERN_ILLEGAL_INDEX = Pattern.compile(".*\\[(\\d*[^\\d\\[\\]]+\\d*)+\\].*");
+    /** original from: http://howtodoinjava.com/2014/11/11/java-regex-validate-email-address/ */
+    public static final String  PATTERN_EMAIL = "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
 
     ////////////////////////////////////////////////////////////////////////////
     public static final framework.Constraint PassValidating
@@ -18,6 +22,29 @@ public class FrameworkUtils {
 
     public static <T> List<T> unmodifiableList(List<T> list) {
         return list == null ? Collections.EMPTY_LIST : Collections.unmodifiableList(list);
+    }
+
+    public static <T> List<T> appendList(List<T> list, T... others) {
+        List<T> result = list == null ? new ArrayList<>() : new ArrayList<>(list);
+        result.addAll(Arrays.asList(others));
+        return result;
+    }
+    public static <T> List<T> mergeList(List<T> list, List<T>... others) {
+        List<T> result = list == null ? new ArrayList<>() : new ArrayList<>(list);
+        for(List<T> other : others) result.addAll(other);
+        return result;
+    }
+    // make Map.Entry
+    public static <K, V> Map.Entry<K, V> entry(K key, V value) {
+        return new AbstractMap.SimpleImmutableEntry(key, value);
+    }
+    // make map
+    public static <K, V> Map<K, V> mmap(Map.Entry<K, V>... entries) {
+        Map<K, V> result = new HashMap<>();
+        for(Map.Entry<K, V> entry : entries) {
+            result.put(entry.getKey(), entry.getValue());
+        }
+        return result;
     }
 
     public static boolean isEmptyStr(String str) {
@@ -40,15 +67,8 @@ public class FrameworkUtils {
         }
     }
 
-    public static String getFirstNotEmpty(String... values) {
-        for(String s : values) {
-            if (s != null) return s;
-        }
-        return null;
-    }
-
-    static Pattern OBJ_ELEMENT_NAME = Pattern.compile("^(.*)\\.([^\\.]+)$");
-    static Pattern ARR_ELEMENT_NAME = Pattern.compile("^(.*)\\[([\\d]+)\\]$");
+    static final Pattern OBJ_ELEMENT_NAME = Pattern.compile("^(.*)\\.([^\\.]+)$");
+    static final Pattern ARR_ELEMENT_NAME = Pattern.compile("^(.*)\\[([\\d]+)\\]$");
     // return (parent, name, isArray:false) or (name, index, isArray:true)
     static String[] splitName(String name) {
         Matcher m = ARR_ELEMENT_NAME.matcher(name);
@@ -58,6 +78,19 @@ public class FrameworkUtils {
             return new String[]{ m.group(1), m.group(2), Boolean.FALSE.toString() };
         } else {
             return new String[]{ "", name, Boolean.FALSE.toString() };
+        }
+    }
+
+    // find work object specified by name, create and attach it if not exists
+    static Object workObject(Map<String, Object> workList, String name, boolean isArray) {
+        if (workList.get(name) != null) return workList.get(name);
+        else {
+            String[] parts = splitName(name);   // parts: (parent, name, isArray)
+            Map<String, Object> parentObj = (Map<String, Object>) workObject(workList, parts[0], false);
+            Object theObj = isArray ? new ArrayList<String>() : new HashMap<String, Object>();
+            parentObj.put(parts[1], theObj);
+            workList.put(name, theObj);
+            return theObj;
         }
     }
 
@@ -72,24 +105,70 @@ public class FrameworkUtils {
     // make a constraint from `(label, vString, messages) => [error]` (ps: vString may be NULL/EMPTY)
     public static framework.Constraint
             mkSimpleConstraint(framework.SimpleConstraint validate) {
-        return (name, data, messages, options) -> {
+        return ((name, data, messages, options) -> {
             String label = getLabel(name, messages, options);
             String error = validate.apply(label, data.get(name), messages);
             return isEmptyStr(error) ? Collections.EMPTY_LIST
-                    : Arrays.asList(new framework.ErrMessage(name, error));
-        };
+                    : Arrays.asList(entry(name, error));
+        });
     }
 
     // make a pre-processor from `(inputString) => outputString` (ps: inputString may be NULL/EMPTY)
     public static framework.PreProcessor
             mkSimplePreProcessor(Function<String, String> process) {
-        return (name, data, options) -> {
+        return ((name, data, options) -> {
             data.put(name, process.apply(data.get(name)));
             return data;
-        };
+        });
     }
 
     ///
+
+    public static Map<String, String>
+            processDataRec(String prefix, Map<String, String> data, Options options,
+                           List<framework.PreProcessor> remainingProcessors) {
+        if (remainingProcessors.isEmpty()) return data;
+        else {
+            framework.PreProcessor currProcessor = remainingProcessors.get(0);
+            List<framework.PreProcessor> newRemainingProcessors = remainingProcessors.subList(1, remainingProcessors.size());
+            Map<String, String> newData = currProcessor.apply(prefix, data, options);
+            return processDataRec(prefix, newData, options, newRemainingProcessors);
+        }
+    }
+
+    public static List<Map.Entry<String, String>>
+            validateRec(String name, Map<String, String> data, framework.Messages messages, Options options,
+                        List<framework.Constraint> remainingValidators) {
+        if (remainingValidators.isEmpty()) return Collections.EMPTY_LIST;
+        else {
+            framework.Constraint currValidator = remainingValidators.get(0);
+            List<framework.Constraint> newRemainingValidators = remainingValidators.subList(1, remainingValidators.size());
+
+            List<Map.Entry<String, String>> errors = currValidator.apply(name, data, messages, options);
+            List<Map.Entry<String, String>> errors1 = errors.isEmpty() || options.eagerCheck().orElse(false)
+                    ? validateRec(name, data, messages, options, newRemainingValidators)
+                    : Collections.EMPTY_LIST;
+            return mergeList(errors, errors1);
+        }
+    }
+
+    public static <T> List<Map.Entry<String, String>>
+            extraValidateRec(String name, T vObject, framework.Messages messages, Options options,
+                             List<framework.ExtraConstraint<T>> remainingValidators) {
+        if (remainingValidators.isEmpty()) return new ArrayList<>();
+        else {
+            framework.ExtraConstraint<T> currValidator = remainingValidators.get(0);
+            List<framework.ExtraConstraint<T>> newRemainingValidators = remainingValidators.subList(1, remainingValidators.size());
+
+            List<Map.Entry<String, String>> errors = currValidator.apply(getLabel(name, messages, options), vObject, messages)
+                    .stream().map(msg -> entry(name, msg))
+                    .collect(Collectors.toList());
+            List<Map.Entry<String, String>> errors1 = errors.isEmpty() || options.eagerCheck().orElse(false)
+                    ? extraValidateRec(name, vObject, messages, options, newRemainingValidators)
+                    : Collections.EMPTY_LIST;
+            return mergeList(errors, errors1);
+        }
+    }
 
     // i18n on: use i18n label, if exists; else use label; else use last field name from full name
     // i18n off: use label; else use last field name from full name
@@ -100,17 +179,12 @@ public class FrameworkUtils {
                 ? splitName(parts[0])[1] + "[" + parts[1] + "]"
                 : parts[1];
 
-        if (options.i18n() == Boolean.TRUE) {
-            return getFirstNotEmpty(
-                    options._label() != null ? messages.get(options._label()) : null,
-                    options._label(),
-                    defaultLabel
-                );
+        if (options.i18n().orElse(false)) {
+            return options._label()
+                    .flatMap(l -> Optional.ofNullable(messages.get(l)))
+                    .orElse(defaultLabel);
         } else {
-            return getFirstNotEmpty(
-                    options._label(),
-                    defaultLabel
-                );
+            return options._label().orElse(defaultLabel);
         }
     }
 

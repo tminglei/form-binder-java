@@ -8,11 +8,12 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static com.github.tminglei.bind.FrameworkUtils.*;
 
 /**
- * Created by tminglei on 6/21/15.
+ * pre-defined mappings
  */
 public interface mappings {
 
@@ -151,47 +152,64 @@ public interface mappings {
     default <T> framework.Mapping<T> ignored(T instead) {
         return new framework.FieldMapping<T>(
                 framework.InputMode.POLY_INPUT,
-                (name, data) -> instead
-            ).options(o -> Options.setter(o)._ignoreConstraints(true).get());
+                ((name, data) -> instead)
+            ).options(o -> o._ignoreConstraints(true));
         }
 
     // note: all options operations will be delegate to 'base' mapping
-    default <T> framework.Mapping<T> defaultVal(framework.Mapping<T> base, T defaultVal) {
+    default <T> framework.Mapping<T> defaultVal(framework.Mapping<T> base, T defaultVal, framework.Constraint... constraints) {
         return new framework.MappingWrapper<T>(base,
-                (name, data) -> {
-                    if (isEmptyInput(name, data, base.options()._inputMode()))
+                ((name, data) -> {
+                    if (isEmptyInput(name, data, base.options()._inputMode())) {
                         return defaultVal;
-                    else return base.convert(name, data);
-                },
-                (name, data, messages, options) -> {
-                    if (isEmptyInput(name, data, base.options()._inputMode()))
+                    } else return base.convert(name, data);
+                }),
+                ((name, data, messages, options) -> {
+                    if (isEmptyInput(name, data, base.options()._inputMode())) {
                         return Collections.emptyList();
-                    else return base.validate(name, data, messages, options);
-                }
-            );
+                    } else return base.validate(name, data, messages, options);
+                })
+            ).constraint(constraints);
         }
 
-    // note: all constraints added to the outer 'ignored' mapping, will be ignored
-    default <T> framework.Mapping<Optional<T>> optional(framework.Mapping<T> base) {
+    default <T> framework.Mapping<Optional<T>> optional(framework.Mapping<T> base, framework.Constraint... constraints) {
         return new framework.FieldMapping<Optional<T>>(
                 base.options()._inputMode(),
-                (name, data) -> {
-                    if (isEmptyInput(name, data, base.options()._inputMode()))
+                ((name, data) -> {
+                    if (isEmptyInput(name, data, base.options()._inputMode())) {
                         return Optional.empty();
-                    else return Optional.of(base.convert(name, data));
-                },
-                (name, data, messages, options) -> {
-                    if (isEmptyInput(name, data, base.options()._inputMode()))
-                        return Collections.emptyList();
-                    else return base.validate(name, data, messages, options);
-                },
-                base.options()
-            ).options(o -> Options.setter(o)._ignoreConstraints(true).get());
+                    } else return Optional.of(base.convert(name, data));
+                }),
+                ((name, data, messages, options) -> {
+                    if (isEmptyInput(name, data, base.options()._inputMode())) {
+                        return Collections.EMPTY_LIST;
+                    } else {
+                        List<Map.Entry<String, String>> errors = validateRec(name, data, messages, options, options._constraints());
+                        List<Map.Entry<String, String>> errors1 = errors.isEmpty() || options.eagerCheck().orElse(false)
+                                ? base.validate(name, data, messages, options)
+                                : Collections.EMPTY_LIST;
+                        return mergeList(errors, errors1);
+                    }
+                })
+            ).options(o -> o._ignoreConstraints(true))
+                .constraint(constraints);
         }
 
     default <T> framework.Mapping<List<T>> list(framework.Mapping<T> base, framework.Constraint... constraints) {
-        return null;
-    }
+        return new framework.FieldMapping<List<T>>(
+                framework.InputMode.BULK_INPUT,
+                ((name, data) -> {
+                    return indexes(name, data).stream()
+                            .map(i -> base.convert(name + "[" + i + "]", data))
+                            .collect(Collectors.toList());
+                }),
+                ((name, data, messages, options) -> {
+                    return indexes(name, data).stream()
+                            .flatMap(i -> base.validate(name + "[" + i + "]", data, messages, options).stream())
+                            .collect(Collectors.toList());
+                })
+            ).constraint(constraints);
+        }
 
     default <V> framework.Mapping<Map<String, V>> map(framework.Mapping<V> vBase,
                                                       framework.Constraint... constraints) {
@@ -199,6 +217,28 @@ public interface mappings {
     }
     default <K, V> framework.Mapping<Map<K, V>> map(framework.Mapping<K> kBase, framework.Mapping<V> vBase,
                                                     framework.Constraint... constraints) {
-        return null;
-    }
+        return new framework.FieldMapping<Map<K, V>>(
+                framework.InputMode.BULK_INPUT,
+                ((name, data) -> {
+                    return keys(name, data).stream()
+                        .map(key -> entry(
+                                kBase.convert(key, mmap(entry(key, key))),
+                                vBase.convert(name + "." + key, data)
+                        ))
+                        .collect(Collectors.toMap(
+                                Map.Entry::getKey,
+                                Map.Entry::getValue
+                        ));
+                }),
+                ((name, data, messages, options) -> {
+                    return keys(name, data).stream()
+                        .flatMap(key -> mergeList(
+                                kBase.validate(key, mmap(entry(key, key)), messages, options),
+                                vBase.validate(name + "." + key, data, messages, options)
+                        ).stream())
+                        .collect(Collectors.toList());
+                })
+            ).constraint(constraints);
+        }
+
 }

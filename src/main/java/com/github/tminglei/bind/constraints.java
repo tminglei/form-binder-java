@@ -3,11 +3,13 @@ package com.github.tminglei.bind;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.regex.Matcher;
+import java.util.stream.Collectors;
 
 import static com.github.tminglei.bind.FrameworkUtils.*;
 
 /**
- * Created by tminglei on 6/21/15.
+ * pre-defined constraints/extra-constraints
  */
 public interface constraints {
 
@@ -19,7 +21,7 @@ public interface constraints {
                 String msgTemplate = message != null ? message : messages.get("error.required");
                 String label = getLabel(name, messages, options);
                 return Arrays.asList(
-                    new framework.ErrMessage(name, String.format(msgTemplate, label))
+                    entry(name, String.format(msgTemplate, label))
                 );
             } else return Collections.EMPTY_LIST;
         };
@@ -62,11 +64,23 @@ public interface constraints {
     }
 
     default framework.Constraint email(String message) {
-        return pattern("", message); //todo
+        return pattern(PATTERN_EMAIL, message);
     }
 
     default framework.Constraint index(String message) {
-        return null; //todo
+        return (name, data, messages, options) -> {
+            String msgTemplate = message != null ? message : messages.get("error.index");
+            return data.keySet().stream()
+                    .filter(key -> key.startsWith(name))
+                    .map(key -> {
+                        Matcher m = PATTERN_ILLEGAL_INDEX.matcher(key.substring(name.length()));
+                        if (m.matches()) {
+                            return entry(key, NAME_ERR_PREFIX + String.format(msgTemplate, key, m.group(1)));
+                        } else return null;
+                    })
+                    .filter(err -> err != null)
+                    .collect(Collectors.toList());
+        };
     }
 
     default framework.Constraint pattern(String pattern, String message) {
