@@ -1,5 +1,7 @@
 package com.github.tminglei.bind;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -17,7 +19,7 @@ public class FrameworkUtils {
     public static final String  PATTERN_EMAIL = "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
 
     ////////////////////////////////////////////////////////////////////////////
-    public static final framework.Constraint PassValidating
+    public static final Framework.Constraint PassValidating
             = (name, data, messages, options) -> Collections.EMPTY_LIST;
 
     public static <T> List<T> unmodifiableList(List<T> list) {
@@ -48,12 +50,12 @@ public class FrameworkUtils {
     }
 
     public static boolean isEmptyStr(String str) {
-        return str == null || str.trim().equals("");
+        return str == null || str.trim().equals("") || str.trim().equalsIgnoreCase("null");
     }
 
     public static boolean isEmptyInput(String name, Map<String, String> data,
-                                       framework.InputMode inputMode) {
-        if (inputMode == framework.InputMode.SOLO_INPUT)
+                                       Framework.InputMode inputMode) {
+        if (inputMode == Framework.InputMode.SINGLE)
             return isEmptyStr(data.get(name));
         else {
             String prefix1 = name + ".";
@@ -61,7 +63,7 @@ public class FrameworkUtils {
             long subInputCount = data.keySet().stream()
                     .filter(k -> k.startsWith(prefix1) || k.startsWith(prefix2))
                     .count();
-            return inputMode == framework.InputMode.POLY_INPUT
+            return inputMode == Framework.InputMode.POLYMORPHIC
                     ? isEmptyStr(data.get(name)) && subInputCount == 0
                     : subInputCount == 0;
         }
@@ -103,9 +105,12 @@ public class FrameworkUtils {
     }
 
     // make a constraint from `(label, vString, messages) => [error]` (ps: vString may be NULL/EMPTY)
-    public static framework.Constraint
-            mkSimpleConstraint(framework.SimpleConstraint validate) {
+    public static Framework.Constraint
+            mkSimpleConstraint(Framework.SimpleConstraint validate) {
         return ((name, data, messages, options) -> {
+            if (options._inputMode() != Framework.InputMode.SINGLE)
+                throw new IllegalArgumentException("The constraint shouldn't be used to non-single input mapping");
+
             String label = getLabel(name, messages, options);
             String error = validate.apply(label, data.get(name), messages);
             return isEmptyStr(error) ? Collections.EMPTY_LIST
@@ -113,36 +118,27 @@ public class FrameworkUtils {
         });
     }
 
-    // make a pre-processor from `(inputString) => outputString` (ps: inputString may be NULL/EMPTY)
-    public static framework.PreProcessor
-            mkSimplePreProcessor(Function<String, String> process) {
-        return ((name, data, options) -> {
-            data.put(name, process.apply(data.get(name)));
-            return data;
-        });
-    }
-
     ///
 
     public static Map<String, String>
             processDataRec(String prefix, Map<String, String> data, Options options,
-                           List<framework.PreProcessor> remainingProcessors) {
+                           List<Framework.PreProcessor> remainingProcessors) {
         if (remainingProcessors.isEmpty()) return data;
         else {
-            framework.PreProcessor currProcessor = remainingProcessors.get(0);
-            List<framework.PreProcessor> newRemainingProcessors = remainingProcessors.subList(1, remainingProcessors.size());
+            Framework.PreProcessor currProcessor = remainingProcessors.get(0);
+            List<Framework.PreProcessor> newRemainingProcessors = remainingProcessors.subList(1, remainingProcessors.size());
             Map<String, String> newData = currProcessor.apply(prefix, data, options);
             return processDataRec(prefix, newData, options, newRemainingProcessors);
         }
     }
 
     public static List<Map.Entry<String, String>>
-            validateRec(String name, Map<String, String> data, framework.Messages messages, Options options,
-                        List<framework.Constraint> remainingValidators) {
+            validateRec(String name, Map<String, String> data, Framework.Messages messages, Options options,
+                        List<Framework.Constraint> remainingValidators) {
         if (remainingValidators.isEmpty()) return Collections.EMPTY_LIST;
         else {
-            framework.Constraint currValidator = remainingValidators.get(0);
-            List<framework.Constraint> newRemainingValidators = remainingValidators.subList(1, remainingValidators.size());
+            Framework.Constraint currValidator = remainingValidators.get(0);
+            List<Framework.Constraint> newRemainingValidators = remainingValidators.subList(1, remainingValidators.size());
 
             List<Map.Entry<String, String>> errors = currValidator.apply(name, data, messages, options);
             List<Map.Entry<String, String>> errors1 = errors.isEmpty() || options.eagerCheck().orElse(false)
@@ -153,12 +149,12 @@ public class FrameworkUtils {
     }
 
     public static <T> List<Map.Entry<String, String>>
-            extraValidateRec(String name, T vObject, framework.Messages messages, Options options,
-                             List<framework.ExtraConstraint<T>> remainingValidators) {
+            extraValidateRec(String name, T vObject, Framework.Messages messages, Options options,
+                             List<Framework.ExtraConstraint<T>> remainingValidators) {
         if (remainingValidators.isEmpty()) return new ArrayList<>();
         else {
-            framework.ExtraConstraint<T> currValidator = remainingValidators.get(0);
-            List<framework.ExtraConstraint<T>> newRemainingValidators = remainingValidators.subList(1, remainingValidators.size());
+            Framework.ExtraConstraint<T> currValidator = remainingValidators.get(0);
+            List<Framework.ExtraConstraint<T>> newRemainingValidators = remainingValidators.subList(1, remainingValidators.size());
 
             List<Map.Entry<String, String>> errors = currValidator.apply(getLabel(name, messages, options), vObject, messages)
                     .stream().map(msg -> entry(name, msg))
@@ -172,7 +168,7 @@ public class FrameworkUtils {
 
     // i18n on: use i18n label, if exists; else use label; else use last field name from full name
     // i18n off: use label; else use last field name from full name
-    public static String getLabel(String fullname, framework.Messages messages, Options options) {
+    public static String getLabel(String fullname, Framework.Messages messages, Options options) {
         String[] parts = splitName(fullname);   // parts: (parent, name, isArray)
         boolean isArray = Boolean.parseBoolean(parts[2]);
         String defaultLabel = isArray
@@ -189,7 +185,7 @@ public class FrameworkUtils {
     }
 
     // make a Constraint which will try to parse and collect errors
-    public static <T> framework.Constraint
+    public static <T> Framework.Constraint
             parsing(Function<String, T> parse, String messageKey, String pattern) {
         return mkSimpleConstraint(((label, vString, messages) -> {
             if (isEmptyStr(vString)) return null;
@@ -228,5 +224,24 @@ public class FrameworkUtils {
                             : null;
                 }).filter(k -> k != null)
                 .collect(Collectors.toList());
+    }
+
+    // Construct data map from inputting jackson json object
+    public static Map<String, String> json2map(String prefix, JsonNode json) {
+        if (json.isArray()) {
+            Map<String, String> result = new HashMap<>();
+            for(int i=0; i <json.size(); i++) {
+                result.putAll(json2map(prefix +"["+i+"]", json.get(i)));
+            }
+            return result;
+        } else if (json.isObject()) {
+            Map<String, String> result = new HashMap<>();
+            json.fields().forEachRemaining(e -> {
+                result.putAll(json2map(prefix + "." + e.getKey(), e.getValue()));
+            });
+            return result;
+        } else {
+            return mmap(entry(prefix, json.asText()));
+        }
     }
 }

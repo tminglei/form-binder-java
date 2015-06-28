@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * Created by tminglei on 6/21/15.
+ * object used to hold bind result or errors
  */
 public class BindObject {
     static final String DEFAULT_KEY = "_default$";
@@ -39,6 +39,7 @@ public class BindObject {
         return (T) data.get(name);
     }
 
+    // build a bean based on data of this bind object
     public <T> T build(Class<T> clazz) {
         return null;//todo
     }
