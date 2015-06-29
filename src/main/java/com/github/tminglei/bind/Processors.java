@@ -67,10 +67,10 @@ public class Processors {
                         else {
                             String v = e.getValue();
                             return entry(
-                                    e.getKey(),
-                                    v != null ? v.replaceAll(pattern, replacement) : ""
+                                e.getKey(),
+                                v != null ? v.replaceAll(pattern, replacement) : ""
                             );
-                    }
+                        }
                     }).collect(Collectors.toMap(
                             Map.Entry::getKey,
                             Map.Entry::getValue
@@ -85,14 +85,17 @@ public class Processors {
         return ((prefix1, data, options) -> {
             String thePrefix = prefix == null ? prefix1 : prefix;
             String jsonStr  = data.get(thePrefix);
+
             try {
                 JsonNode json = new ObjectMapper().readTree(jsonStr);
 
                 Map<String, String> newData = new HashMap<>(data);
                 newData.remove(thePrefix); // remove old one to avoid disturbing other processing
                 newData.putAll(json2map(thePrefix, json));
+
                 return newData;
-            } catch (IOException e) {
+            }
+            catch (IOException e) {
                 throw new IllegalArgumentException("Illegal json string at: " + thePrefix + " - \n" + jsonStr, e);
             }
         });
@@ -105,19 +108,23 @@ public class Processors {
         return ((prefix1, data, options) -> {
             String thePrefix = prefix == null ? prefix1 : prefix;
             String jsonStr  = data.get(thePrefix);
+
             try {
                 JsonNode json = new ObjectMapper().readTree(jsonStr);
-                if (!json.isArray() || (json.size() > 0 && json.get(0).isTextual())) {
+                if (!json.isArray() || (json.size() > 0 && !json.get(0).isTextual())) {
                     throw new IllegalArgumentException(thePrefix + " is NOT AN String ARRAY!");
                 }
 
                 Map<String, String> newData = new HashMap<>(data);
                 newData.remove(thePrefix); // remove old one to avoid disturbing other processing
                 for(JsonNode key : json) {
-                    newData.put(thePrefix + "." + key.asText(), "true");
+                    String newKey = isEmptyStr(thePrefix) ? key.asText() : thePrefix + "." + key.asText();
+                    newData.put(newKey, "true");
                 }
+
                 return newData;
-            } catch (IOException e) {
+            }
+            catch (IOException e) {
                 throw new IllegalArgumentException("Illegal json string at " + thePrefix + " - \n" + jsonStr, e);
             }
         });
@@ -130,15 +137,17 @@ public class Processors {
                     if (!e.getKey().startsWith(prefix)) return e;
                     else {
                         String toBeReplaced = e.getKey().substring(prefix.length());
+                        String newKey = (prefix + toBeReplaced.replaceFirst("^" + Pattern.quote(from), to))
+                                .replaceFirst("^\\.", "");
                         return entry(
-                            prefix + toBeReplaced.replaceFirst("^" + from, to),
+                            newKey,
                             e.getValue()
                         );
                     }
-                    }).collect(Collectors.toMap(
-                            Map.Entry::getKey,
-                            Map.Entry::getValue
-                    ));
+                }).collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue
+                ));
             });
         }
 

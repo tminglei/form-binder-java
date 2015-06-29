@@ -3,10 +3,7 @@ package com.github.tminglei.bind;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static org.testng.Assert.*;
 import static com.github.tminglei.bind.Simple.*;
@@ -169,7 +166,7 @@ public class PreProcessorsTest {
         assertEquals(omitMatched.apply("", mmap(entry("", "2342-334-12")), Options.EMPTY),
                 mmap(entry("", "2342-334")));
         assertEquals(omitMatched.apply("a", mmap(entry("a", "2342-334")), Options.EMPTY),
-                mmap(entry("", "2342-334")));
+                mmap(entry("a", "2342-334")));
     }
 
     @Test
@@ -179,7 +176,7 @@ public class PreProcessorsTest {
         PreProcessor omitMatched = Processors.omitMatched("-\\d\\d$");
 
         assertEquals(omitMatched.apply("", mmap(entry("", "2342-334-12"), entry("a", "2342-334-13")), Options.EMPTY),
-                mmap(entry("", "2342-334"), entry("", "2342-334")));
+                mmap(entry("", "2342-334"), entry("a", "2342-334")));
         assertEquals(omitMatched.apply("a", mmap(entry("", "2342-334-12"), entry("a", "2342-334")), Options.EMPTY),
                 mmap(entry("", "2342-334-12"), entry("a", "2342-334")));
     }
@@ -207,12 +204,12 @@ public class PreProcessorsTest {
         PreProcessor replaceMatched = Processors.replaceMatched("-\\d\\d$", "-1");
 
         assertEquals(replaceMatched.apply("", mmap(entry("", "2342-334-12"), entry("a", "2342-334-13")), Options.EMPTY),
-                mmap(entry("", "2342-334-1"), entry("", "2342-334-1")));
+                mmap(entry("", "2342-334-1"), entry("a", "2342-334-1")));
         assertEquals(replaceMatched.apply("a", mmap(entry("", "2342-334-12"), entry("a", "2342-334")), Options.EMPTY),
-                mmap(entry("", "2342-334-12"), entry("a", "2342-334-1")));
+                mmap(entry("", "2342-334-12"), entry("a", "2342-334")));
     }
 
-    // expand json test
+    // expand-json test
 
     @Test
     public void testExpandJson_DirectUse() {
@@ -223,14 +220,14 @@ public class PreProcessorsTest {
         Map<String, String> rawData = mmap(
                 entry("aa", "wett"),
                 entry("json", "{\"id\":123, \"name\":\"tewd\", \"dr-1\":[33,45]}")
-        );
+            );
         Map<String, String> expected = mmap(
                 entry("aa", "wett"),
                 entry("json.id", "123"),
                 entry("json.name", "tewd"),
                 entry("json.dr-1[0]", "33"),
                 entry("json.dr-1[1]", "45")
-        );
+            );
 
         assertEquals(expandJson.apply("json", rawData, Options.EMPTY),
                 expected);
@@ -243,16 +240,28 @@ public class PreProcessorsTest {
         PreProcessor expandJson = Processors.expandJson();
 
         Map<String, String> nullData = mmap(entry("aa", "wett"));
-        assertEquals(expandJson.apply("json", nullData, Options.EMPTY),
-                nullData);
+        try {
+            assertEquals(expandJson.apply("json", nullData, Options.EMPTY),
+                    nullData);
+        } catch (NullPointerException e) {
+            // expected
+        }
 
         Map<String, String> nullData1 = mmap(entry("aa", "wett"), entry("json", null));
-        assertEquals(expandJson.apply("json", nullData1, Options.EMPTY),
-                mmap(entry("aa", "wett")));
+        try {
+            assertEquals(expandJson.apply("json", nullData1, Options.EMPTY),
+                    mmap(entry("aa", "wett")));
+        } catch (NullPointerException e) {
+            // expected
+        }
 
         Map<String, String> emptyData1 = mmap(entry("aa", "wett"), entry("json", ""));
-        assertEquals(expandJson.apply("json", emptyData1, Options.EMPTY),
-                mmap(entry("aa", "wett")));
+        try {
+            assertEquals(expandJson.apply("json", emptyData1, Options.EMPTY),
+                    mmap(entry("aa", "wett")));
+        } catch (IllegalArgumentException e) {
+            // expected
+        }
     }
 
     @Test
@@ -264,24 +273,113 @@ public class PreProcessorsTest {
         Map<String, String> rawData = mmap(
                 entry("aa", "wett"),
                 entry("json", "{\"id\":123, \"name\":\"tewd\", \"dr-1\":[33,45]}")
-        );
+            );
         Map<String, String> expected = mmap(
                 entry("aa", "wett"),
                 entry("json.id", "123"),
                 entry("json.name", "tewd"),
                 entry("json.dr-1[0]", "33"),
                 entry("json.dr-1[1]", "45")
-        );
+            );
 
         assertEquals(expandJson.apply("", rawData, Options.EMPTY),
                 expected);
     }
 
-    // expand json keys test
+    // expand-json-keys test
 
     @Test
     public void testExpandJsonKeys_DirectUse() {
         System.out.println(green(">> expand json keys - direct use"));
+
+        PreProcessor expandJsonKeys = Processors.expandJsonKeys();
+
+        Map<String, String> rawData = mmap(
+                entry("aa", "wett"),
+                entry("touched", "[\"a[0]\",\"b\", \"c.t\"]")
+            );
+        Map<String, String> expected = mmap(
+                entry("aa", "wett"),
+                entry("touched.a[0]", "true"),
+                entry("touched.b", "true"),
+                entry("touched.c.t", "true")
+            );
+
+        assertEquals(expandJsonKeys.apply("touched", rawData, Options.EMPTY),
+                expected);
+    }
+
+    @Test
+    public void testExpandJsonKeys_WithPrefix() {
+        System.out.println(green(">> expand json keys - with prefix"));
+
+        PreProcessor expandJsonKeys = Processors.expandJsonKeys("touched");
+
+        Map<String, String> rawData = mmap(
+                entry("aa", "wett"),
+                entry("touched", "[\"a[0]\",\"b\", \"c.t\"]")
+            );
+        Map<String, String> expected = mmap(
+                entry("aa", "wett"),
+                entry("touched.a[0]", "true"),
+                entry("touched.b", "true"),
+                entry("touched.c.t", "true")
+            );
+
+        assertEquals(expandJsonKeys.apply("", rawData, Options.EMPTY),
+                expected);
+    }
+
+    // change-prefix test
+
+    @Test
+    public void testChangePrefix_DirectUse() {
+        System.out.println(green(">> change prefix - direct use"));
+
+        PreProcessor changePrefix = Processors.changePrefix("json", "data");
+
+        Map<String, String> data = mmap(
+                entry("aa", "wett"),
+                entry("json.id", "123"),
+                entry("json.name", "tewd"),
+                entry("json.dr-1[0]", "33"),
+                entry("json.dr-1[1]", "45")
+            );
+        Map<String, String> expected = mmap(
+                entry("aa", "wett"),
+                entry("data.id", "123"),
+                entry("data.name", "tewd"),
+                entry("data.dr-1[0]", "33"),
+                entry("data.dr-1[1]", "45")
+            );
+
+        assertEquals(changePrefix.apply("", data, Options.EMPTY),
+                expected);
+    }
+
+    @Test
+    public void testChangePrefix_WithHeadDotOmit() {
+        System.out.println(green(">> change prefix - with head dot omitting"));
+
+        PreProcessor changePrefix = Processors.changePrefix("json", "");
+
+        Map<String, String> data = mmap(
+                entry("aa", "wett"),
+                entry("json.id", "123"),
+                entry("json.name", "tewd"),
+                entry("json.dr-1[0]", "33"),
+                entry("json.dr-1[1]", "45")
+            );
+        Map<String, String> expected = mmap(
+                entry("aa", "wett"),
+                entry("id", "123"),
+                entry("name", "tewd"),
+                entry("dr-1[0]", "33"),
+                entry("dr-1[1]", "45")
+            );
+
+        assertEquals(changePrefix.apply("", data, Options.EMPTY),
+                expected);
     }
 
 }

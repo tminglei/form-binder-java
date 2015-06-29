@@ -13,4 +13,9 @@ import static com.github.tminglei.bind.FrameworkUtils.*;
 import static com.github.tminglei.bind.Utils.*;
 
 public class GeneralMappingsTest {
+
+    @BeforeClass
+    public void start() {
+        System.out.println(cyan("test pre-defined general mappings"));
+    }
 }

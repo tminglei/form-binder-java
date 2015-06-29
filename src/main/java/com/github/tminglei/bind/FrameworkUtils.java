@@ -50,7 +50,7 @@ public class FrameworkUtils {
     }
 
     public static boolean isEmptyStr(String str) {
-        return str == null || str.trim().equals("") || str.trim().equalsIgnoreCase("null");
+        return str == null || str.trim().equals("") || str.equalsIgnoreCase("null");
     }
 
     public static boolean isEmptyInput(String name, Map<String, String> data,
@@ -148,18 +148,18 @@ public class FrameworkUtils {
     }
 
     public static <T> List<Map.Entry<String, String>>
-            extraValidateRec(String name, T vObject, Framework.Messages messages, Options options,
+            extraValidateRec(String name, T vObj, Framework.Messages messages, Options options,
                              List<Framework.ExtraConstraint<T>> remainingValidators) {
         if (remainingValidators.isEmpty()) return new ArrayList<>();
         else {
             Framework.ExtraConstraint<T> currValidator = remainingValidators.get(0);
             List<Framework.ExtraConstraint<T>> newRemainingValidators = remainingValidators.subList(1, remainingValidators.size());
 
-            List<Map.Entry<String, String>> errors = currValidator.apply(getLabel(name, messages, options), vObject, messages)
+            List<Map.Entry<String, String>> errors = currValidator.apply(getLabel(name, messages, options), vObj, messages)
                     .stream().map(msg -> entry(name, msg))
                     .collect(Collectors.toList());
             List<Map.Entry<String, String>> errors1 = errors.isEmpty() || options.eagerCheck().orElse(false)
-                    ? extraValidateRec(name, vObject, messages, options, newRemainingValidators)
+                    ? extraValidateRec(name, vObj, messages, options, newRemainingValidators)
                     : Collections.EMPTY_LIST;
             return mergeList(errors, errors1);
         }
@@ -168,7 +168,7 @@ public class FrameworkUtils {
     // i18n on: use i18n label, if exists; else use label; else use last field name from full name
     // i18n off: use label; else use last field name from full name
     public static String getLabel(String fullname, Framework.Messages messages, Options options) {
-        String[] parts = splitName(fullname);   // parts: (parent, name, isArray)
+        String[] parts = splitName(fullname);   // parts: (parent, name/index, isArray)
         boolean isArray = Boolean.parseBoolean(parts[2]);
         String defaultLabel = isArray
                 ? splitName(parts[0])[1] + "[" + parts[1] + "]"

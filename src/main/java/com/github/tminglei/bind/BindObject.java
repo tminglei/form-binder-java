@@ -1,13 +1,11 @@
 package com.github.tminglei.bind;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * object used to hold bind result or errors
  */
-public class BindObject {
+public class BindObject implements Iterable<Map.Entry<String, Object>> {
     static final String DEFAULT_KEY = "_default$";
 
     private final Object errors;
@@ -26,6 +24,14 @@ public class BindObject {
         return Optional.ofNullable((T) errors);
     }
 
+    @Override
+    public Iterator<Map.Entry<String, Object>> iterator() {
+        return data.entrySet().iterator();
+    }
+    public Set<String> names() {
+        return data.keySet();
+    }
+
     public BindObject node(String name) {
         checkExisted(name);
         return (BindObject) data.get(name);
@@ -40,7 +46,7 @@ public class BindObject {
     }
 
     // build a bean based on data of this bind object
-    public <T> T build(Class<T> clazz) {
+    public <T> T to(Class<T> clazz) {
         return null;//todo
     }
 

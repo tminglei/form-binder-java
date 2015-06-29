@@ -31,10 +31,10 @@ public class FormBinder {
     public BindObject bind(Framework.Mapping<?> mapping, Map<String, String> data, String root) {
         List<Map.Entry<String, String>> errors = mapping.validate(root, data, messages, Options.EMPTY);
         if (errors.isEmpty()) {
-            Object vObject = mapping.convert(root, data);
-            return vObject instanceof BindObject
-                    ? (BindObject) vObject
-                    : new BindObject(mmap(entry(BindObject.DEFAULT_KEY, vObject)));
+            Object vObj = mapping.convert(root, data);
+            return vObj instanceof BindObject
+                    ? (BindObject) vObj
+                    : new BindObject(mmap(entry(BindObject.DEFAULT_KEY, vObj)));
         } else {
             if (errProcessor != null) {
                 return new BindObject(errProcessor.apply(errors));

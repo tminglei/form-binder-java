@@ -32,7 +32,7 @@ public class FieldMappingsTest {
     public void testText_ValidData() {
         System.out.println(green(">> text - valid data"));
 
-        Mapping<String> text = $(trim()).to(Mappings.text());
+        Mapping<String> text = fb(trim()).to(Mappings.text());
         Map<String, String> data = mmap(entry("text", "tett "));
 
         assertEquals(text.validate("text", data, dummyMessages, Options.EMPTY),
@@ -44,7 +44,7 @@ public class FieldMappingsTest {
     public void testText_NullData() {
         System.out.println(green(">> text - null data"));
 
-        Mapping<String> text = $(trim()).to(Mappings.text());
+        Mapping<String> text = fb(trim()).to(Mappings.text());
         Map<String, String> data = mmap();
 
         assertEquals(text.validate("text", data, dummyMessages, Options.EMPTY),
@@ -168,7 +168,7 @@ public class FieldMappingsTest {
     public void testInt_OutOfScopeData() {
         System.out.println(green(">> int - out-of-scope data"));
 
-        Mapping<Integer> integer = $(omit(",")).to(Mappings.vInt())
+        Mapping<Integer> integer = fb(omit(",")).to(Mappings.vInt())
                 .verifying(min(1000), max(10000));
         Map<String, String> data = mmap(entry("int", "345"));
 
@@ -180,7 +180,7 @@ public class FieldMappingsTest {
     public void testInt_WithLongNumber() {
         System.out.println(green(">> int - long number"));
 
-        Mapping<Integer> integer = $(omit(",")).to(Mappings.vInt());
+        Mapping<Integer> integer = fb(omit(",")).to(Mappings.vInt());
         Map<String, String> data = mmap(entry("int", "146894532240"));
 
         assertEquals(integer.validate("int", data, dummyMessages, Options.EMPTY),
@@ -191,7 +191,7 @@ public class FieldMappingsTest {
     public void testInt_ValidDataWithComma() {
         System.out.println(green(">> int - valid data with comma"));
 
-        Mapping<Integer> integer = $(omit(",")).to(Mappings.vInt())
+        Mapping<Integer> integer = fb(omit(",")).to(Mappings.vInt())
                 .verifying(min(1000), max(10000));
         Map<String, String> data = mmap(entry("int", "3,549"));
 
@@ -204,7 +204,7 @@ public class FieldMappingsTest {
     public void testInt_NullData() {
         System.out.println(green(">> int - null data"));
 
-        Mapping<Integer> integer = $(omit(",")).to(Mappings.vInt());
+        Mapping<Integer> integer = fb(omit(",")).to(Mappings.vInt());
         Map<String, String> data = mmap();
 
         assertEquals(integer.validate("int", data, dummyMessages, Options.EMPTY),
@@ -216,7 +216,7 @@ public class FieldMappingsTest {
     public void testInt_EmptyData() {
         System.out.println(green(">> int - empty data"));
 
-        Mapping<Integer> integer = $(omit(",")).to(Mappings.vInt())
+        Mapping<Integer> integer = fb(omit(",")).to(Mappings.vInt())
                 .verifying(min(1000), max(10000));
         Map<String, String> data = mmap(entry("int", ""));
 

@@ -28,7 +28,7 @@ public class Framework {
     }
     @FunctionalInterface
     public interface ExtraConstraint<T> {
-        List<String> apply(String label, T vObject, Messages messages);
+        List<String> apply(String label, T vObj, Messages messages);
     }
     @FunctionalInterface
     public interface SimpleConstraint {
@@ -192,9 +192,10 @@ public class Framework {
                 List<Constraint> validators = appendList(theOptions._ignoreConstraints() ? null : theOptions._constraints(), moreValidate);
                 List<Map.Entry<String, String>> errors = validateRec(name, newData, messages, theOptions, validators);
                 if (errors.isEmpty()) {
-                    T vObject = doConvert.apply(name, newData);
-                    if (vObject != null) {
-                        return extraValidateRec(name, vObject, messages, theOptions, extraConstraints);
+                    T vObj = doConvert.apply(name, newData);
+                    if (vObj != null) {
+                        String label = getLabel(name, messages, theOptions);
+                        return extraValidateRec(label, vObj, messages, theOptions, extraConstraints);
                     }
                 }
                 return errors;
@@ -287,9 +288,10 @@ public class Framework {
                 if (errors.isEmpty()) {
                     if (isEmptyInput(name, newData, theOptions._inputMode())) return Collections.EMPTY_LIST;
                     else {
-                        BindObject vObject = doConvert(name, newData);
-                        if (vObject != null) {
-                            return extraValidateRec(name, vObject, messages, theOptions, extraConstraints);
+                        BindObject vObj = doConvert(name, newData);
+                        if (vObj != null) {
+                            String label = getLabel(name, messages, theOptions);
+                            return extraValidateRec(label, vObj, messages, theOptions, extraConstraints);
                         }
                     }
                 }

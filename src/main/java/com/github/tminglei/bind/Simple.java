@@ -16,13 +16,13 @@ public class Simple extends Framework {
         return FrameworkUtils.entry(name, mapping);
     }
 
-    public static Binding   $(String name) {
+    public static  Binding  fb(String name) {
         return new Binding(name);
     }
-    public static Attaching $(Framework.Constraint... constraints) {
+    public static Attaching fb(Framework.Constraint... constraints) {
         return new Attaching(Arrays.asList(constraints), null);
     }
-    public static Attaching $(Framework.PreProcessor... processors) {
+    public static Attaching fb(Framework.PreProcessor... processors) {
         return new Attaching(null, Arrays.asList(processors));
     }
 
