@@ -58,14 +58,13 @@ public class FrameworkUtils {
         if (inputMode == Framework.InputMode.SINGLE)
             return isEmptyStr(data.get(name));
         else {
-            String prefix1 = name + ".";
-            String prefix2 = name + "[";
+            String prefix1 = isEmptyStr(name) ? "" : name + ".";
+            String prefix2 = isEmptyStr(name) ? "" : name + "[";
             long subInputCount = data.keySet().stream()
                     .filter(k -> k.startsWith(prefix1) || k.startsWith(prefix2))
                     .count();
-            return inputMode == Framework.InputMode.POLYMORPHIC
-                    ? isEmptyStr(data.get(name)) && subInputCount == 0
-                    : subInputCount == 0;
+            return inputMode == Framework.InputMode.MULTIPLE ? subInputCount == 0
+                    : isEmptyStr(data.get(name)) && subInputCount == 0;
         }
     }
 
@@ -237,7 +236,8 @@ public class FrameworkUtils {
         } else if (json.isObject()) {
             Map<String, String> result = new HashMap<>();
             json.fields().forEachRemaining(e -> {
-                result.putAll(json2map(prefix + "." + e.getKey(), e.getValue()));
+                String newPrefix = isEmptyStr(prefix) ? e.getKey() : prefix + "." + e.getKey();
+                result.putAll(json2map(newPrefix, e.getValue()));
             });
             return result;
         } else {

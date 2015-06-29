@@ -1,9 +1,6 @@
 package com.github.tminglei.bind;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.github.tminglei.bind.FrameworkUtils.*;
 
@@ -39,6 +36,9 @@ public class Simple extends Framework {
         return mapping2;
     }
 
+    /**
+     * used to bind a field name to a mapping w/ or w/o constraints/pre-processors
+     */
     public static class Binding {
         private String name;
         private List<Framework.Constraint> constraints
@@ -50,20 +50,39 @@ public class Simple extends Framework {
             this.name = name;
         }
 
+        /**
+         * mix in some constraints
+         * @param constraints
+         * @return
+         */
         public Binding then(Framework.Constraint... constraints) {
             this.constraints.addAll(Arrays.asList(constraints));
             return this;
         }
+
+        /**
+         * pipe in some pre-processors
+         * @param processors
+         * @return
+         */
         public Binding pipe(Framework.PreProcessor... processors) {
             this.processors.addAll(Arrays.asList(processors));
             return this;
         }
 
+        /**
+         * bind to target mapping
+         * @param mapping
+         * @return
+         */
         public Map.Entry<String, Framework.Mapping<?>> to(Framework.Mapping<?> mapping) {
             return entry(name, attach(mapping, constraints, processors));
         }
     }
 
+    /**
+     * used to attach constraints/pre-processors to a mapping
+     */
     public static class Attaching {
         private List<Framework.Constraint> constraints
                 = new ArrayList<>();
@@ -75,15 +94,32 @@ public class Simple extends Framework {
             this.processors = processors != null ? processors : new ArrayList<>();
         }
 
+        /**
+         * mix in some constraints
+         * @param constraints
+         * @return
+         */
         public Attaching then(Framework.Constraint... constraints) {
             this.constraints.addAll(Arrays.asList(constraints));
             return this;
         }
+
+        /**
+         * pipe in some pre-processors
+         * @param processors
+         * @return
+         */
         public Attaching pipe(Framework.PreProcessor... processors) {
             this.processors.addAll(Arrays.asList(processors));
             return this;
         }
 
+        /**
+         * attach to target mapping
+         * @param mapping
+         * @param <T>
+         * @return
+         */
         public <T> Framework.Mapping<T> to(Framework.Mapping<T> mapping) {
             return attach(mapping, constraints, processors);
         }

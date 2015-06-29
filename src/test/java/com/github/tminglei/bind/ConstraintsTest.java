@@ -30,9 +30,9 @@ public class ConstraintsTest {
 
         assertEquals(required.apply("", mmap(entry("", null)), dummyMessages, new Options()._inputMode(InputMode.SINGLE)),
                 Arrays.asList(entry("", "dummy")));
-        assertEquals(required.apply("", mmap(entry("", "")), dummyMessages, new Options()._label("")),
+        assertEquals(required.apply("", mmap(entry("", "")), dummyMessages, new Options()._label("")._inputMode(InputMode.SINGLE)),
                 Arrays.asList(entry("", "dummy")));
-        assertEquals(required.apply("", mmap(entry("", "test")), dummyMessages, new Options()._label("")),
+        assertEquals(required.apply("", mmap(entry("", "test")), dummyMessages, new Options()._label("")._inputMode(InputMode.SINGLE)),
                 Collections.EMPTY_LIST);
     }
 
@@ -76,11 +76,11 @@ public class ConstraintsTest {
 
         Constraint maxlength = Constraints.maxlength(10);
 
-        assertEquals(maxlength.apply("", mmap(entry("", "wetyyuu")), dummyMessages, new Options()._label("")),
+        assertEquals(maxlength.apply("", mmap(entry("", "wetyyuu")), dummyMessages, new Options()._label("")._inputMode(InputMode.SINGLE)),
                 Collections.EMPTY_LIST);
-        assertEquals(maxlength.apply("", mmap(entry("", "wetyettyiiie")), dummyMessages, new Options()._label("")),
+        assertEquals(maxlength.apply("", mmap(entry("", "wetyettyiiie")), dummyMessages, new Options()._label("")._inputMode(InputMode.SINGLE)),
                 Arrays.asList(entry("", "dummy")));
-        assertEquals(maxlength.apply("", mmap(entry("", "tuewerri97")), dummyMessages, new Options()._label("")),
+        assertEquals(maxlength.apply("", mmap(entry("", "tuewerri97")), dummyMessages, new Options()._label("")._inputMode(InputMode.SINGLE)),
                 Collections.EMPTY_LIST);
     }
 
@@ -90,7 +90,7 @@ public class ConstraintsTest {
 
         Constraint maxlength = Constraints.maxlength(10, "'%s': length > %d");
 
-        assertEquals(maxlength.apply("", mmap(entry("", "eewryuooerjhy")), dummyMessages, new Options()._label("haha")),
+        assertEquals(maxlength.apply("", mmap(entry("", "eewryuooerjhy")), dummyMessages, new Options()._label("haha")._inputMode(InputMode.SINGLE)),
                 Arrays.asList(entry("", "'eewryuooerjhy': length > 10")));
     }
 
@@ -102,11 +102,11 @@ public class ConstraintsTest {
 
         Constraint minlength = Constraints.minlength(3);
 
-        assertEquals(minlength.apply("", mmap(entry("", "er")), dummyMessages, new Options()._label("")),
+        assertEquals(minlength.apply("", mmap(entry("", "er")), dummyMessages, new Options()._label("")._inputMode(InputMode.SINGLE)),
                 Arrays.asList(entry("", "dummy")));
-        assertEquals(minlength.apply("", mmap(entry("", "ert6")), dummyMessages, new Options()._label("")),
+        assertEquals(minlength.apply("", mmap(entry("", "ert6")), dummyMessages, new Options()._label("")._inputMode(InputMode.SINGLE)),
                 Collections.EMPTY_LIST);
-        assertEquals(minlength.apply("", mmap(entry("", "tee")), dummyMessages, new Options()._label("")),
+        assertEquals(minlength.apply("", mmap(entry("", "tee")), dummyMessages, new Options()._label("")._inputMode(InputMode.SINGLE)),
                 Collections.EMPTY_LIST);
     }
 
@@ -116,7 +116,7 @@ public class ConstraintsTest {
 
         Constraint minlength = Constraints.minlength(3, "'%s': length cannot < %d");
 
-        assertEquals(minlength.apply("", mmap(entry("", "te")), dummyMessages, new Options()._label("haha")),
+        assertEquals(minlength.apply("", mmap(entry("", "te")), dummyMessages, new Options()._label("haha")._inputMode(InputMode.SINGLE)),
                 Arrays.asList(entry("", "'te': length cannot < 3")));
     }
 
@@ -128,11 +128,11 @@ public class ConstraintsTest {
 
         Constraint length = Constraints.length(9);
 
-        assertEquals(length.apply("", mmap(entry("", "123456789")), dummyMessages, new Options()._label("")),
+        assertEquals(length.apply("", mmap(entry("", "123456789")), dummyMessages, new Options()._label("")._inputMode(InputMode.SINGLE)),
                 Collections.EMPTY_LIST);
-        assertEquals(length.apply("", mmap(entry("", "123")), dummyMessages, new Options()._label("")),
+        assertEquals(length.apply("", mmap(entry("", "123")), dummyMessages, new Options()._label("")._inputMode(InputMode.SINGLE)),
                 Arrays.asList(entry("", "dummy")));
-        assertEquals(length.apply("", mmap(entry("", "1234567890")), dummyMessages, new Options()._label("")),
+        assertEquals(length.apply("", mmap(entry("", "1234567890")), dummyMessages, new Options()._label("")._inputMode(InputMode.SINGLE)),
                 Arrays.asList(entry("", "dummy")));
     }
 
@@ -142,7 +142,7 @@ public class ConstraintsTest {
 
         Constraint length = Constraints.length(9, "'%s': length not equals to %d");
 
-        assertEquals(length.apply("", mmap(entry("", "123")), dummyMessages, new Options()._label("haha")),
+        assertEquals(length.apply("", mmap(entry("", "123")), dummyMessages, new Options()._label("haha")._inputMode(InputMode.SINGLE)),
                 Arrays.asList(entry("", "'123': length not equals to 9")));
     }
 
@@ -154,11 +154,11 @@ public class ConstraintsTest {
 
         Constraint oneof = Constraints.oneOf(Arrays.asList("a", "b", "c"));
 
-        assertEquals(oneof.apply("", mmap(entry("", "a")), dummyMessages, new Options()._label("")),
+        assertEquals(oneof.apply("", mmap(entry("", "a")), dummyMessages, new Options()._label("")._inputMode(InputMode.SINGLE)),
                 Collections.EMPTY_LIST);
-        assertEquals(oneof.apply("", mmap(entry("", "t")), dummyMessages, new Options()._label("")),
+        assertEquals(oneof.apply("", mmap(entry("", "t")), dummyMessages, new Options()._label("")._inputMode(InputMode.SINGLE)),
                 Arrays.asList(entry("", "dummy")));
-        assertEquals(oneof.apply("", mmap(entry("", null)), dummyMessages, new Options()._label("")),
+        assertEquals(oneof.apply("", mmap(entry("", null)), dummyMessages, new Options()._label("")._inputMode(InputMode.SINGLE)),
                 Arrays.asList(entry("", "dummy")));
     }
 
@@ -168,7 +168,7 @@ public class ConstraintsTest {
 
         Constraint oneof = Constraints.oneOf(Arrays.asList("a", "b", "c"), "'%s': is not one of %s");
 
-        assertEquals(oneof.apply("t.a", mmap(entry("t.a", "ts")), dummyMessages, new Options()._label("haha")),
+        assertEquals(oneof.apply("t.a", mmap(entry("t.a", "ts")), dummyMessages, new Options()._label("haha")._inputMode(InputMode.SINGLE)),
                 Arrays.asList(entry("t.a", "'ts': is not one of [a, b, c]")));
     }
 
@@ -180,11 +180,11 @@ public class ConstraintsTest {
 
         Constraint pattern = Constraints.pattern("^(\\d+)$");
 
-        assertEquals(pattern.apply("", mmap(entry("", "1234657")), dummyMessages, new Options()._label("")),
+        assertEquals(pattern.apply("", mmap(entry("", "1234657")), dummyMessages, new Options()._label("")._inputMode(InputMode.SINGLE)),
                 Collections.EMPTY_LIST);
-        assertEquals(pattern.apply("", mmap(entry("", "32566y")), dummyMessages, new Options()._label("")),
+        assertEquals(pattern.apply("", mmap(entry("", "32566y")), dummyMessages, new Options()._label("")._inputMode(InputMode.SINGLE)),
                 Arrays.asList(entry("", "dummy")));
-        assertEquals(pattern.apply("", mmap(entry("", "123,567")), dummyMessages, new Options()._label("")),
+        assertEquals(pattern.apply("", mmap(entry("", "123,567")), dummyMessages, new Options()._label("")._inputMode(InputMode.SINGLE)),
                 Arrays.asList(entry("", "dummy")));
     }
 
@@ -194,7 +194,7 @@ public class ConstraintsTest {
 
         Constraint pattern = Constraints.pattern("^(\\d+)$", "'%s' not match '%s'");
 
-        assertEquals(pattern.apply("", mmap(entry("", "t4366")), dummyMessages, new Options()._label("haha")),
+        assertEquals(pattern.apply("", mmap(entry("", "t4366")), dummyMessages, new Options()._label("haha")._inputMode(InputMode.SINGLE)),
                 Arrays.asList(entry("", "'t4366' not match '^(\\d+)$'")));
     }
 
@@ -206,9 +206,9 @@ public class ConstraintsTest {
 
         Constraint patternNot = Constraints.patternNot(".*\\[(\\d*[^\\d\\[\\]]+\\d*)+\\].*");
 
-        assertEquals(patternNot.apply("", mmap(entry("", "eree.[1234657].eee")), dummyMessages, new Options()._label("")),
+        assertEquals(patternNot.apply("", mmap(entry("", "eree.[1234657].eee")), dummyMessages, new Options()._label("")._inputMode(InputMode.SINGLE)),
                 Collections.EMPTY_LIST);
-        assertEquals(patternNot.apply("", mmap(entry("", "errr.[32566y].ereee")), dummyMessages, new Options()._label("")),
+        assertEquals(patternNot.apply("", mmap(entry("", "errr.[32566y].ereee")), dummyMessages, new Options()._label("")._inputMode(InputMode.SINGLE)),
                 Arrays.asList(entry("", "dummy")));
     }
 
@@ -218,7 +218,7 @@ public class ConstraintsTest {
 
         Constraint patternNot = Constraints.pattern("^(\\d+)$", "'%s' contains illegal array index");
 
-        assertEquals(patternNot.apply("", mmap(entry("", "ewtr.[t4366].eweee")), dummyMessages, new Options()._label("haha")),
+        assertEquals(patternNot.apply("", mmap(entry("", "ewtr.[t4366].eweee")), dummyMessages, new Options()._label("haha")._inputMode(InputMode.SINGLE)),
                 Arrays.asList(entry("", "'ewtr.[t4366].eweee' contains illegal array index")));
     }
 
@@ -249,7 +249,7 @@ public class ConstraintsTest {
                 //        "甲斐@黒川.日本",  //Japanese Characters
                 //        "чебурашка@ящик-с-апельсинами.рф"  //Cyrillic Characters
         ).stream().forEach(emailAddr -> {
-            assertEquals(email.apply("", mmap(entry("", emailAddr)), dummyMessages, new Options()._label("")),
+            assertEquals(email.apply("", mmap(entry("", emailAddr)), dummyMessages, new Options()._label("")._inputMode(InputMode.SINGLE)),
                     Collections.EMPTY_LIST);
         });
     }
@@ -270,7 +270,7 @@ public class ConstraintsTest {
                 "john..doe@example.com", //(double dot before @)
                 "john.doe@example..com" //(double dot after @)
         ).stream().forEach(emailAddr -> {
-            assertEquals(email.apply("", mmap(entry("", emailAddr)), dummyMessages, new Options()._label("")),
+            assertEquals(email.apply("", mmap(entry("", emailAddr)), dummyMessages, new Options()._label("")._inputMode(InputMode.SINGLE)),
                     Arrays.asList(entry("", "'" + emailAddr + "' not valid")));
         });
     }

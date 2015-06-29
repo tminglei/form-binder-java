@@ -5,6 +5,7 @@ import org.testng.annotations.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.testng.Assert.*;
@@ -160,6 +161,127 @@ public class PreProcessorsTest {
     @Test
     public void testOmitMatched_SingleInput() {
         System.out.println(green(">> omit matched - single input"));
+
+        PreProcessor omitMatched = Processors.omitMatched("-\\d\\d$");
+
+        assertEquals(omitMatched.apply("", mmap(entry("", null)), Options.EMPTY),
+                mmap(entry("", "")));
+        assertEquals(omitMatched.apply("", mmap(entry("", "2342-334-12")), Options.EMPTY),
+                mmap(entry("", "2342-334")));
+        assertEquals(omitMatched.apply("a", mmap(entry("a", "2342-334")), Options.EMPTY),
+                mmap(entry("", "2342-334")));
+    }
+
+    @Test
+    public void testOmitMatched_MultiInput() {
+        System.out.println(green(">> omit matched - multiple input"));
+
+        PreProcessor omitMatched = Processors.omitMatched("-\\d\\d$");
+
+        assertEquals(omitMatched.apply("", mmap(entry("", "2342-334-12"), entry("a", "2342-334-13")), Options.EMPTY),
+                mmap(entry("", "2342-334"), entry("", "2342-334")));
+        assertEquals(omitMatched.apply("a", mmap(entry("", "2342-334-12"), entry("a", "2342-334")), Options.EMPTY),
+                mmap(entry("", "2342-334-12"), entry("a", "2342-334")));
+    }
+
+    // replace-matched test
+
+    @Test
+    public void testReplaceMatched_SingleInput() {
+        System.out.println(green(">> replace matched - single input"));
+
+        PreProcessor replaceMatched = Processors.replaceMatched("-\\d\\d$", "-1");
+
+        assertEquals(replaceMatched.apply("", mmap(entry("", null)), Options.EMPTY),
+                mmap(entry("", "")));
+        assertEquals(replaceMatched.apply("", mmap(entry("", "2342-334-12")), Options.EMPTY),
+                mmap(entry("", "2342-334-1")));
+        assertEquals(replaceMatched.apply("a", mmap(entry("a", "2342-334")), Options.EMPTY),
+                mmap(entry("a", "2342-334")));
+    }
+
+    @Test
+    public void testReplaceMatched_MultiInput() {
+        System.out.println(green(">> replace matched - multiple input"));
+
+        PreProcessor replaceMatched = Processors.replaceMatched("-\\d\\d$", "-1");
+
+        assertEquals(replaceMatched.apply("", mmap(entry("", "2342-334-12"), entry("a", "2342-334-13")), Options.EMPTY),
+                mmap(entry("", "2342-334-1"), entry("", "2342-334-1")));
+        assertEquals(replaceMatched.apply("a", mmap(entry("", "2342-334-12"), entry("a", "2342-334")), Options.EMPTY),
+                mmap(entry("", "2342-334-12"), entry("a", "2342-334-1")));
+    }
+
+    // expand json test
+
+    @Test
+    public void testExpandJson_DirectUse() {
+        System.out.println(green(">> expand json - direct use"));
+
+        PreProcessor expandJson = Processors.expandJson();
+
+        Map<String, String> rawData = mmap(
+                entry("aa", "wett"),
+                entry("json", "{\"id\":123, \"name\":\"tewd\", \"dr-1\":[33,45]}")
+        );
+        Map<String, String> expected = mmap(
+                entry("aa", "wett"),
+                entry("json.id", "123"),
+                entry("json.name", "tewd"),
+                entry("json.dr-1[0]", "33"),
+                entry("json.dr-1[1]", "45")
+        );
+
+        assertEquals(expandJson.apply("json", rawData, Options.EMPTY),
+                expected);
+    }
+
+    @Test
+    public void testExpandJson_NullOrEmpty() {
+        System.out.println(green(">> expand json - null or empty"));
+
+        PreProcessor expandJson = Processors.expandJson();
+
+        Map<String, String> nullData = mmap(entry("aa", "wett"));
+        assertEquals(expandJson.apply("json", nullData, Options.EMPTY),
+                nullData);
+
+        Map<String, String> nullData1 = mmap(entry("aa", "wett"), entry("json", null));
+        assertEquals(expandJson.apply("json", nullData1, Options.EMPTY),
+                mmap(entry("aa", "wett")));
+
+        Map<String, String> emptyData1 = mmap(entry("aa", "wett"), entry("json", ""));
+        assertEquals(expandJson.apply("json", emptyData1, Options.EMPTY),
+                mmap(entry("aa", "wett")));
+    }
+
+    @Test
+    public void testExpandJson_WithPrefix() {
+        System.out.println(green(">> expand json - with prefix"));
+
+        PreProcessor expandJson = Processors.expandJson("json");
+
+        Map<String, String> rawData = mmap(
+                entry("aa", "wett"),
+                entry("json", "{\"id\":123, \"name\":\"tewd\", \"dr-1\":[33,45]}")
+        );
+        Map<String, String> expected = mmap(
+                entry("aa", "wett"),
+                entry("json.id", "123"),
+                entry("json.name", "tewd"),
+                entry("json.dr-1[0]", "33"),
+                entry("json.dr-1[1]", "45")
+        );
+
+        assertEquals(expandJson.apply("", rawData, Options.EMPTY),
+                expected);
+    }
+
+    // expand json keys test
+
+    @Test
+    public void testExpandJsonKeys_DirectUse() {
+        System.out.println(green(">> expand json keys - direct use"));
     }
 
 }

@@ -15,7 +15,7 @@ public class Options {
     private Boolean ignoreEmpty;
     private Framework.TouchedChecker touched;
     // internal options, only applied to current mapping
-    private Framework.InputMode _inputMode = Framework.InputMode.SINGLE;
+    private Framework.InputMode _inputMode;
     private String  _label = null;
     private boolean _ignoreConstraints = false;
     private List<Framework.Constraint> _constraints = Collections.EMPTY_LIST;

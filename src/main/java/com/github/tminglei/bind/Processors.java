@@ -84,24 +84,29 @@ public class Processors {
     public static Framework.PreProcessor expandJson(String prefix) {
         return ((prefix1, data, options) -> {
             String thePrefix = prefix == null ? prefix1 : prefix;
+            String jsonStr  = data.get(thePrefix);
             try {
-                JsonNode json = new ObjectMapper().readTree(data.get(thePrefix));
+                JsonNode json = new ObjectMapper().readTree(jsonStr);
 
                 Map<String, String> newData = new HashMap<>(data);
                 newData.remove(thePrefix); // remove old one to avoid disturbing other processing
                 newData.putAll(json2map(thePrefix, json));
                 return newData;
             } catch (IOException e) {
-                throw new IllegalArgumentException("Illegal json string at: " + thePrefix, e);
+                throw new IllegalArgumentException("Illegal json string at: " + thePrefix + " - \n" + jsonStr, e);
             }
         });
     }
 
+    public static Framework.PreProcessor expandJsonKeys() {
+        return expandJsonKeys(null);
+    }
     public static Framework.PreProcessor expandJsonKeys(String prefix) {
         return ((prefix1, data, options) -> {
             String thePrefix = prefix == null ? prefix1 : prefix;
+            String jsonStr  = data.get(thePrefix);
             try {
-                JsonNode json = new ObjectMapper().readTree(data.get(thePrefix));
+                JsonNode json = new ObjectMapper().readTree(jsonStr);
                 if (!json.isArray() || (json.size() > 0 && json.get(0).isTextual())) {
                     throw new IllegalArgumentException(thePrefix + " is NOT AN String ARRAY!");
                 }
@@ -113,7 +118,7 @@ public class Processors {
                 }
                 return newData;
             } catch (IOException e) {
-                throw new IllegalArgumentException("Illegal json string at: " + thePrefix, e);
+                throw new IllegalArgumentException("Illegal json string at " + thePrefix + " - \n" + jsonStr, e);
             }
         });
     }

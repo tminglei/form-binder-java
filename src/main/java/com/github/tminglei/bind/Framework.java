@@ -15,27 +15,27 @@ import static com.github.tminglei.bind.FrameworkUtils.*;
  */
 public class Framework {
     @FunctionalInterface
-    interface Messages {
+    public interface Messages {
         String get(String key);
     }
     @FunctionalInterface
-    interface PreProcessor {
+    public interface PreProcessor {
         Map<String, String> apply(String prefix, Map<String, String> data, Options options);
     }
     @FunctionalInterface
-    interface Constraint {
+    public interface Constraint {
         List<Map.Entry<String, String>> apply(String name, Map<String, String> data, Messages messages, Options options);
     }
     @FunctionalInterface
-    interface ExtraConstraint<T> {
+    public interface ExtraConstraint<T> {
         List<String> apply(String label, T vObject, Messages messages);
     }
     @FunctionalInterface
-    interface SimpleConstraint {
+    public interface SimpleConstraint {
         String apply(String label, String vString, Messages messages);
     }
     @FunctionalInterface
-    interface TouchedChecker {
+    public interface TouchedChecker {
         boolean apply(String prefix, Map<String, String> data);
     }
     ///
@@ -49,7 +49,7 @@ public class Framework {
      */
     public interface Mapping<T> {
         Options options();
-        Mapping options(Function<Options, Options> setting);
+        Mapping<T> options(Function<Options, Options> setting);
 
         default Mapping<T> label(String label) {
             return options(o -> o._label(label));
