@@ -11,6 +11,7 @@ import static org.testng.Assert.*;
 import static com.github.tminglei.bind.Simple.*;
 import static com.github.tminglei.bind.Mappings.*;
 import static com.github.tminglei.bind.Constraints.*;
+import static com.github.tminglei.bind.Processors.*;
 import static com.github.tminglei.bind.FrameworkUtils.*;
 import static com.github.tminglei.bind.Utils.*;
 
@@ -36,6 +37,10 @@ public class GroupMappingsTest {
                 if (price * count > 1000) return Arrays.asList("total cost too much!");
                 else return Collections.EMPTY_LIST;
             });
+    private Mapping<BindObject> mappingx = mapping(
+            fb("email").to(text(maxlength(20, "%s: length > %s"), email("%s: invalid email"), required("%s is required"))),
+            fb("count").to(vInt().verifying(max(10, "%s > %s"), max(15, "%s > %s")))
+        );
 
     @BeforeClass
     public void start() {
@@ -165,5 +170,58 @@ public class GroupMappingsTest {
     }
 
     // group mapping with options test
+
+    @Test
+    public void testGroupMapping_WithEagerCheck() {
+        System.out.println(green(">> group mapping - with eager check"));
+
+        Mapping<BindObject> mapping = mappingx.options(o -> o.eagerCheck(true));
+        Map<String, String> data = mmap(
+                entry("email", "etttt.att#example-1111111.com"),
+                entry("count", "20")
+            );
+
+        assertEquals(mapping.validate("", data, dummyMessages, Options.EMPTY),
+                Arrays.asList(
+                    entry("email", "etttt.att#example-1111111.com: length > 20"),
+                    entry("email", "etttt.att#example-1111111.com: invalid email"),
+                    entry("count", "count > 10"),
+                    entry("count", "count > 15")
+                ));
+    }
+
+    @Test
+    public void testGroupMapping_WithIgnoreEmpty() {
+        System.out.println(green(">> group mapping - with ignore empty"));
+
+        Map<String, String> nullData = mmap();
+        Map<String, String> emptyData = mmap(entry("count", ""));
+
+        assertEquals(mappingx.validate("", nullData, dummyMessages, Options.EMPTY),
+                Collections.EMPTY_LIST);
+        assertEquals(mappingx.options(o -> o.ignoreEmpty(true))
+                        .validate("", nullData, dummyMessages, Options.EMPTY),
+                Collections.EMPTY_LIST);
+
+        assertEquals(mappingx.validate("", emptyData, dummyMessages, Options.EMPTY),
+                Arrays.asList(entry("email", "email is required")));
+        assertEquals(mappingx.options(o -> o.ignoreEmpty(true))
+                        .validate("", emptyData, dummyMessages, Options.EMPTY),
+                Collections.EMPTY_LIST);
+    }
+
+    @Test
+    public void testGroupMapping_WithIgnoreEmptyAndTouched() {
+        System.out.println(green(">> group mapping - with ignore empty and touched"));
+
+        Mapping<BindObject> mapping = mappingx.options(o -> o.ignoreEmpty(true));
+        Map<String, String> data = mmap(entry("count", ""));
+
+        assertEquals(mapping.validate("", data, dummyMessages, Options.EMPTY),
+                Collections.EMPTY_LIST);
+        assertEquals(mapping.validate("", data, dummyMessages, Options.EMPTY
+                        .touched(listTouched(Arrays.asList("email")))),
+                Arrays.asList(entry("email", "email is required")));
+    }
 
 }
