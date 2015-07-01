@@ -155,7 +155,8 @@ public class FrameworkUtils {
             Framework.ExtraConstraint<T> currValidator = remainingValidators.get(0);
             List<Framework.ExtraConstraint<T>> newRemainingValidators = remainingValidators.subList(1, remainingValidators.size());
 
-            List<Map.Entry<String, String>> errors = currValidator.apply(getLabel(name, messages, options), vObj, messages)
+            String label = getLabel(name, messages, options);
+            List<Map.Entry<String, String>> errors = currValidator.apply(label, vObj, messages)
                     .stream().map(msg -> entry(name, msg))
                     .collect(Collectors.toList());
             List<Map.Entry<String, String>> errors1 = errors.isEmpty() || options.eagerCheck().orElse(false)

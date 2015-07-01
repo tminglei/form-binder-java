@@ -34,7 +34,7 @@ public class Options {
         clone.i18n = i18n != null ? i18n : parent.i18n;
         clone.eagerCheck = eagerCheck != null ? eagerCheck : parent.eagerCheck;
         clone.ignoreEmpty = ignoreEmpty != null ? ignoreEmpty : parent.ignoreEmpty;
-        clone.touched = parent.touched;
+        clone.touched = touched != null ? touched : parent.touched;
         return clone;
     }
 

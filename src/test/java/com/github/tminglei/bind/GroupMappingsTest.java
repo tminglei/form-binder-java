@@ -77,7 +77,7 @@ public class GroupMappingsTest {
         Map<String, String> data = mmap(entry("count", "15"));
 
         assertEquals(mapping1.validate("", data, dummyMessages, Options.EMPTY),
-                Arrays.asList(entry("xx", "count cannot greater then 10")));
+                Arrays.asList(entry("", "count cannot greater then 10")));
     }
 
     @Test
@@ -98,7 +98,7 @@ public class GroupMappingsTest {
         Map<String, String> data = mmap(entry("", ""));
 
         assertEquals(mapping1.validate("", data, dummyMessages, Options.EMPTY),
-                Arrays.asList(entry("xx", "count cannot less than 3")));
+                Arrays.asList(entry("", "count cannot less than 3")));
         assertEquals(mapping1.convert("", data).get("count"), Integer.valueOf(0));
     }
 
@@ -143,7 +143,7 @@ public class GroupMappingsTest {
         Map<String, String> data = mmap(entry("price", "123.5f"), entry("count", "9"));
 
         assertEquals(mapping2.validate("", data, dummyMessages, Options.EMPTY),
-                Arrays.asList(entry("xx", "total cost too much!")));
+                Arrays.asList(entry("", "total cost too much!")));
     }
 
     @Test

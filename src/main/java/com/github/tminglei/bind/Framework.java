@@ -1,5 +1,8 @@
 package com.github.tminglei.bind;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -75,6 +78,8 @@ public class Framework {
         public final BiFunction<String, Map<String, String>, T> doConvert;
         public final Constraint doValidate;
 
+        private final Logger log = LoggerFactory.getLogger(MappingWrapper.class);
+
         MappingWrapper(Mapping<T> base) {
             this(base, null, null);
         }
@@ -102,6 +107,8 @@ public class Framework {
 
         @Override
         public T convert(String name, Map<String, String> data) {
+            log.debug("converting with {} for {}", (doConvert == null ? "base.convert(..)" : "doConvert(..)"), name);
+
             if (doConvert == null) return base.convert(name, data);
             else {
                 Map<String, String> newData = processDataRec(name, data, options(), options()._processors());
@@ -112,6 +119,8 @@ public class Framework {
         @Override
         public List<Map.Entry<String, String>> validate(String name, Map<String, String> data,
                                                 Messages messages, Options parentOptions) {
+            log.debug("validation with {} for {}", (doValidate == null ? "base.validate(..)" : "doValidate(..)"), name);
+
             Options theOptions = options().merge(parentOptions);
             if (doValidate == null) return base.validate(name, data, messages, theOptions);
             else {
@@ -129,6 +138,8 @@ public class Framework {
         private final Constraint moreValidate;
         private final List<ExtraConstraint<T>> extraConstraints;
         private final BiFunction<String, Map<String, String>, T> doConvert;
+
+        private final Logger log = LoggerFactory.getLogger(FieldMapping.class);
 
         FieldMapping(InputMode inputMode, BiFunction<String, Map<String, String>, T> doConvert) {
             this(inputMode, doConvert, FrameworkUtils.PassValidating, Collections.EMPTY_LIST, Options.EMPTY);
@@ -173,6 +184,8 @@ public class Framework {
 
         @Override
         public T convert(String name, Map<String, String> data) {
+            log.debug("converting for {}", name);
+
             Map<String, String> newData = processDataRec(name, data, options(), options()._processors());
             return doConvert.apply(name, newData);
         }
@@ -180,12 +193,14 @@ public class Framework {
         @Override
         public List<Map.Entry<String, String>> validate(String name, Map<String, String> data,
                                                 Messages messages, Options parentOptions) {
+            log.debug("validating for {}", name);
+
             Options theOptions = options().merge(parentOptions);
             Map<String, String> newData = processDataRec(name, data, theOptions, theOptions._processors());
 
-            if (theOptions.ignoreEmpty().orElse(false)
-                    && (theOptions.touched() == null || !theOptions.touched().apply(name, newData))
-                    && isEmptyInput(name, newData, theOptions._inputMode())) {
+            if (isEmptyInput(name, newData, theOptions._inputMode())
+                    && theOptions.ignoreEmpty().orElse(false)
+                    && (theOptions.touched() == null || !theOptions.touched().apply(name, newData))) {
                 return Collections.EMPTY_LIST;
             }
             else {
@@ -194,8 +209,7 @@ public class Framework {
                 if (errors.isEmpty()) {
                     T vObj = doConvert.apply(name, newData);
                     if (vObj != null) {
-                        String label = getLabel(name, messages, theOptions);
-                        return extraValidateRec(label, vObj, messages, theOptions, extraConstraints);
+                        return extraValidateRec(name, vObj, messages, theOptions, extraConstraints);
                     }
                 }
                 return errors;
@@ -210,6 +224,8 @@ public class Framework {
         private final Options options;
         private final List<Map.Entry<String, Mapping<?>>> fields;
         private final List<ExtraConstraint<BindObject>> extraConstraints;
+
+        private final Logger log = LoggerFactory.getLogger(GroupMapping.class);
 
         GroupMapping(List<Map.Entry<String, Mapping<?>>> fields) {
             this(fields, Collections.EMPTY_LIST, Options.EMPTY);
@@ -245,6 +261,8 @@ public class Framework {
 
         @Override
         public BindObject convert(String name, Map<String, String> data) {
+            log.debug("converting for {}", name);
+
             Map<String, String> newData = processDataRec(name, data, options, options._processors());
             return isEmptyInput(name, newData, options._inputMode()) ? null
                     : doConvert(name, newData);
@@ -255,7 +273,7 @@ public class Framework {
             for(Map.Entry<String, Mapping<?>> field : fields) {
                 String fullName = isEmptyStr(name) ? field.getKey() : name + "." + field.getKey();
                 Object value = field.getValue().convert(fullName, data);
-                values.put(fullName, value);
+                values.put(field.getKey(), value);
             }
             return new BindObject(values);
         }
@@ -263,12 +281,14 @@ public class Framework {
         @Override
         public List<Map.Entry<String, String>> validate(String name, Map<String, String> data,
                                                 Messages messages, Options parentOptions) {
+            log.debug("validating for {}", name);
+
             Options theOptions = options().merge(parentOptions);
             Map<String, String> newData = processDataRec(name, data, theOptions, theOptions._processors());
 
-            if (theOptions.ignoreEmpty().orElse(false)
-                    && (theOptions.touched() == null || !theOptions.touched().apply(name, newData))
-                    && isEmptyInput(name, newData, theOptions._inputMode())) {
+            if (isEmptyInput(name, newData, theOptions._inputMode())
+                    && theOptions.ignoreEmpty().orElse(false)
+                    && (theOptions.touched() == null || !theOptions.touched().apply(name, newData))) {
                 return Collections.EMPTY_LIST;
             }
             else {
@@ -290,8 +310,7 @@ public class Framework {
                     else {
                         BindObject vObj = doConvert(name, newData);
                         if (vObj != null) {
-                            String label = getLabel(name, messages, theOptions);
-                            return extraValidateRec(label, vObj, messages, theOptions, extraConstraints);
+                            return extraValidateRec(name, vObj, messages, theOptions, extraConstraints);
                         }
                     }
                 }
