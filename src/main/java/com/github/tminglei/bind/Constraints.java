@@ -21,10 +21,27 @@ public class Constraints {
     public static Framework.Constraint required(String message) {
         return (name, data, messages, options) -> {
             if (isEmptyInput(name, data, options._inputMode())) {
-                String msgTemplate = message != null ? message : messages.get("error.required");
-                String label = getLabel(name, messages, options);
+                String errMessage;
+                // wrong input, e.g. required single but found multiple, required multiple but found single
+                if (!isEmptyInput(name, data, Framework.InputMode.POLYMORPHIC)) {
+                    String msgTemplate = messages.get("error.wronginput");
+                    String simple = getLabel("simple", messages, options);
+                    String compound = getLabel("compound", messages, options);
+
+                    if (options._inputMode() == Framework.InputMode.SINGLE) {
+                        errMessage = String.format(msgTemplate, simple, compound);
+                    } else {
+                        errMessage = String.format(msgTemplate, compound, simple);
+                    }
+                } else {
+                    String msgTemplate = message != null ? message : messages.get("error.required");
+                    String label = getLabel(name, messages, options);
+
+                    errMessage = String.format(msgTemplate, label);
+                }
+
                 return Arrays.asList(
-                    entry(name, String.format(msgTemplate, label))
+                    entry(name, errMessage)
                 );
             } else return Collections.EMPTY_LIST;
         };
@@ -122,7 +139,7 @@ public class Constraints {
     public static Framework.Constraint patternNot(String pattern, String message) {
         return mkSimpleConstraint((label, vString, messages) -> {
             if (vString != null && vString.matches(pattern)) {
-                String msgTemplate = message != null ? message : messages.get("error.pattern");
+                String msgTemplate = message != null ? message : messages.get("error.patternnot");
                 return String.format(msgTemplate, vString, pattern);
             } else return null;
         });
