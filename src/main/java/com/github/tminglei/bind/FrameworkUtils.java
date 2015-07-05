@@ -1,7 +1,13 @@
 package com.github.tminglei.bind;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -13,7 +19,8 @@ import java.util.stream.Collectors;
  * utilities for framework internal usages
  */
 public class FrameworkUtils {
-    public static final String  NAME_ERR_PREFIX = "name: ";
+    private static final Logger logger = LoggerFactory.getLogger(FrameworkUtils.class);
+
     public static final Pattern PATTERN_ILLEGAL_INDEX = Pattern.compile(".*\\[(\\d*[^\\d\\[\\]]+\\d*)+\\].*");
     /** original from: http://howtodoinjava.com/2014/11/11/java-regex-validate-email-address/ */
     public static final String  PATTERN_EMAIL = "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
@@ -55,6 +62,8 @@ public class FrameworkUtils {
 
     public static boolean isEmptyInput(String name, Map<String, String> data,
                                        Framework.InputMode inputMode) {
+        logger.trace("checking empty input for {}", name);
+
         if (inputMode == Framework.InputMode.SINGLE)
             return isEmptyStr(data.get(name));
         else {
@@ -72,6 +81,8 @@ public class FrameworkUtils {
     static final Pattern ARR_ELEMENT_NAME = Pattern.compile("^(.*)\\[([\\d]+)\\]$");
     // return (parent, name, isArray:false) or (name, index, isArray:true)
     static String[] splitName(String name) {
+        logger.trace("splitting name for {}", name);
+
         Matcher m = ARR_ELEMENT_NAME.matcher(name);
         if (m.matches()) {
             return new String[]{ m.group(1), m.group(2), Boolean.TRUE.toString() };
@@ -84,13 +95,17 @@ public class FrameworkUtils {
 
     // find work object specified by name, create and attach it if not exists
     static Object workObject(Map<String, Object> workList, String name, boolean isArray) {
+        logger.trace("get working object for {}", name);
+
         if (workList.get(name) != null) return workList.get(name);
         else {
             String[] parts = splitName(name);   // parts: (parent, name, isArray)
             Map<String, Object> parentObj = (Map<String, Object>) workObject(workList, parts[0], false);
             Object theObj = isArray ? new ArrayList<String>() : new HashMap<String, Object>();
+
             parentObj.put(parts[1], theObj);
             workList.put(name, theObj);
+
             return theObj;
         }
     }
@@ -169,32 +184,38 @@ public class FrameworkUtils {
     // i18n on: use i18n label, if exists; else use label; else use last field name from full name
     // i18n off: use label; else use last field name from full name
     public static String getLabel(String fullname, Framework.Messages messages, Options options) {
+        logger.trace("getting label for {} with i18n:{}, _label:{}", fullname, options.i18n(), options._label());
+
         String[] parts = splitName(fullname);   // parts: (parent, name/index, isArray)
         boolean isArray = Boolean.parseBoolean(parts[2]);
         String defaultLabel = isArray
                 ? splitName(parts[0])[1] + "[" + parts[1] + "]"
                 : parts[1];
 
-        if (options.i18n().orElse(false)) {
-            return options._label()
+        String label = options.i18n().orElse(false)
+                ? options._label()
                     .flatMap(l -> Optional.ofNullable(messages.get(l)))
-                    .orElse(defaultLabel);
-        } else {
-            return options._label().orElse(defaultLabel);
-        }
+                    .orElse(defaultLabel)
+                : options._label().orElse(defaultLabel);
+
+        logger.trace("getting label - return {}", label);
+
+        return label;
     }
 
     // make a Constraint which will try to parse and collect errors
     public static <T> Framework.Constraint
             parsing(Function<String, T> parse, String messageKey, String pattern) {
         return mkSimpleConstraint(((label, vString, messages) -> {
+            logger.debug("parsing check for {}", vString);
+
             if (isEmptyStr(vString)) return null;
             else {
                 try {
                     parse.apply(vString);
                     return null;
                 } catch (Exception ex) {
-                    return String.format(messages.get(messageKey), label,
+                    return String.format(messages.get(messageKey), vString,
                             pattern == null ? "" : pattern);
                 }
             }
@@ -203,6 +224,8 @@ public class FrameworkUtils {
 
     // Computes the available indexes for the given key in this set of data.
     public static List<Integer> indexes(String name, Map<String, String> data) {
+        logger.debug("get indexes for {}", name);
+
         Pattern keyPattern = Pattern.compile("^" + Pattern.quote(name) + "\\[(\\d+)\\].*$");
         return data.keySet().stream()
                 .map(key -> {
@@ -210,12 +233,15 @@ public class FrameworkUtils {
                     return m.matches() ? Integer.parseInt(m.group(1))
                             : -1;
                 }).filter(i -> i >= 0)
+                .distinct()
                 .sorted()
                 .collect(Collectors.toList());
     }
 
     // Computes the available keys for the given prefix in this set of data.
     public static List<String> keys(String prefix, Map<String, String> data) {
+        logger.debug("get keys for {}", prefix);
+
         Pattern keyPattern = Pattern.compile("^" + Pattern.quote(prefix) + "\\.(\"?[^\\.\"]+\"?).*$");
         return data.keySet().stream()
                 .map(key -> {
@@ -223,11 +249,14 @@ public class FrameworkUtils {
                     return m.matches() ? m.group(1)
                             : null;
                 }).filter(k -> k != null)
+                .distinct()
                 .collect(Collectors.toList());
     }
 
     // Construct data map from inputting jackson json object
     public static Map<String, String> json2map(String prefix, JsonNode json) {
+        logger.trace("json to map - prefix: {}", prefix);
+
         if (json.isArray()) {
             Map<String, String> result = new HashMap<>();
             for(int i=0; i <json.size(); i++) {

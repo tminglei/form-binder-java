@@ -5,6 +5,7 @@ import org.testng.annotations.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
 import static org.testng.Assert.*;
@@ -13,7 +14,8 @@ import static com.github.tminglei.bind.FrameworkUtils.*;
 import static com.github.tminglei.bind.Utils.*;
 
 public class ConstraintsTest {
-    Messages dummyMessages = (key) -> "dummy";
+    private ResourceBundle bundle = ResourceBundle.getBundle("bind-messages");
+    private Messages messages = (key) -> bundle.getString(key);
 
     @BeforeClass
     public void start() {
@@ -28,11 +30,11 @@ public class ConstraintsTest {
 
         Constraint required = Constraints.required();
 
-        assertEquals(required.apply("", mmap(entry("", null)), dummyMessages, new Options()._inputMode(InputMode.SINGLE)),
-                Arrays.asList(entry("", "dummy")));
-        assertEquals(required.apply("", mmap(entry("", "")), dummyMessages, new Options()._label("")._inputMode(InputMode.SINGLE)),
-                Arrays.asList(entry("", "dummy")));
-        assertEquals(required.apply("", mmap(entry("", "test")), dummyMessages, new Options()._label("")._inputMode(InputMode.SINGLE)),
+        assertEquals(required.apply("", mmap(entry("", null)), messages, new Options()._inputMode(InputMode.SINGLE)),
+                Arrays.asList(entry("", "required simple value, but found compound value.")));
+        assertEquals(required.apply("", mmap(entry("", "")), messages, new Options()._inputMode(InputMode.SINGLE)),
+                Arrays.asList(entry("", "required simple value, but found compound value.")));
+        assertEquals(required.apply("", mmap(entry("", "test")), messages, new Options()._label("")._inputMode(InputMode.SINGLE)),
                 Collections.EMPTY_LIST);
     }
 
@@ -42,13 +44,13 @@ public class ConstraintsTest {
 
         Constraint required = Constraints.required("%s is required");
 
-        assertEquals(required.apply("tt", mmap(entry("tt.a", "tt")), dummyMessages, new Options()._label("haha")._inputMode(InputMode.MULTIPLE)),
+        assertEquals(required.apply("tt", mmap(entry("tt.a", "tt")), messages, new Options()._label("haha")._inputMode(InputMode.MULTIPLE)),
                 Collections.EMPTY_LIST);
-        assertEquals(required.apply("tt", mmap(entry("tt.a", null)), dummyMessages, new Options()._label("haha")._inputMode(InputMode.MULTIPLE)),
+        assertEquals(required.apply("tt", mmap(entry("tt.a", null)), messages, new Options()._label("haha")._inputMode(InputMode.MULTIPLE)),
                 Collections.EMPTY_LIST);
-        assertEquals(required.apply("tt", mmap(entry("tt", null)), dummyMessages, new Options()._inputMode(InputMode.MULTIPLE)),
+        assertEquals(required.apply("tt", mmap(entry("tt", null)), messages, new Options()._inputMode(InputMode.MULTIPLE)),
                 Arrays.asList(entry("tt", "tt is required")));
-        assertEquals(required.apply("tt", mmap(), dummyMessages, new Options()._inputMode(InputMode.MULTIPLE)),
+        assertEquals(required.apply("tt", mmap(), messages, new Options()._inputMode(InputMode.MULTIPLE)),
                 Arrays.asList(entry("tt", "tt is required")));
     }
 
@@ -58,13 +60,13 @@ public class ConstraintsTest {
 
         Constraint required = Constraints.required("%s is required");
 
-        assertEquals(required.apply("tt", mmap(entry("tt.a", "tt")), dummyMessages, new Options()._label("haha")._inputMode(InputMode.POLYMORPHIC)),
+        assertEquals(required.apply("tt", mmap(entry("tt.a", "tt")), messages, new Options()._label("haha")._inputMode(InputMode.POLYMORPHIC)),
                 Collections.EMPTY_LIST);
-        assertEquals(required.apply("tt", mmap(entry("tt.a", null)), dummyMessages, new Options()._label("haha")._inputMode(InputMode.POLYMORPHIC)),
+        assertEquals(required.apply("tt", mmap(entry("tt.a", null)), messages, new Options()._label("haha")._inputMode(InputMode.POLYMORPHIC)),
                 Collections.EMPTY_LIST);
-        assertEquals(required.apply("tt", mmap(entry("tt", null)), dummyMessages, new Options()._inputMode(InputMode.POLYMORPHIC)),
+        assertEquals(required.apply("tt", mmap(entry("tt", null)), messages, new Options()._inputMode(InputMode.POLYMORPHIC)),
                 Arrays.asList(entry("tt", "tt is required")));
-        assertEquals(required.apply("tt.a", mmap(entry("tt.a", null)), dummyMessages, new Options()._inputMode(InputMode.POLYMORPHIC)),
+        assertEquals(required.apply("tt.a", mmap(entry("tt.a", null)), messages, new Options()._inputMode(InputMode.POLYMORPHIC)),
                 Arrays.asList(entry("tt.a", "a is required")));
     }
 
@@ -76,11 +78,11 @@ public class ConstraintsTest {
 
         Constraint maxlength = Constraints.maxlength(10);
 
-        assertEquals(maxlength.apply("", mmap(entry("", "wetyyuu")), dummyMessages, new Options()._label("")._inputMode(InputMode.SINGLE)),
+        assertEquals(maxlength.apply("", mmap(entry("", "wetyyuu")), messages, new Options()._label("")._inputMode(InputMode.SINGLE)),
                 Collections.EMPTY_LIST);
-        assertEquals(maxlength.apply("", mmap(entry("", "wetyettyiiie")), dummyMessages, new Options()._label("")._inputMode(InputMode.SINGLE)),
-                Arrays.asList(entry("", "dummy")));
-        assertEquals(maxlength.apply("", mmap(entry("", "tuewerri97")), dummyMessages, new Options()._label("")._inputMode(InputMode.SINGLE)),
+        assertEquals(maxlength.apply("", mmap(entry("", "wetyettyiiie")), messages, new Options()._label("")._inputMode(InputMode.SINGLE)),
+                Arrays.asList(entry("", "'wetyettyiiie' cannot be longer than 10 characters.")));
+        assertEquals(maxlength.apply("", mmap(entry("", "tuewerri97")), messages, new Options()._label("")._inputMode(InputMode.SINGLE)),
                 Collections.EMPTY_LIST);
     }
 
@@ -90,7 +92,7 @@ public class ConstraintsTest {
 
         Constraint maxlength = Constraints.maxlength(10, "'%s': length > %d");
 
-        assertEquals(maxlength.apply("", mmap(entry("", "eewryuooerjhy")), dummyMessages, new Options()._label("haha")._inputMode(InputMode.SINGLE)),
+        assertEquals(maxlength.apply("", mmap(entry("", "eewryuooerjhy")), messages, new Options()._label("haha")._inputMode(InputMode.SINGLE)),
                 Arrays.asList(entry("", "'eewryuooerjhy': length > 10")));
     }
 
@@ -102,11 +104,11 @@ public class ConstraintsTest {
 
         Constraint minlength = Constraints.minlength(3);
 
-        assertEquals(minlength.apply("", mmap(entry("", "er")), dummyMessages, new Options()._label("")._inputMode(InputMode.SINGLE)),
-                Arrays.asList(entry("", "dummy")));
-        assertEquals(minlength.apply("", mmap(entry("", "ert6")), dummyMessages, new Options()._label("")._inputMode(InputMode.SINGLE)),
+        assertEquals(minlength.apply("", mmap(entry("", "er")), messages, new Options()._label("")._inputMode(InputMode.SINGLE)),
+                Arrays.asList(entry("", "'er' cannot be shorter than 3 characters.")));
+        assertEquals(minlength.apply("", mmap(entry("", "ert6")), messages, new Options()._label("")._inputMode(InputMode.SINGLE)),
                 Collections.EMPTY_LIST);
-        assertEquals(minlength.apply("", mmap(entry("", "tee")), dummyMessages, new Options()._label("")._inputMode(InputMode.SINGLE)),
+        assertEquals(minlength.apply("", mmap(entry("", "tee")), messages, new Options()._label("")._inputMode(InputMode.SINGLE)),
                 Collections.EMPTY_LIST);
     }
 
@@ -116,7 +118,7 @@ public class ConstraintsTest {
 
         Constraint minlength = Constraints.minlength(3, "'%s': length cannot < %d");
 
-        assertEquals(minlength.apply("", mmap(entry("", "te")), dummyMessages, new Options()._label("haha")._inputMode(InputMode.SINGLE)),
+        assertEquals(minlength.apply("", mmap(entry("", "te")), messages, new Options()._label("haha")._inputMode(InputMode.SINGLE)),
                 Arrays.asList(entry("", "'te': length cannot < 3")));
     }
 
@@ -128,12 +130,12 @@ public class ConstraintsTest {
 
         Constraint length = Constraints.length(9);
 
-        assertEquals(length.apply("", mmap(entry("", "123456789")), dummyMessages, new Options()._label("")._inputMode(InputMode.SINGLE)),
+        assertEquals(length.apply("", mmap(entry("", "123456789")), messages, new Options()._label("")._inputMode(InputMode.SINGLE)),
                 Collections.EMPTY_LIST);
-        assertEquals(length.apply("", mmap(entry("", "123")), dummyMessages, new Options()._label("")._inputMode(InputMode.SINGLE)),
-                Arrays.asList(entry("", "dummy")));
-        assertEquals(length.apply("", mmap(entry("", "1234567890")), dummyMessages, new Options()._label("")._inputMode(InputMode.SINGLE)),
-                Arrays.asList(entry("", "dummy")));
+        assertEquals(length.apply("", mmap(entry("", "123")), messages, new Options()._label("")._inputMode(InputMode.SINGLE)),
+                Arrays.asList(entry("", "'123' must be 9 characters.")));
+        assertEquals(length.apply("", mmap(entry("", "1234567890")), messages, new Options()._label("")._inputMode(InputMode.SINGLE)),
+                Arrays.asList(entry("", "'1234567890' must be 9 characters.")));
     }
 
     @Test
@@ -142,7 +144,7 @@ public class ConstraintsTest {
 
         Constraint length = Constraints.length(9, "'%s': length not equals to %d");
 
-        assertEquals(length.apply("", mmap(entry("", "123")), dummyMessages, new Options()._label("haha")._inputMode(InputMode.SINGLE)),
+        assertEquals(length.apply("", mmap(entry("", "123")), messages, new Options()._label("haha")._inputMode(InputMode.SINGLE)),
                 Arrays.asList(entry("", "'123': length not equals to 9")));
     }
 
@@ -154,12 +156,12 @@ public class ConstraintsTest {
 
         Constraint oneof = Constraints.oneOf(Arrays.asList("a", "b", "c"));
 
-        assertEquals(oneof.apply("", mmap(entry("", "a")), dummyMessages, new Options()._label("")._inputMode(InputMode.SINGLE)),
+        assertEquals(oneof.apply("", mmap(entry("", "a")), messages, new Options()._label("")._inputMode(InputMode.SINGLE)),
                 Collections.EMPTY_LIST);
-        assertEquals(oneof.apply("", mmap(entry("", "t")), dummyMessages, new Options()._label("")._inputMode(InputMode.SINGLE)),
-                Arrays.asList(entry("", "dummy")));
-        assertEquals(oneof.apply("", mmap(entry("", null)), dummyMessages, new Options()._label("")._inputMode(InputMode.SINGLE)),
-                Arrays.asList(entry("", "dummy")));
+        assertEquals(oneof.apply("", mmap(entry("", "t")), messages, new Options()._label("")._inputMode(InputMode.SINGLE)),
+                Arrays.asList(entry("", "'t' must be one of [a, b, c].")));
+        assertEquals(oneof.apply("", mmap(entry("", null)), messages, new Options()._label("")._inputMode(InputMode.SINGLE)),
+                Arrays.asList(entry("", "'null' must be one of [a, b, c].")));
     }
 
     @Test
@@ -168,7 +170,7 @@ public class ConstraintsTest {
 
         Constraint oneof = Constraints.oneOf(Arrays.asList("a", "b", "c"), "'%s': is not one of %s");
 
-        assertEquals(oneof.apply("t.a", mmap(entry("t.a", "ts")), dummyMessages, new Options()._label("haha")._inputMode(InputMode.SINGLE)),
+        assertEquals(oneof.apply("t.a", mmap(entry("t.a", "ts")), messages, new Options()._label("haha")._inputMode(InputMode.SINGLE)),
                 Arrays.asList(entry("t.a", "'ts': is not one of [a, b, c]")));
     }
 
@@ -180,12 +182,12 @@ public class ConstraintsTest {
 
         Constraint pattern = Constraints.pattern("^(\\d+)$");
 
-        assertEquals(pattern.apply("", mmap(entry("", "1234657")), dummyMessages, new Options()._label("")._inputMode(InputMode.SINGLE)),
+        assertEquals(pattern.apply("", mmap(entry("", "1234657")), messages, new Options()._label("")._inputMode(InputMode.SINGLE)),
                 Collections.EMPTY_LIST);
-        assertEquals(pattern.apply("", mmap(entry("", "32566y")), dummyMessages, new Options()._label("")._inputMode(InputMode.SINGLE)),
-                Arrays.asList(entry("", "dummy")));
-        assertEquals(pattern.apply("", mmap(entry("", "123,567")), dummyMessages, new Options()._label("")._inputMode(InputMode.SINGLE)),
-                Arrays.asList(entry("", "dummy")));
+        assertEquals(pattern.apply("", mmap(entry("", "32566y")), messages, new Options()._label("")._inputMode(InputMode.SINGLE)),
+                Arrays.asList(entry("", "'32566y' must be '^(\\d+)$'.")));
+        assertEquals(pattern.apply("", mmap(entry("", "123,567")), messages, new Options()._label("")._inputMode(InputMode.SINGLE)),
+                Arrays.asList(entry("", "'123,567' must be '^(\\d+)$'.")));
     }
 
     @Test
@@ -194,7 +196,7 @@ public class ConstraintsTest {
 
         Constraint pattern = Constraints.pattern("^(\\d+)$", "'%s' not match '%s'");
 
-        assertEquals(pattern.apply("", mmap(entry("", "t4366")), dummyMessages, new Options()._label("haha")._inputMode(InputMode.SINGLE)),
+        assertEquals(pattern.apply("", mmap(entry("", "t4366")), messages, new Options()._label("haha")._inputMode(InputMode.SINGLE)),
                 Arrays.asList(entry("", "'t4366' not match '^(\\d+)$'")));
     }
 
@@ -206,10 +208,10 @@ public class ConstraintsTest {
 
         Constraint patternNot = Constraints.patternNot(".*\\[(\\d*[^\\d\\[\\]]+\\d*)+\\].*");
 
-        assertEquals(patternNot.apply("", mmap(entry("", "eree.[1234657].eee")), dummyMessages, new Options()._label("")._inputMode(InputMode.SINGLE)),
+        assertEquals(patternNot.apply("", mmap(entry("", "eree.[1234657].eee")), messages, new Options()._label("")._inputMode(InputMode.SINGLE)),
                 Collections.EMPTY_LIST);
-        assertEquals(patternNot.apply("", mmap(entry("", "errr.[32566y].ereee")), dummyMessages, new Options()._label("")._inputMode(InputMode.SINGLE)),
-                Arrays.asList(entry("", "dummy")));
+        assertEquals(patternNot.apply("", mmap(entry("", "errr.[32566y].ereee")), messages, new Options()._label("")._inputMode(InputMode.SINGLE)),
+                Arrays.asList(entry("", "'errr.[32566y].ereee' mustn't be '.*\\[(\\d*[^\\d\\[\\]]+\\d*)+\\].*'.")));
     }
 
     @Test
@@ -218,7 +220,7 @@ public class ConstraintsTest {
 
         Constraint patternNot = Constraints.pattern("^(\\d+)$", "'%s' contains illegal array index");
 
-        assertEquals(patternNot.apply("", mmap(entry("", "ewtr.[t4366].eweee")), dummyMessages, new Options()._label("haha")._inputMode(InputMode.SINGLE)),
+        assertEquals(patternNot.apply("", mmap(entry("", "ewtr.[t4366].eweee")), messages, new Options()._label("haha")._inputMode(InputMode.SINGLE)),
                 Arrays.asList(entry("", "'ewtr.[t4366].eweee' contains illegal array index")));
     }
 
@@ -249,7 +251,7 @@ public class ConstraintsTest {
                 //        "甲斐@黒川.日本",  //Japanese Characters
                 //        "чебурашка@ящик-с-апельсинами.рф"  //Cyrillic Characters
         ).stream().forEach(emailAddr -> {
-            assertEquals(email.apply("", mmap(entry("", emailAddr)), dummyMessages, new Options()._label("")._inputMode(InputMode.SINGLE)),
+            assertEquals(email.apply("", mmap(entry("", emailAddr)), messages, new Options()._label("")._inputMode(InputMode.SINGLE)),
                     Collections.EMPTY_LIST);
         });
     }
@@ -270,41 +272,43 @@ public class ConstraintsTest {
                 "john..doe@example.com", //(double dot before @)
                 "john.doe@example..com" //(double dot after @)
         ).stream().forEach(emailAddr -> {
-            assertEquals(email.apply("", mmap(entry("", emailAddr)), dummyMessages, new Options()._label("")._inputMode(InputMode.SINGLE)),
+            assertEquals(email.apply("", mmap(entry("", emailAddr)), messages, new Options()._label("")._inputMode(InputMode.SINGLE)),
                     Arrays.asList(entry("", "'" + emailAddr + "' not valid")));
         });
     }
 
-    // indexInKey test
+    // indexInKeys test
 
     @Test
     public void testIndexInKey_SimpleUse() {
         System.out.println(green(">> index in key - simple use"));
 
-        Constraint index = Constraints.indexInKey();
+        Constraint index = Constraints.indexInKeys();
 
-        assertEquals(index.apply("a", mmap(entry("a[0]", "aaa")), dummyMessages, new Options()._inputMode(InputMode.MULTIPLE)),
+        assertEquals(index.apply("a", mmap(entry("a[0]", "aaa")), messages, new Options()._inputMode(InputMode.MULTIPLE)),
                 Collections.EMPTY_LIST);
-        assertEquals(index.apply("a", mmap(entry("a[t0]", "aaa"), entry("a[3]", "tew")), dummyMessages, new Options()._label("")._inputMode(InputMode.MULTIPLE)),
-                Arrays.asList(entry("a[t0]", "name: dummy")));
-        assertEquals(index.apply("a", mmap(entry("a[t1]", "aewr"), entry("a[t4]", "ewre")), dummyMessages,
+        assertEquals(index.apply("a", mmap(entry("a[t0]", "aaa"), entry("a[3]", "tew")), messages, new Options()._label("")._inputMode(InputMode.MULTIPLE)),
+                Arrays.asList(entry("a[t0]", "'a[t0]' contains illegal array index.")));
+        assertEquals(index.apply("a", mmap(entry("a[t1]", "aewr"), entry("a[t4]", "ewre")), messages,
                         new Options()._label("xx")._inputMode(InputMode.MULTIPLE)).stream().collect(Collectors.toSet()),
-                Arrays.asList(entry("a[t1]", "name: dummy"), entry("a[t4]", "name: dummy")).stream().collect(Collectors.toSet()));
+                Arrays.asList(entry("a[t1]", "'a[t1]' contains illegal array index."), entry("a[t4]", "'a[t4]' contains illegal array index."))
+                        .stream().collect(Collectors.toSet()));
     }
 
     @Test
     public void testIndexInKey_WithCustomMessage() {
         System.out.println(green(">> index in key - with custom message"));
 
-        Constraint index = Constraints.indexInKey("illegal array index (%s)");
+        Constraint index = Constraints.indexInKeys("illegal array index (%s)");
 
-        assertEquals(index.apply("a", mmap(entry("a[0]", "aaa")), dummyMessages, new Options()._label("xx")._inputMode(InputMode.MULTIPLE)),
+        assertEquals(index.apply("a", mmap(entry("a[0]", "aaa")), messages, new Options()._label("xx")._inputMode(InputMode.MULTIPLE)),
                 Collections.EMPTY_LIST);
-        assertEquals(index.apply("a", mmap(entry("a[t0]", "aaa"), entry("a[3]", "tew")), dummyMessages, new Options()._label("")._inputMode(InputMode.MULTIPLE)),
-                Arrays.asList(entry("a[t0]", "name: illegal array index (a[t0])")));
-        assertEquals(index.apply("", mmap(entry("a[t1]", "aewr"), entry("a[t4].er", "ewre")), dummyMessages,
+        assertEquals(index.apply("a", mmap(entry("a[t0]", "aaa"), entry("a[3]", "tew")), messages, new Options()._label("")._inputMode(InputMode.MULTIPLE)),
+                Arrays.asList(entry("a[t0]", "illegal array index (a[t0])")));
+        assertEquals(index.apply("", mmap(entry("a[t1]", "aewr"), entry("a[t4].er", "ewre")), messages,
                         new Options()._label("xx")._inputMode(InputMode.MULTIPLE)).stream().collect(Collectors.toSet()),
-                Arrays.asList(entry("a[t1]", "name: illegal array index (a[t1])"), entry("a[t4].er", "name: illegal array index (a[t4].er)")).stream().collect(Collectors.toSet()));
+                Arrays.asList(entry("a[t1]", "illegal array index (a[t1])"), entry("a[t4].er", "illegal array index (a[t4].er)"))
+                        .stream().collect(Collectors.toSet()));
     }
 
 }

@@ -32,8 +32,7 @@ public class FormBinder {
         List<Map.Entry<String, String>> errors = mapping.validate(root, data, messages, Options.EMPTY);
         if (errors.isEmpty()) {
             Object vObj = mapping.convert(root, data);
-            return vObj instanceof BindObject
-                    ? (BindObject) vObj
+            return vObj instanceof BindObject ? (BindObject) vObj
                     : new BindObject(mmap(entry(BindObject.DEFAULT_KEY, vObj)));
         } else {
             if (errProcessor != null) {

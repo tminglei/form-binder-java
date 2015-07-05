@@ -286,6 +286,55 @@ public class PreProcessorsTest {
                 expected);
     }
 
+    // expand-list-keys test
+
+    @Test
+    public void testExpandListKeys_DirectUse() {
+        System.out.println(green(">> expand list keys - direct use"));
+
+        PreProcessor expandListKeys = Processors.expandListKeys();
+
+        Map<String, String> rawData = mmap(
+                entry("aa", "wett"),
+                entry("touched[0]", "a[0]"),
+                entry("touched[1]", "b"),
+                entry("touched[2]", "c.t")
+            );
+        Map<String, String> expected = mmap(
+                entry("aa", "wett"),
+                entry("touched.a[0]", "true"),
+                entry("touched.b", "true"),
+                entry("touched.c.t", "true")
+            );
+
+        assertEquals(expandListKeys.apply("touched", rawData, Options.EMPTY),
+                expected);
+    }
+
+    @Test
+    public void testExpandListKeys_WithPrefix() {
+        System.out.println(green(">> expand json keys - with prefix"));
+
+        PreProcessor expandJsonKeys = Processors.expandJsonKeys("touched");
+
+        Map<String, String> rawData = mmap(
+                entry("aa", "wett"),
+                entry("touched[0]", "a[0]"),
+                entry("touched[1]", "b"),
+                entry("touched[2]", "c.t")
+            );
+        Map<String, String> expected = mmap(
+                entry("aa", "wett"),
+                entry("touched.a[0]", "true"),
+                entry("touched.b", "true"),
+                entry("touched.c.t", "true")
+            );
+
+        assertEquals(expandJsonKeys.apply("", rawData, Options.EMPTY),
+                expected);
+
+    }
+
     // expand-json-keys test
 
     @Test

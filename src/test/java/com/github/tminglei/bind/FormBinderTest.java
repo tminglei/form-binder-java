@@ -3,9 +3,7 @@ package com.github.tminglei.bind;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Map;
+import java.util.*;
 
 import static org.testng.Assert.*;
 import static com.github.tminglei.bind.Simple.*;
@@ -16,7 +14,9 @@ import static com.github.tminglei.bind.FrameworkUtils.*;
 import static com.github.tminglei.bind.Utils.*;
 
 public class FormBinderTest {
-    private Messages dummyMessages = (key) -> "xx".equals(key) ? "haha" : "dummy";
+    private ResourceBundle bundle = ResourceBundle.getBundle("bind-messages");
+    private Messages messages = (key) -> "xx".equals(key) ? "haha" : bundle.getString(key);
+
     private Mapping<BindObject> mapping =
         mapping(
             field("id", vLong()),
@@ -24,7 +24,7 @@ public class FormBinderTest {
                 field("email", fb(required("%s is required")).to(text(maxlength(20, "%s: length > %s"), email("%s: invalid email")))),
                 field("price", fb(omitLeft("$")).to(vFloat())),
                 field("count", vInt().verifying(min(3), max(10)))
-            )).label("xx").verifying((label, vObj, messages) -> {
+            )).label("xx").verifying((label, vObj, messages1) -> {
                 float price = vObj.get("price");
                 int count = vObj.get("count");
                 if (price * count > 1000) {
@@ -49,7 +49,7 @@ public class FormBinderTest {
                 entry("data", "{\"email\":\"etttt@example.com\", \"price\":\"$137.5\", \"count\":5}")
             );
 
-        BindObject bindObj = new FormBinder(dummyMessages).bind(mapping, data);
+        BindObject bindObj = new FormBinder(messages).bind(mapping, data);
 
         assertEquals(bindObj.errors().isPresent(), false);
         assertEquals(bindObj.get("id"), Long.valueOf(133));
@@ -88,7 +88,7 @@ public class FormBinderTest {
                 .options(o -> o.touched(prefixTouched("data", "touched")))
                 .processor(expandJsonKeys("touched"));
 
-        BindObject bindObj = new FormBinder(dummyMessages).bind(mappingx, data);
+        BindObject bindObj = new FormBinder(messages).bind(mappingx, data);
 
         assertEquals(bindObj.errors().isPresent(), true);
         assertEquals(bindObj.errors().get(), Arrays.asList(
@@ -105,7 +105,7 @@ public class FormBinderTest {
             );
         Mapping<BindObject> mappingx = mapping.options(o -> o.i18n(true));
 
-        BindObject bindObj = new FormBinder(dummyMessages).bind(mappingx, data);
+        BindObject bindObj = new FormBinder(messages).bind(mappingx, data);
 
         assertEquals(bindObj.errors().isPresent(), true);
         assertEquals(bindObj.errors().get(), Arrays.asList(
@@ -124,13 +124,68 @@ public class FormBinderTest {
                 .options(o -> o.ignoreEmpty(true))
                 .options(o -> o.touched(prefixTouched("body.data", "body.touched")))
                 .processor(expandJson("body"));
+
+        BindObject bindObj = new FormBinder(messages).bind(mappingx, data, "body");
+
+        assertEquals(bindObj.errors().isPresent(), true);
+        assertEquals(bindObj.errors().get(), Arrays.asList(
+                entry("body.data", "xx: total cost too much!")));
     }
 
     // validate test
 
     @Test
-    public void testValidate_() {
+    public void testValidate_ValidData() {
+        System.out.println(green(">> validate - valid data"));
 
+        Map<String, String> data = mmap(
+                entry("id", "133"),
+                entry("data", "{\"email\":\"etttt@example.com\", \"price\":\"$137.5\", \"count\":5}")
+        );
+
+        Optional<List<Map.Entry<String, String>>> errors = new FormBinder(messages)
+                .validate(mapping, data);
+        assertEquals(errors.isPresent(), false);
+    }
+
+    @Test
+    public void testValidate_InvalidData() {
+        System.out.println(green(">> validate - invalid data"));
+
+        Map<String, String> data = mmap(
+                entry("id", "133"),
+                entry("data", "{\"email\":null, \"price\":337.5, \"count\":5}"),
+                entry("touched", "[\"email\", \"price\"]")
+            );
+        Mapping<BindObject> mappingx = mapping
+                .options(o -> o.ignoreEmpty(true))
+                .options(o -> o.touched(prefixTouched("data", "touched")))
+                .processor(expandJsonKeys("touched"));
+
+        Optional<List<Map.Entry<String, String>>> errors = new FormBinder(messages)
+                .validate(mappingx, data);
+
+        assertEquals(errors.isPresent(), true);
+        assertEquals(errors.get(), Arrays.asList(
+                entry("data.email", "email is required")));
+    }
+
+    @Test
+    public void testValidate_WithErrProcessor() {
+        System.out.println(green(">> validate - with error processor"));
+
+        Map<String, String> data = mmap(
+                entry("id", "133"),
+                entry("data", "{\"email\":null, \"price\":\"$337.5\", \"count\":5}")
+        );
+
+        Optional<List<Map.Entry<String, String>>> errors =
+                new FormBinder(messages, foldErrs())
+                        .validate(mapping, data);
+
+        assertEquals(errors.isPresent(), true);
+        assertEquals(errors.get(), mmap(
+                entry("data.email", Arrays.asList("email is required"))));
     }
 
 }

@@ -19,7 +19,8 @@ import static com.github.tminglei.bind.FrameworkUtils.*;
 import static com.github.tminglei.bind.Utils.*;
 
 public class FieldMappingsTest {
-    Messages dummyMessages = (key) -> "%s dummy";
+    private ResourceBundle bundle = ResourceBundle.getBundle("bind-messages");
+    private Messages messages = (key) -> bundle.getString(key);
 
     @BeforeClass
     public void start() {
@@ -35,7 +36,7 @@ public class FieldMappingsTest {
         Mapping<String> text = fb(trim()).to(Mappings.text());
         Map<String, String> data = mmap(entry("text", "tett "));
 
-        assertEquals(text.validate("text", data, dummyMessages, Options.EMPTY),
+        assertEquals(text.validate("text", data, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(text.convert("text", data), "tett");
     }
@@ -47,7 +48,7 @@ public class FieldMappingsTest {
         Mapping<String> text = fb(trim()).to(Mappings.text());
         Map<String, String> data = mmap();
 
-        assertEquals(text.validate("text", data, dummyMessages, Options.EMPTY),
+        assertEquals(text.validate("text", data, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(text.convert("text", data), null);
     }
@@ -59,7 +60,7 @@ public class FieldMappingsTest {
         Mapping<String> text = Mappings.text(maxlength(20, "%s: length > %s"), email("%s: invalid email"));
         Map<String, String> data = mmap(entry("text", "etttt.att#example-1111111.com"));
 
-        assertEquals(text.validate("text", data, dummyMessages, new Options().eagerCheck(true)).stream().collect(Collectors.toSet()),
+        assertEquals(text.validate("text", data, messages, new Options().eagerCheck(true)).stream().collect(Collectors.toSet()),
                 Arrays.asList(
                         entry("text", "etttt.att#example-1111111.com: length > 20"),
                         entry("text", "etttt.att#example-1111111.com: invalid email")
@@ -73,12 +74,12 @@ public class FieldMappingsTest {
         Map<String, String> data = mmap();
 
         Mapping<String> text1 = Mappings.text(required("%s is required"));
-        assertEquals(text1.validate("text", data, dummyMessages, Options.EMPTY),
+        assertEquals(text1.validate("text", data, messages, Options.EMPTY),
                 Arrays.asList(entry("text", "text is required")));
 
         Mapping<String> text2 = Mappings.text(required("%s is required"))
                 .options(o -> o.ignoreEmpty(true));
-        assertEquals(text2.validate("text", data, dummyMessages, Options.EMPTY),
+        assertEquals(text2.validate("text", data, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(text2.convert("text", data), null);
     }
@@ -91,13 +92,13 @@ public class FieldMappingsTest {
 
         Mapping<String> text1 = Mappings.text(required("%s is required"))
                 .options(o -> o.ignoreEmpty(true));
-        assertEquals(text1.validate("text", data, dummyMessages, Options.EMPTY),
+        assertEquals(text1.validate("text", data, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(text1.convert("text", data), null);
 
         Mapping<String> text2 = Mappings.text(required("%s is required"))
                 .options(o -> o.ignoreEmpty(true));
-        assertEquals(text2.validate("text", data, dummyMessages, new Options()
+        assertEquals(text2.validate("text", data, messages, new Options()
                         .touched(listTouched(Arrays.asList("text")))),
                 Arrays.asList(entry("text", "text is required")));
     }
@@ -111,7 +112,7 @@ public class FieldMappingsTest {
         Mapping<Boolean> bool = Mappings.vBoolean();
         Map<String, String> data = mmap(entry("boolean", "true"));
 
-        assertEquals(bool.validate("boolean", data, dummyMessages, Options.EMPTY),
+        assertEquals(bool.validate("boolean", data, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(bool.convert("boolean", data), Boolean.TRUE);
     }
@@ -123,7 +124,7 @@ public class FieldMappingsTest {
         Mapping<Boolean> bool = Mappings.vBoolean();
         Map<String, String> data = mmap(entry("boolean", "teed"));
 
-        assertEquals(bool.validate("boolean", data, dummyMessages, Options.EMPTY),
+        assertEquals(bool.validate("boolean", data, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
     }
 
@@ -134,7 +135,7 @@ public class FieldMappingsTest {
         Mapping<Boolean> bool = Mappings.vBoolean();
         Map<String, String> data = mmap();
 
-        assertEquals(bool.validate("boolean", data, dummyMessages, Options.EMPTY),
+        assertEquals(bool.validate("boolean", data, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(bool.convert("boolean", data), Boolean.FALSE);
     }
@@ -146,7 +147,7 @@ public class FieldMappingsTest {
         Mapping<Boolean> bool = Mappings.vBoolean();
         Map<String, String> data = mmap(entry("boolean", ""));
 
-        assertEquals(bool.validate("boolean", data, dummyMessages, Options.EMPTY),
+        assertEquals(bool.validate("boolean", data, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(bool.convert("boolean", data), Boolean.FALSE);
     }
@@ -160,8 +161,8 @@ public class FieldMappingsTest {
         Mapping<Integer> integer = Mappings.vInt().label("xx");
         Map<String, String> data = mmap(entry("int", "t12345"));
 
-        assertEquals(integer.validate("int", data, dummyMessages, Options.EMPTY),
-                Arrays.asList(entry("int", "xx dummy")));
+        assertEquals(integer.validate("int", data, messages, Options.EMPTY),
+                Arrays.asList(entry("int", "'t12345' must be a number.")));
     }
 
     @Test
@@ -172,8 +173,8 @@ public class FieldMappingsTest {
                 .verifying(min(1000), max(10000));
         Map<String, String> data = mmap(entry("int", "345"));
 
-        assertEquals(integer.validate("int", data, dummyMessages, Options.EMPTY),
-                Arrays.asList(entry("int", "int dummy")));
+        assertEquals(integer.validate("int", data, messages, Options.EMPTY),
+                Arrays.asList(entry("int", "'345' cannot be lower than 1000.")));
     }
 
     @Test
@@ -183,8 +184,8 @@ public class FieldMappingsTest {
         Mapping<Integer> integer = fb(omit(",")).to(Mappings.vInt());
         Map<String, String> data = mmap(entry("int", "146894532240"));
 
-        assertEquals(integer.validate("int", data, dummyMessages, Options.EMPTY),
-                Arrays.asList(entry("int", "int dummy")));
+        assertEquals(integer.validate("int", data, messages, Options.EMPTY),
+                Arrays.asList(entry("int", "'146894532240' must be a number.")));
     }
 
     @Test
@@ -195,7 +196,7 @@ public class FieldMappingsTest {
                 .verifying(min(1000), max(10000));
         Map<String, String> data = mmap(entry("int", "3,549"));
 
-        assertEquals(integer.validate("int", data, dummyMessages, Options.EMPTY),
+        assertEquals(integer.validate("int", data, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(integer.convert("int", data), Integer.valueOf(3549));
     }
@@ -207,7 +208,7 @@ public class FieldMappingsTest {
         Mapping<Integer> integer = fb(omit(",")).to(Mappings.vInt());
         Map<String, String> data = mmap();
 
-        assertEquals(integer.validate("int", data, dummyMessages, Options.EMPTY),
+        assertEquals(integer.validate("int", data, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(integer.convert("int", data), Integer.valueOf(0));
     }
@@ -220,8 +221,8 @@ public class FieldMappingsTest {
                 .verifying(min(1000), max(10000));
         Map<String, String> data = mmap(entry("int", ""));
 
-        assertEquals(integer.validate("int", data, dummyMessages, Options.EMPTY),
-                Arrays.asList(entry("int", "int dummy")));
+        assertEquals(integer.validate("int", data, messages, Options.EMPTY),
+                Arrays.asList(entry("int", "'0' cannot be lower than 1000.")));
         assertEquals(integer.convert("int", data), Integer.valueOf(0));
     }
 
@@ -234,8 +235,8 @@ public class FieldMappingsTest {
         Mapping<Double> mDouble = Mappings.vDouble().label("xx");
         Map<String, String> data = mmap(entry("double", "tesstt"));
 
-        assertEquals(mDouble.validate("double", data, dummyMessages, Options.EMPTY),
-                Arrays.asList(entry("double", "xx dummy")));
+        assertEquals(mDouble.validate("double", data, messages, Options.EMPTY),
+                Arrays.asList(entry("double", "'tesstt' must be a number.")));
     }
 
     @Test
@@ -245,7 +246,7 @@ public class FieldMappingsTest {
         Mapping<Double> mDouble = Mappings.vDouble();
         Map<String, String> data = mmap(entry("double", "23545.2355"));
 
-        assertEquals(mDouble.validate("double", data, dummyMessages, Options.EMPTY),
+        assertEquals(mDouble.validate("double", data, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(mDouble.convert("double", data), Double.valueOf(23545.2355d));
     }
@@ -257,7 +258,7 @@ public class FieldMappingsTest {
         Mapping<Double> mDouble = Mappings.vDouble();
         Map<String, String> data = mmap();
 
-        assertEquals(mDouble.validate("double", data, dummyMessages, Options.EMPTY),
+        assertEquals(mDouble.validate("double", data, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(mDouble.convert("double", data), Double.valueOf(0d));
     }
@@ -269,7 +270,7 @@ public class FieldMappingsTest {
         Mapping<Double> mDouble = Mappings.vDouble();
         Map<String, String> data = mmap(entry("double", ""));
 
-        assertEquals(mDouble.validate("double", data, dummyMessages, Options.EMPTY),
+        assertEquals(mDouble.validate("double", data, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(mDouble.convert("double", data), Double.valueOf(0d));
     }
@@ -283,8 +284,8 @@ public class FieldMappingsTest {
         Mapping<Float> mFloat = Mappings.vFloat();
         Map<String, String> data = mmap(entry("float", "tesstt"));
 
-        assertEquals(mFloat.validate("float", data, dummyMessages, Options.EMPTY),
-                Arrays.asList(entry("float", "float dummy")));
+        assertEquals(mFloat.validate("float", data, messages, Options.EMPTY),
+                Arrays.asList(entry("float", "'tesstt' must be a number.")));
     }
 
     @Test
@@ -294,7 +295,7 @@ public class FieldMappingsTest {
         Mapping<Float> mFloat = Mappings.vFloat();
         Map<String, String> data = mmap(entry("float", "23545.2355"));
 
-        assertEquals(mFloat.validate("float", data, dummyMessages, Options.EMPTY),
+        assertEquals(mFloat.validate("float", data, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(mFloat.convert("float", data), Float.valueOf(23545.2355f));
     }
@@ -306,7 +307,7 @@ public class FieldMappingsTest {
         Mapping<Float> mFloat = Mappings.vFloat();
         Map<String, String> data = mmap();
 
-        assertEquals(mFloat.validate("float", data, dummyMessages, Options.EMPTY),
+        assertEquals(mFloat.validate("float", data, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(mFloat.convert("float", data), Float.valueOf(0f));
     }
@@ -318,7 +319,7 @@ public class FieldMappingsTest {
         Mapping<Float> mFloat = Mappings.vFloat();
         Map<String, String> data = mmap(entry("float", ""));
 
-        assertEquals(mFloat.validate("float", data, dummyMessages, Options.EMPTY),
+        assertEquals(mFloat.validate("float", data, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(mFloat.convert("float", data), Float.valueOf(0f));
     }
@@ -332,8 +333,8 @@ public class FieldMappingsTest {
         Mapping<Long> mLong = Mappings.vLong();
         Map<String, String> data = mmap(entry("long", "tesstt"));
 
-        assertEquals(mLong.validate("long", data, dummyMessages, Options.EMPTY),
-                Arrays.asList(entry("long", "long dummy")));
+        assertEquals(mLong.validate("long", data, messages, Options.EMPTY),
+                Arrays.asList(entry("long", "'tesstt' must be a number.")));
     }
 
     @Test
@@ -343,7 +344,7 @@ public class FieldMappingsTest {
         Mapping<Long> mLong = Mappings.vLong();
         Map<String, String> data = mmap(entry("long", "235452355"));
 
-        assertEquals(mLong.validate("long", data, dummyMessages, Options.EMPTY),
+        assertEquals(mLong.validate("long", data, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(mLong.convert("long", data), Long.valueOf(235452355l));
     }
@@ -355,7 +356,7 @@ public class FieldMappingsTest {
         Mapping<Long> mLong = Mappings.vLong();
         Map<String, String> data = mmap();
 
-        assertEquals(mLong.validate("long", data, dummyMessages, Options.EMPTY),
+        assertEquals(mLong.validate("long", data, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(mLong.convert("long", data), Long.valueOf(0l));
     }
@@ -367,7 +368,7 @@ public class FieldMappingsTest {
         Mapping<Long> mLong = Mappings.vLong();
         Map<String, String> data = mmap(entry("long", ""));
 
-        assertEquals(mLong.validate("long", data, dummyMessages, Options.EMPTY),
+        assertEquals(mLong.validate("long", data, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(mLong.convert("long", data), Long.valueOf(0l));
     }
@@ -381,8 +382,8 @@ public class FieldMappingsTest {
         Mapping<BigDecimal> bigDecimal = Mappings.bigDecimal();
         Map<String, String> data = mmap(entry("bigDecimal", "tesstt"));
 
-        assertEquals(bigDecimal.validate("bigDecimal", data, dummyMessages, Options.EMPTY),
-                Arrays.asList(entry("bigDecimal", "bigDecimal dummy")));
+        assertEquals(bigDecimal.validate("bigDecimal", data, messages, Options.EMPTY),
+                Arrays.asList(entry("bigDecimal", "'tesstt' must be a number.")));
     }
 
     @Test
@@ -392,7 +393,7 @@ public class FieldMappingsTest {
         Mapping<BigDecimal> bigDecimal = Mappings.bigDecimal();
         Map<String, String> data = mmap(entry("bigDecimal", "23545.2355"));
 
-        assertEquals(bigDecimal.validate("bigDecimal", data, dummyMessages, Options.EMPTY),
+        assertEquals(bigDecimal.validate("bigDecimal", data, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(bigDecimal.convert("bigDecimal", data), new BigDecimal("23545.2355"));
     }
@@ -404,7 +405,7 @@ public class FieldMappingsTest {
         Mapping<BigDecimal> bigDecimal = Mappings.bigDecimal();
         Map<String, String> data = mmap();
 
-        assertEquals(bigDecimal.validate("bigDecimal", data, dummyMessages, Options.EMPTY),
+        assertEquals(bigDecimal.validate("bigDecimal", data, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(bigDecimal.convert("bigDecimal", data), BigDecimal.ZERO);
     }
@@ -416,7 +417,7 @@ public class FieldMappingsTest {
         Mapping<BigDecimal> bigDecimal = Mappings.bigDecimal();
         Map<String, String> data = mmap(entry("bigDecimal", ""));
 
-        assertEquals(bigDecimal.validate("bigDecimal", data, dummyMessages, Options.EMPTY),
+        assertEquals(bigDecimal.validate("bigDecimal", data, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(bigDecimal.convert("bigDecimal", data), BigDecimal.ZERO);
     }
@@ -430,8 +431,8 @@ public class FieldMappingsTest {
         Mapping<BigInteger> bigInt = Mappings.bigInt();
         Map<String, String> data = mmap(entry("bigInt", "23545.2355"));
 
-        assertEquals(bigInt.validate("bigInt", data, dummyMessages, Options.EMPTY),
-                Arrays.asList(entry("bigInt", "bigInt dummy")));
+        assertEquals(bigInt.validate("bigInt", data, messages, Options.EMPTY),
+                Arrays.asList(entry("bigInt", "'23545.2355' must be a number.")));
     }
 
     @Test
@@ -441,7 +442,7 @@ public class FieldMappingsTest {
         Mapping<BigInteger> bigInt = Mappings.bigInt();
         Map<String, String> data = mmap(entry("bigInt", "235452355"));
 
-        assertEquals(bigInt.validate("bigInt", data, dummyMessages, Options.EMPTY),
+        assertEquals(bigInt.validate("bigInt", data, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(bigInt.convert("bigInt", data), new BigInteger("235452355"));
     }
@@ -453,7 +454,7 @@ public class FieldMappingsTest {
         Mapping<BigInteger> bigInt = Mappings.bigInt();
         Map<String, String> data = mmap();
 
-        assertEquals(bigInt.validate("bigInt", data, dummyMessages, Options.EMPTY),
+        assertEquals(bigInt.validate("bigInt", data, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(bigInt.convert("bigInt", data), BigInteger.ZERO);
     }
@@ -465,7 +466,7 @@ public class FieldMappingsTest {
         Mapping<BigInteger> bigInt = Mappings.bigInt();
         Map<String, String> data = mmap(entry("bigInt", ""));
 
-        assertEquals(bigInt.validate("bigInt", data, dummyMessages, Options.EMPTY),
+        assertEquals(bigInt.validate("bigInt", data, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(bigInt.convert("bigInt", data), BigInteger.ZERO);
     }
@@ -479,8 +480,8 @@ public class FieldMappingsTest {
         Mapping<UUID> uuid = Mappings.uuid();
         Map<String, String> data = mmap(entry("uuid", "tesstt"));
 
-        assertEquals(uuid.validate("uuid", data, dummyMessages, Options.EMPTY),
-                Arrays.asList(entry("uuid", "uuid dummy")));
+        assertEquals(uuid.validate("uuid", data, messages, Options.EMPTY),
+                Arrays.asList(entry("uuid", "'tesstt' missing or not a valid uuid.")));
     }
 
     @Test
@@ -491,7 +492,7 @@ public class FieldMappingsTest {
         Mapping<UUID> uuid = Mappings.uuid();
         Map<String, String> data = mmap(entry("uuid", uuidObj.toString()));
 
-        assertEquals(uuid.validate("uuid", data, dummyMessages, Options.EMPTY),
+        assertEquals(uuid.validate("uuid", data, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(uuid.convert("uuid", data), uuidObj);
     }
@@ -503,7 +504,7 @@ public class FieldMappingsTest {
         Mapping<UUID> uuid = Mappings.uuid();
         Map<String, String> data = mmap();
 
-        assertEquals(uuid.validate("uuid", data, dummyMessages, Options.EMPTY),
+        assertEquals(uuid.validate("uuid", data, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(uuid.convert("uuid", data), null);
     }
@@ -515,7 +516,7 @@ public class FieldMappingsTest {
         Mapping<UUID> uuid = Mappings.uuid();
         Map<String, String> data = mmap(entry("uuid", ""));
 
-        assertEquals(uuid.validate("uuid", data, dummyMessages, Options.EMPTY),
+        assertEquals(uuid.validate("uuid", data, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(uuid.convert("uuid", data), null);
     }
@@ -529,8 +530,8 @@ public class FieldMappingsTest {
         Mapping<LocalDate> date = Mappings.date().label("xx");
         Map<String, String> data = mmap(entry("date", "5/3/2003"));
 
-        assertEquals(date.validate("date", data, dummyMessages, Options.EMPTY),
-                Arrays.asList(entry("date", "xx dummy")));
+        assertEquals(date.validate("date", data, messages, Options.EMPTY),
+                Arrays.asList(entry("date", "'5/3/2003' must be 'yyyy-MM-dd'.")));
     }
 
     @Test
@@ -541,7 +542,7 @@ public class FieldMappingsTest {
         Mapping<LocalDate> date = Mappings.date();
         Map<String, String> data = mmap(entry("date", dateObj.toString()));
 
-        assertEquals(date.validate("date", data, dummyMessages, Options.EMPTY),
+        assertEquals(date.validate("date", data, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(date.convert("date", data), dateObj);
     }
@@ -553,7 +554,7 @@ public class FieldMappingsTest {
         Mapping<LocalDate> date = Mappings.date();
         Map<String, String> data = mmap();
 
-        assertEquals(date.validate("date", data, dummyMessages, Options.EMPTY),
+        assertEquals(date.validate("date", data, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(date.convert("date", data), null);
     }
@@ -565,7 +566,7 @@ public class FieldMappingsTest {
         Mapping<LocalDate> date = Mappings.date();
         Map<String, String> data = mmap(entry("date", ""));
 
-        assertEquals(date.validate("date", data, dummyMessages, Options.EMPTY),
+        assertEquals(date.validate("date", data, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(date.convert("date", data), null);
     }
@@ -579,8 +580,8 @@ public class FieldMappingsTest {
         Mapping<LocalDateTime> datetime = Mappings.datetime().label("xx");
         Map<String, String> data = mmap(entry("datetime", "5/3/2003"));
 
-        assertEquals(datetime.validate("datetime", data, dummyMessages, Options.EMPTY),
-                Arrays.asList(entry("datetime", "xx dummy")));
+        assertEquals(datetime.validate("datetime", data, messages, Options.EMPTY),
+                Arrays.asList(entry("datetime", "'5/3/2003' must be 'yyyy-MM-dd'T'HH:mm:ss.SSS'.")));
     }
 
     @Test
@@ -591,7 +592,7 @@ public class FieldMappingsTest {
         Mapping<LocalDateTime> datetime = Mappings.datetime();
         Map<String, String> data = mmap(entry("datetime", datetimeObj.toString()));
 
-        assertEquals(datetime.validate("datetime", data, dummyMessages, Options.EMPTY),
+        assertEquals(datetime.validate("datetime", data, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(datetime.convert("datetime", data), datetimeObj);
     }
@@ -603,7 +604,7 @@ public class FieldMappingsTest {
         Mapping<LocalDateTime> datetime = Mappings.datetime();
         Map<String, String> data = mmap();
 
-        assertEquals(datetime.validate("datetime", data, dummyMessages, Options.EMPTY),
+        assertEquals(datetime.validate("datetime", data, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(datetime.convert("datetime", data), null);
     }
@@ -615,7 +616,7 @@ public class FieldMappingsTest {
         Mapping<LocalDateTime> datetime = Mappings.datetime();
         Map<String, String> data = mmap(entry("datetime", ""));
 
-        assertEquals(datetime.validate("datetime", data, dummyMessages, Options.EMPTY),
+        assertEquals(datetime.validate("datetime", data, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(datetime.convert("datetime", data), null);
     }
@@ -629,8 +630,8 @@ public class FieldMappingsTest {
         Mapping<LocalTime> time = Mappings.time().label("xx");
         Map<String, String> data = mmap(entry("time", "5/3/2003"));
 
-        assertEquals(time.validate("time", data, dummyMessages, Options.EMPTY),
-                Arrays.asList(entry("time", "xx dummy")));
+        assertEquals(time.validate("time", data, messages, Options.EMPTY),
+                Arrays.asList(entry("time", "'5/3/2003' must be 'HH:mm:ss.SSS'.")));
     }
 
     @Test
@@ -641,7 +642,7 @@ public class FieldMappingsTest {
         Mapping<LocalTime> time = Mappings.time();
         Map<String, String> data = mmap(entry("time", timeObj.toString()));
 
-        assertEquals(time.validate("time", data, dummyMessages, Options.EMPTY),
+        assertEquals(time.validate("time", data, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(time.convert("time", data), timeObj);
     }
@@ -653,7 +654,7 @@ public class FieldMappingsTest {
         Mapping<LocalTime> time = Mappings.time();
         Map<String, String> data = mmap();
 
-        assertEquals(time.validate("time", data, dummyMessages, Options.EMPTY),
+        assertEquals(time.validate("time", data, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(time.convert("time", data), null);
     }
@@ -665,7 +666,7 @@ public class FieldMappingsTest {
         Mapping<LocalTime> time = Mappings.time();
         Map<String, String> data = mmap(entry("time", ""));
 
-        assertEquals(time.validate("time", data, dummyMessages, Options.EMPTY),
+        assertEquals(time.validate("time", data, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(time.convert("time", data), null);
     }

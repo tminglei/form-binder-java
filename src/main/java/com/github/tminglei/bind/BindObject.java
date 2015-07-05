@@ -33,25 +33,13 @@ public class BindObject implements Iterable<Map.Entry<String, Object>> {
     }
 
     public BindObject node(String name) {
-        checkExisted(name);
         return (BindObject) data.get(name);
     }
     public <T> T get() {
-        checkExisted(DEFAULT_KEY);
         return (T) data.get(DEFAULT_KEY);
     }
     public <T> T get(String name) {
-        checkExisted(name);
         return (T) data.get(name);
     }
 
-    // build a bean based on data of this bind object
-    public <T> T to(Class<T> clazz) {
-        return null;//todo
-    }
-
-    //////////////////////////////////////////
-    private void checkExisted(String name) {
-        if (!data.containsKey(name)) throw new IllegalArgumentException("Undefined name: " + name);
-    }
 }

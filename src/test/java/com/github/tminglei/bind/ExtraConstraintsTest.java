@@ -6,13 +6,15 @@ import org.testng.annotations.Test;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.ResourceBundle;
 
 import static org.testng.Assert.*;
 import static com.github.tminglei.bind.Simple.*;
 import static com.github.tminglei.bind.Utils.*;
 
 public class ExtraConstraintsTest {
-    Messages dummyMessages = (key) -> "dummy";
+    private ResourceBundle bundle = ResourceBundle.getBundle("bind-messages");
+    private Messages messages = (key) -> bundle.getString(key);
 
     @BeforeClass
     public void start() {
@@ -27,10 +29,10 @@ public class ExtraConstraintsTest {
 
         ExtraConstraint<Integer> min = Constraints.min(5, "%s cannot < %s");
 
-        assertEquals(min.apply("xx", 6, dummyMessages),
+        assertEquals(min.apply("xx", 6, messages),
                 Collections.EMPTY_LIST);
-        assertEquals(min.apply("xx", 3, dummyMessages),
-                Arrays.asList("xx cannot < 5"));
+        assertEquals(min.apply("xx", 3, messages),
+                Arrays.asList("3 cannot < 5"));
     }
 
     @Test
@@ -39,10 +41,10 @@ public class ExtraConstraintsTest {
 
         ExtraConstraint<Double> min = Constraints.min(5.5d, "%s cannot < %s");
 
-        assertEquals(min.apply("xx", 6d, dummyMessages),
+        assertEquals(min.apply("xx", 6d, messages),
                 Collections.EMPTY_LIST);
-        assertEquals(min.apply("xx", 3d, dummyMessages),
-                Arrays.asList("xx cannot < 5.5"));
+        assertEquals(min.apply("xx", 3d, messages),
+                Arrays.asList("3.0 cannot < 5.5"));
     }
 
     // max test
@@ -53,10 +55,10 @@ public class ExtraConstraintsTest {
 
         ExtraConstraint<Integer> max = Constraints.max(15, "%s cannot > %s");
 
-        assertEquals(max.apply("xx", 6, dummyMessages),
+        assertEquals(max.apply("xx", 6, messages),
                 Collections.EMPTY_LIST);
-        assertEquals(max.apply("xx", 23, dummyMessages),
-                Arrays.asList("xx cannot > 15"));
+        assertEquals(max.apply("xx", 23, messages),
+                Arrays.asList("23 cannot > 15"));
     }
 
     @Test
@@ -68,13 +70,12 @@ public class ExtraConstraintsTest {
 
         Calendar c1 = Calendar.getInstance();
         c1.add(Calendar.MONTH, -1);
-        assertEquals(max.apply("xx", c1, dummyMessages),
+        assertEquals(max.apply("xx", c1, messages),
                 Collections.EMPTY_LIST);
 
         Calendar c2 = Calendar.getInstance();
         c2.add(Calendar.MONTH, 1);
-        assertEquals(max.apply("xx", c2, dummyMessages),
-                Arrays.asList("xx cannot > " + c.toString()));
+        assertEquals(max.apply("xx", c2, messages).size(), 1);
     }
 
 }
