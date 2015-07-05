@@ -51,21 +51,72 @@ public class Framework {
      * A mapping, w/ constraints/processors/options, was used to validate/convert input data
      */
     public interface Mapping<T> {
+
+        /**
+         * @return options associated with the mapping
+         */
         Options options();
+
+        /**
+         * change options associated with the mapping
+         * @param setting function used to change the options
+         * @return
+         */
         Mapping<T> options(Function<Options, Options> setting);
 
+        /**
+         * set label which was used to flag the data node
+         * @param label
+         * @return
+         */
         default Mapping<T> label(String label) {
             return options(o -> o._label(label));
         }
+
+        /**
+         * attach some pre-processors to the mapping
+         * @param newProcessors
+         * @return
+         */
         default Mapping<T> processor(PreProcessor... newProcessors) {
             return options(o -> o.append_processors(newProcessors));
         }
+
+        /**
+         * attach some constraints to the mapping
+         * @param newConstraints
+         * @return
+         */
         default Mapping<T> constraint(Constraint... newConstraints) {
             return options(o -> o.append_constraints(newConstraints));
         }
+
+        /**
+         * attach some extra constraints, which was used to do some extra checking
+         * after string was converted to target value, to the mapping
+         * @param extraConstraints
+         * @return
+         */
         Mapping<T> verifying(ExtraConstraint<T>... extraConstraints);
 
+        ///
+
+        /**
+         * used to convert raw string value to target type's value
+         * @param name
+         * @param data
+         * @return
+         */
         T convert(String name, Map<String, String> data);
+
+        /**
+         * used to validate raw string data values w/ or w/o data keys
+         * @param name
+         * @param data
+         * @param messages
+         * @param parentOptions
+         * @return
+         */
         List<Map.Entry<String, String>> validate(
                 String name, Map<String, String> data, Messages messages, Options parentOptions);
     }

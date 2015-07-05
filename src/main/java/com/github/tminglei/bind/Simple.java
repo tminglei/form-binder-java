@@ -9,24 +9,57 @@ import static com.github.tminglei.bind.FrameworkUtils.*;
  */
 public class Simple extends Framework {
 
+    /**
+     * shortcut method to construct group mapping
+     * @param fields
+     * @return
+     */
     public static Mapping<BindObject> mapping(Map.Entry<String, Mapping<?>>... fields) {
         return new GroupMapping(Arrays.asList(fields));
     }
+
+    /**
+     * helper method to construct group field mapping
+     * @param name
+     * @param mapping
+     * @return
+     */
     public static Map.Entry<String, Mapping<?>> field(String name, Mapping<?> mapping) {
         return FrameworkUtils.entry(name, mapping);
     }
 
+    /**
+     * help method to initialize a Binding, which was used to
+     * bind a name w/ or w/o some constraints/pre-processors to a mapping
+     * @param name
+     * @return
+     */
     public static  Binding  fb(String name) {
         return new Binding(name);
     }
+
+    /**
+     * help method to initialize a Attaching, which was used to
+     * attach some constraints w/ or w/o some pre-processors to a mapping
+     * @param constraints
+     * @return
+     */
     public static Attaching fb(Framework.Constraint... constraints) {
         return new Attaching(Arrays.asList(constraints), null);
     }
+
+    /**
+     * help method to initialize a Attaching, which was used to
+     * attach some pre-processors w/ or w/o some constraints to a mapping
+     * @param processors
+     * @return
+     */
     public static Attaching fb(Framework.PreProcessor... processors) {
         return new Attaching(null, Arrays.asList(processors));
     }
 
-    /////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////
+
     private static <T> Framework.Mapping<T> //(prepend) attach constraints and pre-processors to a mapping
                 attach(Framework.Mapping<T> mapping, List<Framework.Constraint> constraints, List<Framework.PreProcessor> processors) {
         Framework.Mapping<T> mapping1 = mapping.options(o ->
