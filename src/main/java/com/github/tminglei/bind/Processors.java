@@ -85,6 +85,9 @@ public class Processors {
             });
         }
 
+    /**
+     * expand json string to map of data
+     */
     public static Framework.PreProcessor expandJson() {
         return expandJson(null);
     }
@@ -114,6 +117,9 @@ public class Processors {
         });
     }
 
+    /**
+     * expand json string to data keys
+     */
     public static Framework.PreProcessor expandJsonKeys() {
         return expandJsonKeys(null);
     }
@@ -127,6 +133,9 @@ public class Processors {
         });
     }
 
+    /**
+     * expand list of strings to data keys
+     */
     public static Framework.PreProcessor expandListKeys() {
         return expandListKeys(null);
     }
@@ -149,6 +158,9 @@ public class Processors {
             });
         }
 
+    /**
+     * change data key prefix from one to other
+     */
     public static Framework.PreProcessor changePrefix(String from, String to) {
         return ((prefix, data, options) -> {
             logger.debug("changing prefix at {} from {} to {}", prefix, from, to);
@@ -174,6 +186,9 @@ public class Processors {
 
     /////////////////////////////////  pre-defined post err-processors  /////////////////////
 
+    /**
+     * fold errors of same key to one error list, e.g. (key, error1), (key, error2) => (key, (error1, error2))
+     */
     public static Function<List<Map.Entry<String, String>>, Map<String, List<String>>>
                 foldErrs() {
         return (errs) -> {
@@ -191,6 +206,9 @@ public class Processors {
             };
         }
 
+    /**
+     * convert list of errors to tree of errors
+     */
     public static Function<List<Map.Entry<String, String>>, Map<String, Object>>
                 errsTree() {
         logger.debug("converting errors list to errors tree");
@@ -209,6 +227,9 @@ public class Processors {
 
     /////////////////////////////////  pre-defined touched checkers  /////////////////////
 
+    /**
+     * touched checker based on inputting touched list
+     */
     public static Framework.TouchedChecker listTouched(List<String> touched) {
         return ((prefix, data) -> {
             logger.debug("checking touched in list for {}", prefix);
@@ -219,6 +240,9 @@ public class Processors {
         });
     }
 
+    /**
+     * touched checker based touched records existed on data map
+     */
     public static Framework.TouchedChecker prefixTouched(String dataPrefix, String touchedPrefix) {
         return ((prefix, data) -> {
             logger.debug("checking touched with data prefix {} and touched prefix {} for {}", dataPrefix, touchedPrefix, prefix);

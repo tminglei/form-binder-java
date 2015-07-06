@@ -22,6 +22,10 @@ public class Mappings {
     private static final Logger logger = LoggerFactory.getLogger(Mappings.class);
 
     ///////////////////////////////////  pre-defined field mappings  ////////////////////////
+
+    /**
+     * (convert to String) mapping
+     */
     public static Framework.Mapping<String> text(Framework.Constraint... constraints) {
         return new Framework.FieldMapping(
                 Framework.InputMode.SINGLE,
@@ -29,6 +33,9 @@ public class Mappings {
             ).constraint(constraints);
         }
 
+    /**
+     * (convert to Boolean) mapping
+     */
     public static Framework.Mapping<Boolean> vBoolean(Framework.Constraint... constraints) {
         return new Framework.FieldMapping(
                 Framework.InputMode.SINGLE,
@@ -39,6 +46,9 @@ public class Mappings {
                 .constraint(constraints);
         }
 
+    /**
+     * (convert to Integer) mapping
+     */
     public static Framework.Mapping<Integer> vInt(Framework.Constraint... constraints) {
         return new Framework.FieldMapping(
                 Framework.InputMode.SINGLE,
@@ -49,6 +59,9 @@ public class Mappings {
                 .constraint(constraints);
         }
 
+    /**
+     * (convert to Double) mapping
+     */
     public static Framework.Mapping<Double> vDouble(Framework.Constraint... constraints) {
         return new Framework.FieldMapping(
                 Framework.InputMode.SINGLE,
@@ -59,6 +72,9 @@ public class Mappings {
                 .constraint(constraints);
         }
 
+    /**
+     * (convert to Float) mapping
+     */
     public static Framework.Mapping<Float> vFloat(Framework.Constraint... constraints) {
         return new Framework.FieldMapping(
                 Framework.InputMode.SINGLE,
@@ -69,6 +85,9 @@ public class Mappings {
                 .constraint(constraints);
         }
 
+    /**
+     * (convert to Long) mapping
+     */
     public static Framework.Mapping<Long> vLong(Framework.Constraint... constraints) {
         return new Framework.FieldMapping(
                 Framework.InputMode.SINGLE,
@@ -79,6 +98,9 @@ public class Mappings {
                 .constraint(constraints);
         }
 
+    /**
+     * (convert to BigDecimal) mapping
+     */
     public static Framework.Mapping<BigDecimal> bigDecimal(Framework.Constraint... constraints) {
         return new Framework.FieldMapping(
                 Framework.InputMode.SINGLE,
@@ -89,6 +111,9 @@ public class Mappings {
                 .constraint(constraints);
         }
 
+    /**
+     * (convert to BigInteger) mapping
+     */
     public static Framework.Mapping<BigInteger> bigInt(Framework.Constraint... constraints) {
         return new Framework.FieldMapping(
                 Framework.InputMode.SINGLE,
@@ -99,6 +124,9 @@ public class Mappings {
                 .constraint(constraints);
         }
 
+    /**
+     * (convert to UUID) mapping
+     */
     public static Framework.Mapping<UUID> uuid(Framework.Constraint... constraints) {
         return new Framework.FieldMapping(
                 Framework.InputMode.SINGLE,
@@ -109,6 +137,9 @@ public class Mappings {
                 .constraint(constraints);
         }
 
+    /**
+     * (convert to LocalDate) mapping
+     */
     public static Framework.Mapping<LocalDate> date(Framework.Constraint... constraints) {
         return date("yyyy-MM-dd", constraints);
     }
@@ -123,6 +154,9 @@ public class Mappings {
                 .constraint(constraints);
         }
 
+    /**
+     * (convert to LocalDateTime) mapping
+     */
     public static Framework.Mapping<LocalDateTime> datetime(Framework.Constraint... constraints) {
         return datetime("yyyy-MM-dd'T'HH:mm:ss.SSS", constraints);
     }
@@ -137,6 +171,9 @@ public class Mappings {
                 .constraint(constraints);
         }
 
+    /**
+     * (convert to Time) mapping
+     */
     public static Framework.Mapping<LocalTime> time(Framework.Constraint... constraints) {
         return time("HH:mm:ss.SSS", constraints);
     }
@@ -152,7 +189,10 @@ public class Mappings {
         }
 
     /////////////////////////////// pre-defined general usage mappings  ///////////////////////
-    // note: all constraints added to the outer 'ignored' mapping, will be ignored
+    /**
+     * (mapping) ignore input value(s), and return 'instead' value
+     * NOTE: all constraints added to the outer 'ignored' mapping, will be ignored
+     */
     public static <T> Framework.Mapping<T> ignored(T instead) {
         return new Framework.FieldMapping<T>(
                 Framework.InputMode.POLYMORPHIC,
@@ -160,7 +200,10 @@ public class Mappings {
             ).options(o -> o._ignoreConstraints(true));
         }
 
-    // note: all options operations will be delegate to 'base' mapping
+    /**
+     * (mapping) return default value, if input value is null or empty
+     * NOTE: all options operations will be delegate to 'base' mapping
+     */
     public static <T> Framework.Mapping<T> defaultVal(Framework.Mapping<T> base, T defaultVal, Framework.Constraint... constraints) {
         return new Framework.MappingWrapper<T>(base,
                 ((name, data) -> {
@@ -180,6 +223,9 @@ public class Mappings {
             ).constraint(constraints);
         }
 
+    /**
+     * (mapping) wrap a base mapping, and return an optional value instead of original value
+     */
     public static <T> Framework.Mapping<Optional<T>> optional(Framework.Mapping<T> base, Framework.Constraint... constraints) {
         return new Framework.FieldMapping<Optional<T>>(
                 base.options()._inputMode(),
@@ -207,6 +253,9 @@ public class Mappings {
                 .constraint(constraints);
         }
 
+    /**
+     * (mapping) convert to list of values
+     */
     public static <T> Framework.Mapping<List<T>> list(Framework.Mapping<T> base, Framework.Constraint... constraints) {
         return new Framework.FieldMapping<List<T>>(
                 Framework.InputMode.MULTIPLE,
@@ -227,6 +276,9 @@ public class Mappings {
             ).constraint(constraints);
         }
 
+    /**
+     * (mapping) convert to map of values
+     */
     public static <V> Framework.Mapping<Map<String, V>> map(Framework.Mapping<V> vBase,
                                                       Framework.Constraint... constraints) {
         return map(text(), vBase, constraints);
