@@ -87,6 +87,7 @@ public class Processors {
 
     /**
      * expand json string to map of data
+     * @return new created pre-processor
      */
     public static Framework.PreProcessor expandJson() {
         return expandJson(null);
@@ -119,6 +120,7 @@ public class Processors {
 
     /**
      * expand json string to data keys
+     * @return new created pre-processor
      */
     public static Framework.PreProcessor expandJsonKeys() {
         return expandJsonKeys(null);
@@ -135,6 +137,7 @@ public class Processors {
 
     /**
      * expand list of strings to data keys
+     * @return new created pre-processor
      */
     public static Framework.PreProcessor expandListKeys() {
         return expandListKeys(null);
@@ -160,6 +163,9 @@ public class Processors {
 
     /**
      * change data key prefix from one to other
+     * @param from from prefix
+     * @param to to prefix
+     * @return new created pre-processor
      */
     public static Framework.PreProcessor changePrefix(String from, String to) {
         return ((prefix, data, options) -> {
@@ -187,7 +193,8 @@ public class Processors {
     /////////////////////////////////  pre-defined post err-processors  /////////////////////
 
     /**
-     * fold errors of same key to one error list, e.g. (key, error1), (key, error2) => (key, (error1, error2))
+     * fold errors of same key to one error list, e.g. (key, error1), (key, error2) -+ (key, (error1, error2))
+     * @return new created function
      */
     public static Function<List<Map.Entry<String, String>>, Map<String, List<String>>>
                 foldErrs() {
@@ -208,6 +215,7 @@ public class Processors {
 
     /**
      * convert list of errors to tree of errors
+     * @return new created function
      */
     public static Function<List<Map.Entry<String, String>>, Map<String, Object>>
                 errsTree() {
@@ -229,6 +237,8 @@ public class Processors {
 
     /**
      * touched checker based on inputting touched list
+     * @param touched the touched list
+     * @return new created touched checker
      */
     public static Framework.TouchedChecker listTouched(List<String> touched) {
         return ((prefix, data) -> {
@@ -242,6 +252,9 @@ public class Processors {
 
     /**
      * touched checker based touched records existed on data map
+     * @param dataPrefix the data prefix
+     * @param touchedPrefix the touched keys prefix
+     * @return new created touched checker
      */
     public static Framework.TouchedChecker prefixTouched(String dataPrefix, String touchedPrefix) {
         return ((prefix, data) -> {

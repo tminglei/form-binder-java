@@ -11,8 +11,8 @@ public class Simple extends Framework {
 
     /**
      * shortcut method to construct group mapping
-     * @param fields
-     * @return
+     * @param fields fields for the group mapping
+     * @return new created mapping
      */
     public static Mapping<BindObject> mapping(Map.Entry<String, Mapping<?>>... fields) {
         return new GroupMapping(Arrays.asList(fields));
@@ -20,9 +20,9 @@ public class Simple extends Framework {
 
     /**
      * helper method to construct group field mapping
-     * @param name
-     * @param mapping
-     * @return
+     * @param name field name (short name)
+     * @param mapping the related mapping
+     * @return field entry
      */
     public static Map.Entry<String, Mapping<?>> field(String name, Mapping<?> mapping) {
         return FrameworkUtils.entry(name, mapping);
@@ -31,8 +31,8 @@ public class Simple extends Framework {
     /**
      * help method to initialize a Binding, which was used to
      * bind a name w/ or w/o some constraints/pre-processors to a mapping
-     * @param name
-     * @return
+     * @param name field name (short name)
+     * @return new created Binding
      */
     public static  Binding  fb(String name) {
         return new Binding(name);
@@ -41,8 +41,8 @@ public class Simple extends Framework {
     /**
      * help method to initialize a Attaching, which was used to
      * attach some constraints w/ or w/o some pre-processors to a mapping
-     * @param constraints
-     * @return
+     * @param constraints constraints
+     * @return new created Attaching
      */
     public static Attaching fb(Framework.Constraint... constraints) {
         return new Attaching(Arrays.asList(constraints), null);
@@ -51,8 +51,8 @@ public class Simple extends Framework {
     /**
      * help method to initialize a Attaching, which was used to
      * attach some pre-processors w/ or w/o some constraints to a mapping
-     * @param processors
-     * @return
+     * @param processors pre-processors
+     * @return new created Attaching
      */
     public static Attaching fb(Framework.PreProcessor... processors) {
         return new Attaching(null, Arrays.asList(processors));
@@ -85,8 +85,8 @@ public class Simple extends Framework {
 
         /**
          * mix in some constraints
-         * @param constraints
-         * @return
+         * @param constraints constraints
+         * @return the Binding
          */
         public Binding then(Framework.Constraint... constraints) {
             this.constraints.addAll(Arrays.asList(constraints));
@@ -95,8 +95,8 @@ public class Simple extends Framework {
 
         /**
          * pipe in some pre-processors
-         * @param processors
-         * @return
+         * @param processors pre-processors
+         * @return the Binding
          */
         public Binding pipe(Framework.PreProcessor... processors) {
             this.processors.addAll(Arrays.asList(processors));
@@ -105,8 +105,8 @@ public class Simple extends Framework {
 
         /**
          * bind to target mapping
-         * @param mapping
-         * @return
+         * @param mapping target mapping
+         * @return result field entry
          */
         public Map.Entry<String, Framework.Mapping<?>> to(Framework.Mapping<?> mapping) {
             return entry(name, attach(mapping, constraints, processors));
@@ -129,8 +129,8 @@ public class Simple extends Framework {
 
         /**
          * mix in some constraints
-         * @param constraints
-         * @return
+         * @param constraints constraints
+         * @return the Attaching
          */
         public Attaching then(Framework.Constraint... constraints) {
             this.constraints.addAll(Arrays.asList(constraints));
@@ -139,8 +139,8 @@ public class Simple extends Framework {
 
         /**
          * pipe in some pre-processors
-         * @param processors
-         * @return
+         * @param processors pre-processors
+         * @return the Attaching
          */
         public Attaching pipe(Framework.PreProcessor... processors) {
             this.processors.addAll(Arrays.asList(processors));
@@ -149,9 +149,9 @@ public class Simple extends Framework {
 
         /**
          * attach to target mapping
-         * @param mapping
-         * @param <T>
-         * @return
+         * @param mapping target mapping
+         * @param <T> base type
+         * @return result mapping
          */
         public <T> Framework.Mapping<T> to(Framework.Mapping<T> mapping) {
             return attach(mapping, constraints, processors);

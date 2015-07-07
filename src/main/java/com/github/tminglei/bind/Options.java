@@ -39,6 +39,11 @@ public class Options {
     }
 
     ///
+
+    /**
+     * whether activate i18n support
+     * @return the value optional
+     */
     public Optional<Boolean> i18n() {
         return Optional.ofNullable(this.i18n);
     }
@@ -48,6 +53,10 @@ public class Options {
         return clone;
     }
 
+    /**
+     * whether check errors as more as possible
+     * @return the value optional
+     */
     public Optional<Boolean> eagerCheck() {
         return Optional.ofNullable(this.eagerCheck);
     }
@@ -57,6 +66,10 @@ public class Options {
         return clone;
     }
 
+    /**
+     * whether skip to check empty even they are declared as required
+     * @return the value optional
+     */
     public Optional<Boolean> ignoreEmpty() {
         return Optional.ofNullable(this.ignoreEmpty);
     }
@@ -66,6 +79,10 @@ public class Options {
         return clone;
     }
 
+    /**
+     * for touched fields, an error will be filed if they are declared as required and they are empty
+     * @return the touched checker
+     */
     public Framework.TouchedChecker touched() {
         return this.touched;
     }

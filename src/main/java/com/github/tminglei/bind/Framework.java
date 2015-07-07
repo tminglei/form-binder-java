@@ -60,14 +60,14 @@ public class Framework {
         /**
          * change options associated with the mapping
          * @param setting function used to change the options
-         * @return
+         * @return the mapping
          */
         Mapping<T> options(Function<Options, Options> setting);
 
         /**
          * set label which was used to flag the data node
-         * @param label
-         * @return
+         * @param label label
+         * @return the mapping
          */
         default Mapping<T> label(String label) {
             return options(o -> o._label(label));
@@ -75,8 +75,8 @@ public class Framework {
 
         /**
          * attach some pre-processors to the mapping
-         * @param newProcessors
-         * @return
+         * @param newProcessors pre-processors
+         * @return the mapping
          */
         default Mapping<T> processor(PreProcessor... newProcessors) {
             return options(o -> o.append_processors(newProcessors));
@@ -84,8 +84,8 @@ public class Framework {
 
         /**
          * attach some constraints to the mapping
-         * @param newConstraints
-         * @return
+         * @param newConstraints constraints
+         * @return the mapping
          */
         default Mapping<T> constraint(Constraint... newConstraints) {
             return options(o -> o.append_constraints(newConstraints));
@@ -94,8 +94,8 @@ public class Framework {
         /**
          * attach some extra constraints, which was used to do some extra checking
          * after string was converted to target value, to the mapping
-         * @param extraConstraints
-         * @return
+         * @param extraConstraints extra constraints
+         * @return the mapping
          */
         Mapping<T> verifying(ExtraConstraint<T>... extraConstraints);
 
@@ -103,19 +103,19 @@ public class Framework {
 
         /**
          * used to convert raw string value to target type's value
-         * @param name
-         * @param data
-         * @return
+         * @param name full path name
+         * @param data data
+         * @return converted value
          */
         T convert(String name, Map<String, String> data);
 
         /**
          * used to validate raw string data values w/ or w/o data keys
-         * @param name
-         * @param data
-         * @param messages
-         * @param parentOptions
-         * @return
+         * @param name full path name
+         * @param data data
+         * @param messages the message holder
+         * @param parentOptions parent options
+         * @return error list
          */
         List<Map.Entry<String, String>> validate(
                 String name, Map<String, String> data, Messages messages, Options parentOptions);

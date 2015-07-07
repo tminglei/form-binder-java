@@ -25,6 +25,8 @@ public class Mappings {
 
     /**
      * (convert to String) mapping
+     * @param constraints constraints
+     * @return new created mapping
      */
     public static Framework.Mapping<String> text(Framework.Constraint... constraints) {
         return new Framework.FieldMapping(
@@ -35,6 +37,8 @@ public class Mappings {
 
     /**
      * (convert to Boolean) mapping
+     * @param constraints constraints
+     * @return new created mapping
      */
     public static Framework.Mapping<Boolean> vBoolean(Framework.Constraint... constraints) {
         return new Framework.FieldMapping(
@@ -48,6 +52,8 @@ public class Mappings {
 
     /**
      * (convert to Integer) mapping
+     * @param constraints constraints
+     * @return new created mapping
      */
     public static Framework.Mapping<Integer> vInt(Framework.Constraint... constraints) {
         return new Framework.FieldMapping(
@@ -61,6 +67,8 @@ public class Mappings {
 
     /**
      * (convert to Double) mapping
+     * @param constraints constraints
+     * @return new created mapping
      */
     public static Framework.Mapping<Double> vDouble(Framework.Constraint... constraints) {
         return new Framework.FieldMapping(
@@ -74,6 +82,8 @@ public class Mappings {
 
     /**
      * (convert to Float) mapping
+     * @param constraints constraints
+     * @return new created mapping
      */
     public static Framework.Mapping<Float> vFloat(Framework.Constraint... constraints) {
         return new Framework.FieldMapping(
@@ -87,6 +97,8 @@ public class Mappings {
 
     /**
      * (convert to Long) mapping
+     * @param constraints constraints
+     * @return new created mapping
      */
     public static Framework.Mapping<Long> vLong(Framework.Constraint... constraints) {
         return new Framework.FieldMapping(
@@ -100,6 +112,8 @@ public class Mappings {
 
     /**
      * (convert to BigDecimal) mapping
+     * @param constraints constraints
+     * @return new created mapping
      */
     public static Framework.Mapping<BigDecimal> bigDecimal(Framework.Constraint... constraints) {
         return new Framework.FieldMapping(
@@ -113,6 +127,8 @@ public class Mappings {
 
     /**
      * (convert to BigInteger) mapping
+     * @param constraints constraints
+     * @return new created mapping
      */
     public static Framework.Mapping<BigInteger> bigInt(Framework.Constraint... constraints) {
         return new Framework.FieldMapping(
@@ -126,6 +142,8 @@ public class Mappings {
 
     /**
      * (convert to UUID) mapping
+     * @param constraints constraints
+     * @return new created mapping
      */
     public static Framework.Mapping<UUID> uuid(Framework.Constraint... constraints) {
         return new Framework.FieldMapping(
@@ -139,6 +157,8 @@ public class Mappings {
 
     /**
      * (convert to LocalDate) mapping
+     * @param constraints constraints
+     * @return new created mapping
      */
     public static Framework.Mapping<LocalDate> date(Framework.Constraint... constraints) {
         return date("yyyy-MM-dd", constraints);
@@ -156,6 +176,8 @@ public class Mappings {
 
     /**
      * (convert to LocalDateTime) mapping
+     * @param constraints constraints
+     * @return new created mapping
      */
     public static Framework.Mapping<LocalDateTime> datetime(Framework.Constraint... constraints) {
         return datetime("yyyy-MM-dd'T'HH:mm:ss.SSS", constraints);
@@ -172,7 +194,9 @@ public class Mappings {
         }
 
     /**
-     * (convert to Time) mapping
+     * (convert to LocalTime) mapping
+     * @param constraints constraints
+     * @return new created mapping
      */
     public static Framework.Mapping<LocalTime> time(Framework.Constraint... constraints) {
         return time("HH:mm:ss.SSS", constraints);
@@ -189,9 +213,13 @@ public class Mappings {
         }
 
     /////////////////////////////// pre-defined general usage mappings  ///////////////////////
+
     /**
      * (mapping) ignore input value(s), and return 'instead' value
      * NOTE: all constraints added to the outer 'ignored' mapping, will be ignored
+     * @param instead the value to be used
+     * @param <T> base type
+     * @return new created mapping
      */
     public static <T> Framework.Mapping<T> ignored(T instead) {
         return new Framework.FieldMapping<T>(
@@ -203,6 +231,11 @@ public class Mappings {
     /**
      * (mapping) return default value, if input value is null or empty
      * NOTE: all options operations will be delegate to 'base' mapping
+     * @param base base mapping
+     * @param defaultVal default value to be used when the related input is empty
+     * @param constraints constraints
+     * @param <T> base type
+     * @return new created mapping
      */
     public static <T> Framework.Mapping<T> defaultVal(Framework.Mapping<T> base, T defaultVal, Framework.Constraint... constraints) {
         return new Framework.MappingWrapper<T>(base,
@@ -225,6 +258,10 @@ public class Mappings {
 
     /**
      * (mapping) wrap a base mapping, and return an optional value instead of original value
+     * @param base base mapping
+     * @param constraints constraints
+     * @param <T> base type
+     * @return new created mapping
      */
     public static <T> Framework.Mapping<Optional<T>> optional(Framework.Mapping<T> base, Framework.Constraint... constraints) {
         return new Framework.FieldMapping<Optional<T>>(
@@ -249,12 +286,16 @@ public class Mappings {
                         return mergeList(errors, errors1);
                     }
                 })
-            ).options(o -> o._ignoreConstraints(true))
+        ).options(o -> o._ignoreConstraints(true))
                 .constraint(constraints);
         }
 
     /**
      * (mapping) convert to list of values
+     * @param base base mapping
+     * @param constraints constraints
+     * @param <T> base type
+     * @return new created mapping
      */
     public static <T> Framework.Mapping<List<T>> list(Framework.Mapping<T> base, Framework.Constraint... constraints) {
         return new Framework.FieldMapping<List<T>>(
@@ -273,11 +314,15 @@ public class Mappings {
                             .flatMap(i -> base.validate(name + "[" + i + "]", data, messages, options).stream())
                             .collect(Collectors.toList());
                 })
-            ).constraint(constraints);
+        ).constraint(constraints);
         }
 
     /**
      * (mapping) convert to map of values
+     * @param vBase base mapping for map key
+     * @param constraints constraints
+     * @param <V> base value type
+     * @return new created mapping
      */
     public static <V> Framework.Mapping<Map<String, V>> map(Framework.Mapping<V> vBase,
                                                       Framework.Constraint... constraints) {
