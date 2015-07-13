@@ -175,9 +175,11 @@ public class Processors {
                 .map(e -> {
                     if (!e.getKey().startsWith(prefix)) return e;
                     else {
-                        String toBeReplaced = e.getKey().substring(prefix.length());
-                        String newKey = (prefix + toBeReplaced.replaceFirst("^" + Pattern.quote(from), to))
+                        String tail = e.getKey().substring(prefix.length())
+                                .replaceFirst("^[\\.]?" + Pattern.quote(from), to)
                                 .replaceFirst("^\\.", "");
+                        String newKey = isEmptyStr(tail) ? prefix
+                                : (prefix +"."+ tail).replaceFirst("^\\.", "");
                         return entry(
                             newKey,
                             e.getValue()
@@ -198,10 +200,10 @@ public class Processors {
      */
     public static Function<List<Map.Entry<String, String>>, Map<String, List<String>>>
                 foldErrs() {
-        return (errs) -> {
+        return (errors) -> {
             logger.debug("folding errors");
 
-            return errs.stream()
+            return errors.stream()
                 .collect(Collectors.groupingBy(
                         Map.Entry::getKey,
                         HashMap::new,
@@ -219,9 +221,9 @@ public class Processors {
      */
     public static Function<List<Map.Entry<String, String>>, Map<String, Object>>
                 errsTree() {
-        logger.debug("converting errors list to errors tree");
-
         return ((errors) -> {
+            logger.debug("converting errors list to errors tree");
+
             Map<String, Object> root = new HashMap<>();
             Map<String, Object> workList = mmap(entry("", root));
             for(Map.Entry<String, String> error : errors) {

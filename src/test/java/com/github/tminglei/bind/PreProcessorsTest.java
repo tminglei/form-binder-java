@@ -382,8 +382,8 @@ public class PreProcessorsTest {
     // change-prefix test
 
     @Test
-    public void testChangePrefix_DirectUse() {
-        System.out.println(green(">> change prefix - direct use"));
+    public void testChangePrefix_SimpleUse() {
+        System.out.println(green(">> change prefix - simple use"));
 
         PreProcessor changePrefix = Processors.changePrefix("json", "data");
 
@@ -407,27 +407,29 @@ public class PreProcessorsTest {
     }
 
     @Test
-    public void testChangePrefix_WithHeadDotOmit() {
-        System.out.println(green(">> change prefix - with head dot omitting"));
+    public void testChangePrefix_ComplexUse() {
+        System.out.println(green(">> change prefix - complex use"));
 
-        PreProcessor changePrefix = Processors.changePrefix("json", "");
+        PreProcessor changePrefix = Processors.changePrefix("json.x", "");
 
         Map<String, String> data = mmap(
                 entry("aa", "wett"),
-                entry("json.id", "123"),
-                entry("json.name", "tewd"),
-                entry("json.dr-1[0]", "33"),
-                entry("json.dr-1[1]", "45")
+                entry("t.json.x", "test"),
+                entry("t.json.x.id", "123"),
+                entry("t.json.x.name", "tewd"),
+                entry("t.json.x.dr-1[0]", "33"),
+                entry("t.json.x.dr-1[1]", "45")
             );
         Map<String, String> expected = mmap(
                 entry("aa", "wett"),
-                entry("id", "123"),
-                entry("name", "tewd"),
-                entry("dr-1[0]", "33"),
-                entry("dr-1[1]", "45")
+                entry("t", "test"),
+                entry("t.id", "123"),
+                entry("t.name", "tewd"),
+                entry("t.dr-1[0]", "33"),
+                entry("t.dr-1[1]", "45")
             );
 
-        assertEquals(changePrefix.apply("", data, Options.EMPTY),
+        assertEquals(changePrefix.apply("t", data, Options.EMPTY),
                 expected);
     }
 
