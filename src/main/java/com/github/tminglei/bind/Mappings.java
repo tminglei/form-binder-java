@@ -278,15 +278,14 @@ public class Mappings {
 
                     if (isEmptyInput(name, data, base.options()._inputMode())) {
                         return Collections.EMPTY_LIST;
-                    } else {
-                        List<Map.Entry<String, String>> errors = validateRec(name, data, messages, options, options._constraints());
-                        List<Map.Entry<String, String>> errors1 = errors.isEmpty() || options.eagerCheck().orElse(false)
-                                ? base.validate(name, data, messages, options)
-                                : Collections.EMPTY_LIST;
-                        return mergeList(errors, errors1);
+                    } else { // merge the optional's constraints/label to base mapping then do validating
+                        return base.options(o -> o.append_constraints(
+                                        options._constraints().toArray(new Framework.Constraint[0])))
+                                .options(o -> o._label(o._label().orElse(options._label().orElse(null))))
+                                .validate(name, data, messages, options);
                     }
                 })
-        ).options(o -> o._ignoreConstraints(true))
+            ).options(o -> o._ignoreConstraints(true))
                 .constraint(constraints);
         }
 
@@ -314,7 +313,7 @@ public class Mappings {
                             .flatMap(i -> base.validate(name + "[" + i + "]", data, messages, options).stream())
                             .collect(Collectors.toList());
                 })
-        ).constraint(constraints);
+            ).constraint(constraints);
         }
 
     /**
