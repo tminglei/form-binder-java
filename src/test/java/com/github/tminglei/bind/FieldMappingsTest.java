@@ -57,7 +57,7 @@ public class FieldMappingsTest {
     public void testText_EagerCheck() {
         System.out.println(green(">> text - eager check"));
 
-        Mapping<String> text = Mappings.text(maxlength(20, "%s: length > %s"), email("%s: invalid email"));
+        Mapping<String> text = Mappings.text(maxLength(20, "%s: length > %s"), email("%s: invalid email"));
         Map<String, String> data = mmap(entry("text", "etttt.att#example-1111111.com"));
 
         assertEquals(text.validate("text", data, messages, new Options().eagerCheck(true)).stream().collect(Collectors.toSet()),

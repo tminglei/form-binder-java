@@ -53,10 +53,10 @@ public class Constraints {
         };
     }
 
-    public static Framework.Constraint maxlength(int length) {
-        return maxlength(length, null);
+    public static Framework.Constraint maxLength(int length) {
+        return maxLength(length, null);
     }
-    public static Framework.Constraint maxlength(int length, String message) {
+    public static Framework.Constraint maxLength(int length, String message) {
         return mkSimpleConstraint((label, vString, messages) -> {
             logger.debug("checking max-length ({}) for '{}'", length, vString);
 
@@ -67,10 +67,10 @@ public class Constraints {
         });
     }
 
-    public static Framework.Constraint minlength(int length) {
-        return minlength(length, null);
+    public static Framework.Constraint minLength(int length) {
+        return minLength(length, null);
     }
-    public static Framework.Constraint minlength(int length, String message) {
+    public static Framework.Constraint minLength(int length, String message) {
         return mkSimpleConstraint((label, vString, messages) -> {
             logger.debug("checking min-length ({}) for '{}'", length, vString);
 
@@ -116,27 +116,6 @@ public class Constraints {
         return pattern(PATTERN_EMAIL, message);
     }
 
-    public static Framework.Constraint indexInKeys() {
-        return indexInKeys(null);
-    }
-    public static Framework.Constraint indexInKeys(String message) {
-        return (name, data, messages, options) -> {
-            logger.debug("checking index in keys for '{}'", name);
-
-            String msgTemplate = message != null ? message : messages.get("error.index");
-            return data.keySet().stream()
-                    .filter(key -> key.startsWith(name))
-                    .map(key -> {
-                        Matcher m = PATTERN_ILLEGAL_INDEX.matcher(key.substring(name.length()));
-                        if (m.matches()) {
-                            return entry(key, String.format(msgTemplate, key, m.group(1)));
-                        } else return null;
-                    })
-                    .filter(err -> err != null)
-                    .collect(Collectors.toList());
-        };
-    }
-
     public static Framework.Constraint pattern(String pattern) {
         return pattern(pattern, null);
     }
@@ -163,6 +142,27 @@ public class Constraints {
                 return String.format(msgTemplate, vString, pattern);
             } else return null;
         });
+    }
+
+    public static Framework.Constraint indexInKeys() {
+        return indexInKeys(null);
+    }
+    public static Framework.Constraint indexInKeys(String message) {
+        return (name, data, messages, options) -> {
+            logger.debug("checking index in keys for '{}'", name);
+
+            String msgTemplate = message != null ? message : messages.get("error.index");
+            return data.keySet().stream()
+                    .filter(key -> key.startsWith(name))
+                    .map(key -> {
+                        Matcher m = PATTERN_ILLEGAL_INDEX.matcher(key.substring(name.length()));
+                        if (m.matches()) {
+                            return entry(key, String.format(msgTemplate, key, m.group(1)));
+                        } else return null;
+                    })
+                    .filter(err -> err != null)
+                    .collect(Collectors.toList());
+        };
     }
 
     ///////////////////////////////////  pre-defined extra constraints  //////////////////////

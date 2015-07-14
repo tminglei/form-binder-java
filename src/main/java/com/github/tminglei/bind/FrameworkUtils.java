@@ -118,13 +118,14 @@ public class FrameworkUtils {
     public static Framework.Constraint
             mkSimpleConstraint(Framework.SimpleConstraint validate) {
         return ((name, data, messages, options) -> {
-            if (options._inputMode() != Framework.InputMode.SINGLE)
-                throw new IllegalArgumentException("The constraint shouldn't be used to non-single input mapping");
-
-            String label = getLabel(name, messages, options);
-            String error = validate.apply(label, data.get(name), messages);
-            return isEmptyStr(error) ? Collections.EMPTY_LIST
-                    : Arrays.asList(entry(name, error));
+            if (options._inputMode() != Framework.InputMode.SINGLE) {
+                throw new IllegalArgumentException("The constraint should only be used to SINGLE INPUT mapping!");
+            } else {
+                String label = getLabel(name, messages, options);
+                String error = validate.apply(label, data.get(name), messages);
+                return isEmptyStr(error) ? Collections.EMPTY_LIST
+                        : Arrays.asList(entry(name, error));
+            }
         });
     }
 
@@ -179,10 +180,10 @@ public class FrameworkUtils {
 
     // i18n on: use i18n label, if exists; else use label; else use last field name from full name
     // i18n off: use label; else use last field name from full name
-    public static String getLabel(String fullname, Framework.Messages messages, Options options) {
-        logger.trace("getting label for {} with i18n:{}, _label:{}", fullname, options.i18n(), options._label());
+    public static String getLabel(String fullName, Framework.Messages messages, Options options) {
+        logger.trace("getting label for {} with i18n:{}, _label:{}", fullName, options.i18n(), options._label());
 
-        String[] parts = splitName(fullname);   // parts: (parent, name/index, isArray)
+        String[] parts = splitName(fullName);   // parts: (parent, name/index, isArray)
         boolean isArray = Boolean.parseBoolean(parts[2]);
         String defaultLabel = isArray
                 ? splitName(parts[0])[1] + "[" + parts[1] + "]"
@@ -191,7 +192,7 @@ public class FrameworkUtils {
         String label = options.i18n().orElse(false)
                 ? options._label()
                     .flatMap(l -> Optional.ofNullable(messages.get(l)))
-                    .orElse(defaultLabel)
+                    .orElse(options._label().orElse(defaultLabel))
                 : options._label().orElse(defaultLabel);
 
         logger.trace("getting label - return {}", label);

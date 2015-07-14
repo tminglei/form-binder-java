@@ -76,7 +76,7 @@ public class ConstraintsTest {
     public void testMaxLength_SimpleUse() {
         System.out.println(green(">> max length - simple use"));
 
-        Constraint maxlength = Constraints.maxlength(10);
+        Constraint maxlength = Constraints.maxLength(10);
 
         assertEquals(maxlength.apply("", mmap(entry("", "wetyyuu")), messages, new Options()._label("")._inputMode(InputMode.SINGLE)),
                 Collections.EMPTY_LIST);
@@ -90,7 +90,7 @@ public class ConstraintsTest {
     public void testMaxLength_WithCustomMessage() {
         System.out.println(green(">> max length - with custom message"));
 
-        Constraint maxlength = Constraints.maxlength(10, "'%s': length > %d");
+        Constraint maxlength = Constraints.maxLength(10, "'%s': length > %d");
 
         assertEquals(maxlength.apply("", mmap(entry("", "eewryuooerjhy")), messages, new Options()._label("haha")._inputMode(InputMode.SINGLE)),
                 Arrays.asList(entry("", "'eewryuooerjhy': length > 10")));
@@ -102,7 +102,7 @@ public class ConstraintsTest {
     public void testMinLength_SimpleUse() {
         System.out.println(green(">> min length - simple use"));
 
-        Constraint minlength = Constraints.minlength(3);
+        Constraint minlength = Constraints.minLength(3);
 
         assertEquals(minlength.apply("", mmap(entry("", "er")), messages, new Options()._label("")._inputMode(InputMode.SINGLE)),
                 Arrays.asList(entry("", "'er' cannot be shorter than 3 characters.")));
@@ -116,7 +116,7 @@ public class ConstraintsTest {
     public void testMinLength_WithCustomMessage() {
         System.out.println(green(">> min length - custom message"));
 
-        Constraint minlength = Constraints.minlength(3, "'%s': length cannot < %d");
+        Constraint minlength = Constraints.minLength(3, "'%s': length cannot < %d");
 
         assertEquals(minlength.apply("", mmap(entry("", "te")), messages, new Options()._label("haha")._inputMode(InputMode.SINGLE)),
                 Arrays.asList(entry("", "'te': length cannot < 3")));

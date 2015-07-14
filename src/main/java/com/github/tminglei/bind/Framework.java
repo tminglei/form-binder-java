@@ -321,10 +321,12 @@ public class Framework {
 
         private BindObject doConvert(String name, Map<String, String> data) {
             Map<String, Object> values = new HashMap<>();
-            for(Map.Entry<String, Mapping<?>> field : fields) {
-                String fullName = isEmptyStr(name) ? field.getKey() : name + "." + field.getKey();
-                Object value = field.getValue().convert(fullName, data);
-                values.put(field.getKey(), value);
+            if (!isEmptyInput(name, data, options._inputMode())) {
+                for(Map.Entry<String, Mapping<?>> field : fields) {
+                    String fullName = isEmptyStr(name) ? field.getKey() : name + "." + field.getKey();
+                    Object value = field.getValue().convert(fullName, data);
+                    values.put(field.getKey(), value);
+                }
             }
             return new BindObject(values);
         }
@@ -360,9 +362,7 @@ public class Framework {
                     if (isEmptyInput(name, newData, theOptions._inputMode())) return Collections.EMPTY_LIST;
                     else {
                         BindObject vObj = doConvert(name, newData);
-                        if (vObj != null) {
-                            return extraValidateRec(name, vObj, messages, theOptions, extraConstraints);
-                        }
+                        return extraValidateRec(name, vObj, messages, theOptions, extraConstraints);
                     }
                 }
                 return errors;

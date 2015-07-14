@@ -40,7 +40,7 @@ public class GroupMappingsTest {
                 else return Collections.EMPTY_LIST;
             });
     private Mapping<BindObject> mappingx = mapping(
-            fb("email").to(text(maxlength(20, "%s: length > %s"), email("%s: invalid email"), required("%s is required"))),
+            fb("email").to(text(maxLength(20, "%s: length > %s"), email("%s: invalid email"), required("%s is required"))),
             fb("count").to(vInt().verifying(max(10, "%s > %s"), max(15, "%s > %s")))
         );
 

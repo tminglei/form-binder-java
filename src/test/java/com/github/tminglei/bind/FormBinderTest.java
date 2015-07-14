@@ -21,7 +21,7 @@ public class FormBinderTest {
         mapping(
             field("id", vLong()),
             field("data", fb(expandJson()).to(mapping(
-                field("email", fb(required("%s is required")).to(text(maxlength(20, "%s: length > %s"), email("%s: invalid email")))),
+                field("email", fb(required("%s is required")).to(text(maxLength(20, "%s: length > %s"), email("%s: invalid email")))),
                 field("price", fb(omitLeft("$")).to(vFloat())),
                 field("count", vInt().verifying(min(3), max(10)))
             )).label("xx").verifying((label, vObj, messages1) -> {

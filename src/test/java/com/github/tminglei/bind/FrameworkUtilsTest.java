@@ -72,7 +72,7 @@ public class FrameworkUtilsTest {
         assertEquals(FrameworkUtils.getLabel("a.b.c", (key) -> "tt", Options.EMPTY.i18n(true)),
                 "c");
         assertEquals(FrameworkUtils.getLabel("a.b.c", (key) -> null, Options.EMPTY.i18n(true)._label("t1")),
-                "c");
+                "t1");
 
         assertEquals(FrameworkUtils.getLabel("a.b.c[1]", (key) -> "tt", Options.EMPTY),
                 "c[1]");
