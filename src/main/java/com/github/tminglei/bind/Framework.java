@@ -3,10 +3,7 @@ package com.github.tminglei.bind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -119,26 +116,35 @@ public class Framework {
          */
         List<Map.Entry<String, String>> validate(
                 String name, Map<String, String> data, Messages messages, Options parentOptions);
+
+        /**
+         * transform this result value to another type
+         * @param transform
+         * @param <R>
+         * @return
+         */
+        default <R> Mapping<R> mapTo(Function<T, R> transform) {
+            return new TransformMapping<>(this, transform);
+        }
     }
 
     /**
-     * A wrapper mapping, used to intercept/customize converting or validating of the delegated mapping
+     * A wrapper mapping, used to transform converted value to another type
      */
-    public static class MappingWrapper<T> implements Mapping<T> {
-        public final Mapping<T> base;
-        public final BiFunction<String, Map<String, String>, T> doConvert;
-        public final Constraint doValidate;
+    private static class TransformMapping<T, R> implements Mapping<R> {
+        private final Mapping<T> base;
+        private final Function<T, R> transform;
+        private final List<ExtraConstraint<R>> extraConstraints;
 
-        private final Logger log = LoggerFactory.getLogger(MappingWrapper.class);
+        private final Logger log = LoggerFactory.getLogger(TransformMapping.class);
 
-        MappingWrapper(Mapping<T> base) {
-            this(base, null, null);
+        TransformMapping(Mapping<T> base, Function<T, R> transform) {
+            this(base, transform, Collections.EMPTY_LIST);
         }
-        MappingWrapper(Mapping<T> base, BiFunction<String, Map<String, String>, T> doConvert,
-                       Constraint doValidate) {
+        TransformMapping(Mapping<T> base, Function<T, R> transform, List<ExtraConstraint<R>> extraConstraints) {
             this.base = base;
-            this.doConvert = doConvert;
-            this.doValidate = doValidate;
+            this.transform = transform;
+            this.extraConstraints = unmodifiableList(extraConstraints);
         }
 
         @Override
@@ -147,37 +153,31 @@ public class Framework {
         }
 
         @Override
-        public Mapping<T> options(Function<Options, Options> setting) {
-            return new MappingWrapper(base.options(setting), doConvert, doValidate);
+        public Mapping<R> options(Function<Options, Options> setting) {
+            return new TransformMapping(base.options(setting), transform, extraConstraints);
         }
 
         @Override
-        public Mapping<T> verifying(ExtraConstraint<T>... extraConstraints) {
-            return new MappingWrapper(base.verifying(extraConstraints), doConvert, doValidate);
+        public Mapping<R> verifying(ExtraConstraint<R>... extraConstraints) {
+            return new TransformMapping(base, transform,
+                    (List<ExtraConstraint<R>>) appendList(this.extraConstraints, extraConstraints));
         }
 
         @Override
-        public T convert(String name, Map<String, String> data) {
-            log.debug("converting with {} for {}", (doConvert == null ? "base.convert(..)" : "doConvert(..)"), name);
-
-            if (doConvert == null) return base.convert(name, data);
-            else {
-                Map<String, String> newData = processDataRec(name, data, options(), options()._processors());
-                return doConvert.apply(name, newData);
-            }
+        public R convert(String name, Map<String, String> data) {
+            log.debug("transforming for {}", name);
+            return transform.apply(base.convert(name, data));
         }
 
         @Override
         public List<Map.Entry<String, String>> validate(String name, Map<String, String> data,
-                                                Messages messages, Options parentOptions) {
-            log.debug("validation with {} for {}", (doValidate == null ? "base.validate(..)" : "doValidate(..)"), name);
-
-            Options theOptions = options().merge(parentOptions);
-            if (doValidate == null) return base.validate(name, data, messages, theOptions);
-            else {
-                Map<String, String> newData = processDataRec(name, data, theOptions, theOptions._processors());
-                return doValidate.apply(name, newData, messages, theOptions);
-            }
+                                                        Messages messages, Options parentOptions) {
+            List<Map.Entry<String, String>> errors = base.validate(name, data, messages, parentOptions);
+            if (errors.isEmpty()) {
+                return Optional.ofNullable(convert(name, data))
+                        .map(v -> extraValidateRec(name, v, messages, parentOptions, extraConstraints))
+                        .orElse(Collections.EMPTY_LIST);
+            } else return errors;
         }
     }
 
@@ -258,12 +258,10 @@ public class Framework {
                 List<Constraint> validators = appendList(theOptions._ignoreConstraints() ? null : theOptions._constraints(), moreValidate);
                 List<Map.Entry<String, String>> errors = validateRec(name, newData, messages, theOptions, validators);
                 if (errors.isEmpty()) {
-                    T vObj = doConvert.apply(name, newData);
-                    if (vObj != null) {
-                        return extraValidateRec(name, vObj, messages, theOptions, extraConstraints);
-                    }
-                }
-                return errors;
+                    return Optional.ofNullable(doConvert.apply(name, newData))
+                            .map(v -> extraValidateRec(name, v, messages, theOptions, extraConstraints))
+                            .orElse(Collections.EMPTY_LIST);
+                } else return errors;
             }
         }
     }

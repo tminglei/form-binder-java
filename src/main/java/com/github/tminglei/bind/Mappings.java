@@ -238,23 +238,8 @@ public class Mappings {
      * @return new created mapping
      */
     public static <T> Framework.Mapping<T> defaultVal(Framework.Mapping<T> base, T defaultVal, Framework.Constraint... constraints) {
-        return new Framework.MappingWrapper<T>(base,
-                ((name, data) -> {
-                    logger.debug("defaultVal - do converting for {}", name);
-
-                    if (isEmptyInput(name, data, base.options()._inputMode())) {
-                        return defaultVal;
-                    } else return base.convert(name, data);
-                }),
-                ((name, data, messages, options) -> {
-                    logger.debug("defaultVal - do validating for {}", name);
-
-                    if (isEmptyInput(name, data, base.options()._inputMode())) {
-                        return Collections.emptyList();
-                    } else return base.validate(name, data, messages, options);
-                })
-            ).constraint(constraints);
-        }
+        return optional(base, constraints).mapTo(o -> o.orElse(defaultVal));
+    }
 
     /**
      * (mapping) wrap a base mapping, and return an optional value instead of original value
