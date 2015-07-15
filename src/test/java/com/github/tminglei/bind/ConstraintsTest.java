@@ -31,9 +31,9 @@ public class ConstraintsTest {
         Constraint required = Constraints.required();
 
         assertEquals(required.apply("", mmap(entry("", null)), messages, new Options()._inputMode(InputMode.SINGLE)),
-                Arrays.asList(entry("", "required simple value, but found compound value.")));
+                Arrays.asList(entry("", " is required.")));
         assertEquals(required.apply("", mmap(entry("", "")), messages, new Options()._inputMode(InputMode.SINGLE)),
-                Arrays.asList(entry("", "required simple value, but found compound value.")));
+                Arrays.asList(entry("", " is required.")));
         assertEquals(required.apply("", mmap(entry("", "test")), messages, new Options()._label("")._inputMode(InputMode.SINGLE)),
                 Collections.EMPTY_LIST);
     }

@@ -100,8 +100,8 @@ public class GroupMappingsTest {
         Map<String, String> data = mmap(entry("", ""));
 
         assertEquals(mapping1.validate("", data, messages, Options.EMPTY),
-                Arrays.asList(entry("", "count cannot less than 3")));
-        assertEquals(mapping1.convert("", data).get("count"), Integer.valueOf(0));
+                Collections.EMPTY_LIST);
+        assertEquals(mapping1.convert("", data), null);
     }
 
     // group mapping 2 test

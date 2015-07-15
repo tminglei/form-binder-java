@@ -66,7 +66,7 @@ public class FrameworkUtils {
             String prefix1 = isEmptyStr(name) ? "" : name + ".";
             String prefix2 = isEmptyStr(name) ? "" : name + "[";
             long subInputCount = data.keySet().stream()
-                    .filter(k -> k.startsWith(prefix1) || k.startsWith(prefix2))
+                    .filter(k -> (k.startsWith(prefix1) || k.startsWith(prefix2)) && k.length() > name.length())
                     .count();
             return inputMode == Framework.InputMode.MULTIPLE ? subInputCount == 0
                     : isEmptyStr(data.get(name)) && subInputCount == 0;

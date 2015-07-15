@@ -251,7 +251,7 @@ public class Framework {
 
             if (isEmptyInput(name, newData, theOptions._inputMode())
                     && theOptions.ignoreEmpty().orElse(false)
-                    && (theOptions.touched() == null || !theOptions.touched().apply(name, newData))) {
+                    && (theOptions.touched() == null || ! theOptions.touched().apply(name, newData))) {
                 return Collections.EMPTY_LIST;
             }
             else {
@@ -339,7 +339,7 @@ public class Framework {
 
             if (isEmptyInput(name, newData, theOptions._inputMode())
                     && theOptions.ignoreEmpty().orElse(false)
-                    && (theOptions.touched() == null || !theOptions.touched().apply(name, newData))) {
+                    && (theOptions.touched() == null || ! theOptions.touched().apply(name, newData))) {
                 return Collections.EMPTY_LIST;
             }
             else {

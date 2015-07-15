@@ -265,7 +265,7 @@ public class Mappings {
                         return Collections.EMPTY_LIST;
                     } else { // merge the optional's constraints/label to base mapping then do validating
                         return base.options(o -> o.append_constraints(
-                                        options._constraints().toArray(new Framework.Constraint[0])))
+                                    options._constraints().toArray(new Framework.Constraint[0])))
                                 .options(o -> o._label(o._label().orElse(options._label().orElse(null))))
                                 .validate(name, data, messages, options);
                     }
@@ -320,10 +320,13 @@ public class Mappings {
                     logger.debug("map - do converting for {}", name);
 
                     return keys(name, data).stream()
-                        .map(key -> entry(
+                        .map(key -> {
+                            String keyName = isEmptyStr(name) ? key : name + "." + key;
+                            return entry(
                                 kBase.convert(key, mmap(entry(key, key))),
-                                vBase.convert(name + "." + key, data)
-                        ))
+                                vBase.convert(keyName, data)
+                            );
+                        })
                         .collect(Collectors.toMap(
                                 Map.Entry::getKey,
                                 Map.Entry::getValue
@@ -333,10 +336,13 @@ public class Mappings {
                     logger.debug("map - do validating for {}", name);
 
                     return keys(name, data).stream()
-                        .flatMap(key -> mergeList(
+                        .flatMap(key -> {
+                            String keyName = isEmptyStr(name) ? key : name + "." + key;
+                            return mergeList(
                                 kBase.validate(key, mmap(entry(key, key)), messages, options),
-                                vBase.validate(name + "." + key, data, messages, options)
-                        ).stream())
+                                vBase.validate(keyName, data, messages, options)
+                            ).stream();
+                        })
                         .collect(Collectors.toList());
                 })
             ).constraint(constraints);
