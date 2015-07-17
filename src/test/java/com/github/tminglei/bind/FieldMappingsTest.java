@@ -5,9 +5,7 @@ import org.testng.annotations.Test;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -162,7 +160,7 @@ public class FieldMappingsTest {
         Map<String, String> data = mmap(entry("int", "t12345"));
 
         assertEquals(integer.validate("int", data, messages, Options.EMPTY),
-                Arrays.asList(entry("int", "'t12345' must be a number.")));
+                Arrays.asList(entry("int", "'t12345' must be a number")));
     }
 
     @Test
@@ -174,7 +172,7 @@ public class FieldMappingsTest {
         Map<String, String> data = mmap(entry("int", "345"));
 
         assertEquals(integer.validate("int", data, messages, Options.EMPTY),
-                Arrays.asList(entry("int", "'345' cannot be lower than 1000.")));
+                Arrays.asList(entry("int", "'345' cannot be lower than 1000")));
     }
 
     @Test
@@ -185,7 +183,7 @@ public class FieldMappingsTest {
         Map<String, String> data = mmap(entry("int", "146894532240"));
 
         assertEquals(integer.validate("int", data, messages, Options.EMPTY),
-                Arrays.asList(entry("int", "'146894532240' must be a number.")));
+                Arrays.asList(entry("int", "'146894532240' must be a number")));
     }
 
     @Test
@@ -222,7 +220,7 @@ public class FieldMappingsTest {
         Map<String, String> data = mmap(entry("int", ""));
 
         assertEquals(integer.validate("int", data, messages, Options.EMPTY),
-                Arrays.asList(entry("int", "'0' cannot be lower than 1000.")));
+                Arrays.asList(entry("int", "'0' cannot be lower than 1000")));
         assertEquals(integer.convert("int", data), Integer.valueOf(0));
     }
 
@@ -236,7 +234,7 @@ public class FieldMappingsTest {
         Map<String, String> data = mmap(entry("double", "tesstt"));
 
         assertEquals(mDouble.validate("double", data, messages, Options.EMPTY),
-                Arrays.asList(entry("double", "'tesstt' must be a number.")));
+                Arrays.asList(entry("double", "'tesstt' must be a number")));
     }
 
     @Test
@@ -285,7 +283,7 @@ public class FieldMappingsTest {
         Map<String, String> data = mmap(entry("float", "tesstt"));
 
         assertEquals(mFloat.validate("float", data, messages, Options.EMPTY),
-                Arrays.asList(entry("float", "'tesstt' must be a number.")));
+                Arrays.asList(entry("float", "'tesstt' must be a number")));
     }
 
     @Test
@@ -334,7 +332,7 @@ public class FieldMappingsTest {
         Map<String, String> data = mmap(entry("long", "tesstt"));
 
         assertEquals(mLong.validate("long", data, messages, Options.EMPTY),
-                Arrays.asList(entry("long", "'tesstt' must be a number.")));
+                Arrays.asList(entry("long", "'tesstt' must be a number")));
     }
 
     @Test
@@ -383,7 +381,7 @@ public class FieldMappingsTest {
         Map<String, String> data = mmap(entry("bigDecimal", "tesstt"));
 
         assertEquals(bigDecimal.validate("bigDecimal", data, messages, Options.EMPTY),
-                Arrays.asList(entry("bigDecimal", "'tesstt' must be a number.")));
+                Arrays.asList(entry("bigDecimal", "'tesstt' must be a number")));
     }
 
     @Test
@@ -432,7 +430,7 @@ public class FieldMappingsTest {
         Map<String, String> data = mmap(entry("bigInt", "23545.2355"));
 
         assertEquals(bigInt.validate("bigInt", data, messages, Options.EMPTY),
-                Arrays.asList(entry("bigInt", "'23545.2355' must be a number.")));
+                Arrays.asList(entry("bigInt", "'23545.2355' must be a number")));
     }
 
     @Test
@@ -481,7 +479,7 @@ public class FieldMappingsTest {
         Map<String, String> data = mmap(entry("uuid", "tesstt"));
 
         assertEquals(uuid.validate("uuid", data, messages, Options.EMPTY),
-                Arrays.asList(entry("uuid", "'tesstt' missing or not a valid uuid.")));
+                Arrays.asList(entry("uuid", "'tesstt' missing or not a valid uuid")));
     }
 
     @Test
@@ -531,20 +529,27 @@ public class FieldMappingsTest {
         Map<String, String> data = mmap(entry("date", "5/3/2003"));
 
         assertEquals(date.validate("date", data, messages, Options.EMPTY),
-                Arrays.asList(entry("date", "'5/3/2003' must be 'yyyy-MM-dd'.")));
+                Arrays.asList(entry("date", "'xx' must satisfy any of following: " +
+                        "['5/3/2003' not a date long, '5/3/2003' must be 'yyyy-MM-dd']")));
     }
 
     @Test
     public void testDate_ValidData() {
         System.out.println(green(">> date - valid data"));
 
-        LocalDate dateObj = LocalDate.now();
+        long timestamp = System.currentTimeMillis();
+        LocalDate dateObj = LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneId.of("UTC")).toLocalDate();
         Mapping<LocalDate> date = Mappings.date();
-        Map<String, String> data = mmap(entry("date", dateObj.toString()));
 
+        Map<String, String> data = mmap(entry("date", dateObj.toString()));
         assertEquals(date.validate("date", data, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(date.convert("date", data), dateObj);
+
+        Map<String, String> data1 = mmap(entry("date", "" + timestamp));
+        assertEquals(date.validate("date", data1, messages, Options.EMPTY),
+                Collections.EMPTY_LIST);
+        assertEquals(date.convert("date", data1), dateObj);
     }
 
     @Test
@@ -581,20 +586,27 @@ public class FieldMappingsTest {
         Map<String, String> data = mmap(entry("datetime", "5/3/2003"));
 
         assertEquals(datetime.validate("datetime", data, messages, Options.EMPTY),
-                Arrays.asList(entry("datetime", "'5/3/2003' must be 'yyyy-MM-dd'T'HH:mm:ss.SSS'.")));
+                Arrays.asList(entry("datetime", "'xx' must satisfy any of following: " +
+                        "['5/3/2003' not a date long, '5/3/2003' must be 'yyyy-MM-dd'T'HH:mm:ss.SSS']")));
     }
 
     @Test
     public void testDatetime_ValidData() {
         System.out.println(green(">> datetime - valid data"));
 
-        LocalDateTime datetimeObj = LocalDateTime.now();
+        long timestamp = System.currentTimeMillis();
+        LocalDateTime datetimeObj = LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneId.of("UTC"));
         Mapping<LocalDateTime> datetime = Mappings.datetime();
         Map<String, String> data = mmap(entry("datetime", datetimeObj.toString()));
 
         assertEquals(datetime.validate("datetime", data, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(datetime.convert("datetime", data), datetimeObj);
+
+        Map<String, String> data1 = mmap(entry("datetime", "" + timestamp));
+        assertEquals(datetime.validate("datetime", data1, messages, Options.EMPTY),
+                Collections.EMPTY_LIST);
+        assertEquals(datetime.convert("datetime", data1), datetimeObj);
     }
 
     @Test
@@ -631,20 +643,27 @@ public class FieldMappingsTest {
         Map<String, String> data = mmap(entry("time", "5/3/2003"));
 
         assertEquals(time.validate("time", data, messages, Options.EMPTY),
-                Arrays.asList(entry("time", "'5/3/2003' must be 'HH:mm:ss.SSS'.")));
+                Arrays.asList(entry("time", "'xx' must satisfy any of following: " +
+                        "['5/3/2003' not a date long, '5/3/2003' must be 'HH:mm:ss.SSS']")));
     }
 
     @Test
     public void testTime_ValidData() {
         System.out.println(green(">> time - valid data"));
 
-        LocalTime timeObj = LocalTime.now();
+        long timestamp = System.currentTimeMillis();
+        LocalTime timeObj = LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneId.of("UTC")).toLocalTime();
         Mapping<LocalTime> time = Mappings.time();
         Map<String, String> data = mmap(entry("time", timeObj.toString()));
 
         assertEquals(time.validate("time", data, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(time.convert("time", data), timeObj);
+
+        Map<String, String> data1 = mmap(entry("time", "" + timestamp));
+        assertEquals(time.validate("time", data1, messages, Options.EMPTY),
+                Collections.EMPTY_LIST);
+        assertEquals(time.convert("time", data1), timeObj);
     }
 
     @Test

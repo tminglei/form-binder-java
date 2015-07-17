@@ -58,7 +58,7 @@ public class GroupMappingsTest {
         Map<String, String> data = mmap(entry("count", "t5"));
 
         assertEquals(mapping1.validate("", data, messages, Options.EMPTY),
-                Arrays.asList(entry("count", "'t5' must be a number.")));
+                Arrays.asList(entry("count", "'t5' must be a number")));
     }
 
     @Test
@@ -113,7 +113,7 @@ public class GroupMappingsTest {
         Map<String, String> data = mmap(entry("price", "23.5f"), entry("count", "t5"));
 
         assertEquals(mapping2.validate("", data, messages, Options.EMPTY),
-                Arrays.asList(entry("count", "'t5' must be a number.")));
+                Arrays.asList(entry("count", "'t5' must be a number")));
     }
 
     @Test
@@ -135,7 +135,7 @@ public class GroupMappingsTest {
         Map<String, String> data = mmap(entry("price", "23.5f"), entry("count", "15"));
 
         assertEquals(mapping2.validate("", data, messages, Options.EMPTY),
-                Arrays.asList(entry("count", "'15' cannot be greater than 10.")));
+                Arrays.asList(entry("count", "'15' cannot be greater than 10")));
     }
 
     @Test

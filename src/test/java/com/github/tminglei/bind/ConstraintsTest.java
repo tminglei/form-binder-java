@@ -31,9 +31,9 @@ public class ConstraintsTest {
         Constraint required = Constraints.required();
 
         assertEquals(required.apply("", mmap(entry("", null)), messages, new Options()._inputMode(InputMode.SINGLE)),
-                Arrays.asList(entry("", " is required.")));
+                Arrays.asList(entry("", " is required")));
         assertEquals(required.apply("", mmap(entry("", "")), messages, new Options()._inputMode(InputMode.SINGLE)),
-                Arrays.asList(entry("", " is required.")));
+                Arrays.asList(entry("", " is required")));
         assertEquals(required.apply("", mmap(entry("", "test")), messages, new Options()._label("")._inputMode(InputMode.SINGLE)),
                 Collections.EMPTY_LIST);
     }
@@ -81,7 +81,7 @@ public class ConstraintsTest {
         assertEquals(maxlength.apply("", mmap(entry("", "wetyyuu")), messages, new Options()._label("")._inputMode(InputMode.SINGLE)),
                 Collections.EMPTY_LIST);
         assertEquals(maxlength.apply("", mmap(entry("", "wetyettyiiie")), messages, new Options()._label("")._inputMode(InputMode.SINGLE)),
-                Arrays.asList(entry("", "'wetyettyiiie' cannot be longer than 10 characters.")));
+                Arrays.asList(entry("", "'wetyettyiiie' cannot be longer than 10 characters")));
         assertEquals(maxlength.apply("", mmap(entry("", "tuewerri97")), messages, new Options()._label("")._inputMode(InputMode.SINGLE)),
                 Collections.EMPTY_LIST);
     }
@@ -105,7 +105,7 @@ public class ConstraintsTest {
         Constraint minlength = Constraints.minLength(3);
 
         assertEquals(minlength.apply("", mmap(entry("", "er")), messages, new Options()._label("")._inputMode(InputMode.SINGLE)),
-                Arrays.asList(entry("", "'er' cannot be shorter than 3 characters.")));
+                Arrays.asList(entry("", "'er' cannot be shorter than 3 characters")));
         assertEquals(minlength.apply("", mmap(entry("", "ert6")), messages, new Options()._label("")._inputMode(InputMode.SINGLE)),
                 Collections.EMPTY_LIST);
         assertEquals(minlength.apply("", mmap(entry("", "tee")), messages, new Options()._label("")._inputMode(InputMode.SINGLE)),
@@ -133,9 +133,9 @@ public class ConstraintsTest {
         assertEquals(length.apply("", mmap(entry("", "123456789")), messages, new Options()._label("")._inputMode(InputMode.SINGLE)),
                 Collections.EMPTY_LIST);
         assertEquals(length.apply("", mmap(entry("", "123")), messages, new Options()._label("")._inputMode(InputMode.SINGLE)),
-                Arrays.asList(entry("", "'123' must be 9 characters.")));
+                Arrays.asList(entry("", "'123' must be 9 characters")));
         assertEquals(length.apply("", mmap(entry("", "1234567890")), messages, new Options()._label("")._inputMode(InputMode.SINGLE)),
-                Arrays.asList(entry("", "'1234567890' must be 9 characters.")));
+                Arrays.asList(entry("", "'1234567890' must be 9 characters")));
     }
 
     @Test
@@ -159,9 +159,9 @@ public class ConstraintsTest {
         assertEquals(oneof.apply("", mmap(entry("", "a")), messages, new Options()._label("")._inputMode(InputMode.SINGLE)),
                 Collections.EMPTY_LIST);
         assertEquals(oneof.apply("", mmap(entry("", "t")), messages, new Options()._label("")._inputMode(InputMode.SINGLE)),
-                Arrays.asList(entry("", "'t' must be one of [a, b, c].")));
+                Arrays.asList(entry("", "'t' must be one of [a, b, c]")));
         assertEquals(oneof.apply("", mmap(entry("", null)), messages, new Options()._label("")._inputMode(InputMode.SINGLE)),
-                Arrays.asList(entry("", "'null' must be one of [a, b, c].")));
+                Arrays.asList(entry("", "'null' must be one of [a, b, c]")));
     }
 
     @Test
@@ -185,9 +185,9 @@ public class ConstraintsTest {
         assertEquals(pattern.apply("", mmap(entry("", "1234657")), messages, new Options()._label("")._inputMode(InputMode.SINGLE)),
                 Collections.EMPTY_LIST);
         assertEquals(pattern.apply("", mmap(entry("", "32566y")), messages, new Options()._label("")._inputMode(InputMode.SINGLE)),
-                Arrays.asList(entry("", "'32566y' must be '^(\\d+)$'.")));
+                Arrays.asList(entry("", "'32566y' must be '^(\\d+)$'")));
         assertEquals(pattern.apply("", mmap(entry("", "123,567")), messages, new Options()._label("")._inputMode(InputMode.SINGLE)),
-                Arrays.asList(entry("", "'123,567' must be '^(\\d+)$'.")));
+                Arrays.asList(entry("", "'123,567' must be '^(\\d+)$'")));
     }
 
     @Test
@@ -211,7 +211,7 @@ public class ConstraintsTest {
         assertEquals(patternNot.apply("", mmap(entry("", "eree.[1234657].eee")), messages, new Options()._label("")._inputMode(InputMode.SINGLE)),
                 Collections.EMPTY_LIST);
         assertEquals(patternNot.apply("", mmap(entry("", "errr.[32566y].ereee")), messages, new Options()._label("")._inputMode(InputMode.SINGLE)),
-                Arrays.asList(entry("", "'errr.[32566y].ereee' mustn't be '.*\\[(\\d*[^\\d\\[\\]]+\\d*)+\\].*'.")));
+                Arrays.asList(entry("", "'errr.[32566y].ereee' mustn't be '.*\\[(\\d*[^\\d\\[\\]]+\\d*)+\\].*'")));
     }
 
     @Test
@@ -288,10 +288,10 @@ public class ConstraintsTest {
         assertEquals(index.apply("a", mmap(entry("a[0]", "aaa")), messages, new Options()._inputMode(InputMode.MULTIPLE)),
                 Collections.EMPTY_LIST);
         assertEquals(index.apply("a", mmap(entry("a[t0]", "aaa"), entry("a[3]", "tew")), messages, new Options()._label("")._inputMode(InputMode.MULTIPLE)),
-                Arrays.asList(entry("a[t0]", "'a[t0]' contains illegal array index.")));
+                Arrays.asList(entry("a[t0]", "'a[t0]' contains illegal array index")));
         assertEquals(index.apply("a", mmap(entry("a[t1]", "aewr"), entry("a[t4]", "ewre")), messages,
                         new Options()._label("xx")._inputMode(InputMode.MULTIPLE)).stream().collect(Collectors.toSet()),
-                Arrays.asList(entry("a[t1]", "'a[t1]' contains illegal array index."), entry("a[t4]", "'a[t4]' contains illegal array index."))
+                Arrays.asList(entry("a[t1]", "'a[t1]' contains illegal array index"), entry("a[t4]", "'a[t4]' contains illegal array index"))
                         .stream().collect(Collectors.toSet()));
     }
 

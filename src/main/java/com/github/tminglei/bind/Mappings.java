@@ -5,9 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.Function;
@@ -46,7 +44,7 @@ public class Mappings {
                 mkSimpleConverter(s ->
                     isEmptyStr(s) ? false : Boolean.parseBoolean(s)
                 )
-            ).constraint(parsing(Boolean::parseBoolean, "error.boolean", ""))
+            ).constraint(checking(Boolean::parseBoolean, "error.boolean", true))
                 .constraint(constraints);
         }
 
@@ -61,7 +59,7 @@ public class Mappings {
                 mkSimpleConverter(s ->
                     isEmptyStr(s) ? 0 : Integer.parseInt(s)
                 )
-            ).constraint(parsing(Integer::parseInt, "error.number", ""))
+            ).constraint(checking(Integer::parseInt, "error.number", true))
                 .constraint(constraints);
         }
 
@@ -76,7 +74,7 @@ public class Mappings {
                 mkSimpleConverter(s ->
                     isEmptyStr(s) ? 0.0d : Double.parseDouble(s)
                 )
-            ).constraint(parsing(Double::parseDouble, "error.double", ""))
+            ).constraint(checking(Double::parseDouble, "error.double", true))
                 .constraint(constraints);
         }
 
@@ -91,7 +89,7 @@ public class Mappings {
                 mkSimpleConverter(s ->
                     isEmptyStr(s) ? 0.0f : Float.parseFloat(s)
                 )
-            ).constraint(parsing(Float::parseFloat, "error.float", ""))
+            ).constraint(checking(Float::parseFloat, "error.float", true))
                 .constraint(constraints);
         }
 
@@ -106,7 +104,7 @@ public class Mappings {
                 mkSimpleConverter(s ->
                     isEmptyStr(s) ? 0l : Long.parseLong(s)
                 )
-            ).constraint(parsing(Long::parseLong, "error.long", ""))
+            ).constraint(checking(Long::parseLong, "error.long", true))
                 .constraint(constraints);
         }
 
@@ -121,7 +119,7 @@ public class Mappings {
                 mkSimpleConverter(s ->
                     isEmptyStr(s) ? BigDecimal.ZERO : new BigDecimal(s)
                 )
-            ).constraint(parsing(BigDecimal::new, "error.bigdecimal", ""))
+            ).constraint(checking(BigDecimal::new, "error.bigdecimal", true))
                 .constraint(constraints);
         }
 
@@ -136,7 +134,7 @@ public class Mappings {
                 mkSimpleConverter(s ->
                     isEmptyStr(s) ? BigInteger.ZERO : new BigInteger(s)
                 )
-            ).constraint(parsing(BigInteger::new, "error.bigint", ""))
+            ).constraint(checking(BigInteger::new, "error.bigint", true))
                 .constraint(constraints);
         }
 
@@ -151,7 +149,7 @@ public class Mappings {
                 mkSimpleConverter(s ->
                     isEmptyStr(s) ? null : UUID.fromString(s)
                 )
-            ).constraint(parsing(UUID::fromString, "error.uuid", ""))
+            ).constraint(checking(UUID::fromString, "error.uuid", true))
                 .constraint(constraints);
         }
 
@@ -167,11 +165,19 @@ public class Mappings {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
         return new Framework.FieldMapping(
                 Framework.InputMode.SINGLE,
-                mkSimpleConverter(s ->
-                    isEmptyStr(s) ? null : LocalDate.parse(s, formatter)
-                )
-            ).constraint(parsing(formatter::parse, "error.pattern", pattern))
-                .constraint(constraints);
+                mkSimpleConverter(s -> {
+                    if (isEmptyStr(s)) return null;
+                    else if (s.matches("^[\\d]+$")) {
+                        Instant instant = new Date(Long.parseLong(s)).toInstant();
+                        return LocalDateTime.ofInstant(instant, ZoneId.of("UTC")).toLocalDate();
+                    } else {
+                        return LocalDate.parse(s, formatter);
+                    }
+                })
+            ).constraint(anyPassed(
+                    checking(s -> new Date(Long.parseLong(s)), "'%s' not a date long", false),
+                    checking(formatter::parse, "error.pattern", true, pattern)
+                )).constraint(constraints);
         }
 
     /**
@@ -186,11 +192,19 @@ public class Mappings {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
         return new Framework.FieldMapping(
                 Framework.InputMode.SINGLE,
-                mkSimpleConverter(s ->
-                    isEmptyStr(s) ? null : LocalDateTime.parse(s, formatter)
-                )
-            ).constraint(parsing(formatter::parse, "error.pattern", pattern))
-                .constraint(constraints);
+                mkSimpleConverter(s -> {
+                    if (isEmptyStr(s)) return null;
+                    else if (s.matches("^[\\d]+$")) {
+                        Instant instant = new Date(Long.parseLong(s)).toInstant();
+                        return LocalDateTime.ofInstant(instant, ZoneId.of("UTC"));
+                    } else {
+                        return LocalDateTime.parse(s, formatter);
+                    }
+                })
+            ).constraint(anyPassed(
+                    checking(s -> new Date(Long.parseLong(s)), "'%s' not a date long", false),
+                    checking(formatter::parse, "error.pattern", true, pattern)
+                )).constraint(constraints);
         }
 
     /**
@@ -205,11 +219,19 @@ public class Mappings {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
         return new Framework.FieldMapping(
                 Framework.InputMode.SINGLE,
-                mkSimpleConverter(s ->
-                    isEmptyStr(s) ? null : LocalTime.parse(s, formatter)
-                )
-            ).constraint(parsing(formatter::parse, "error.pattern", pattern))
-                .constraint(constraints);
+                mkSimpleConverter(s -> {
+                    if (isEmptyStr(s)) return null;
+                    else if (s.matches("^[\\d]+$")) {
+                        Instant instant = new Date(Long.parseLong(s)).toInstant();
+                        return LocalDateTime.ofInstant(instant, ZoneId.of("UTC")).toLocalTime();
+                    } else {
+                        return LocalTime.parse(s, formatter);
+                    }
+                })
+            ).constraint(anyPassed(
+                    checking(s -> new Date(Long.parseLong(s)), "'%s' not a date long", false),
+                    checking(formatter::parse, "error.pattern", true, pattern)
+                )).constraint(constraints);
         }
 
     /////////////////////////////// pre-defined general usage mappings  ///////////////////////

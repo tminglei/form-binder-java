@@ -75,7 +75,7 @@ public class GeneralMappingsTest {
                 entry("number", "t122345")
             );
         assertEquals(defaultVal.validate("number", data1, messages, Options.EMPTY),
-                Arrays.asList(entry("number", "'t122345' must be a number.")));
+                Arrays.asList(entry("number", "'t122345' must be a number")));
 
         Map<String, String> data2 = mmap(entry("number", "122345"));
         assertEquals(defaultVal.validate("number", data2, messages, Options.EMPTY),
