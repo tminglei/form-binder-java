@@ -1,5 +1,8 @@
 package com.github.tminglei.bind;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -13,6 +16,8 @@ import static com.github.tminglei.bind.FrameworkUtils.*;
 public class FormBinder {
     private final Framework.Messages messages;
     private final Function<List<Map.Entry<String, String>>, ?> errProcessor;
+
+    private static final Logger logger = LoggerFactory.getLogger(FormBinder.class);
 
     public FormBinder(Framework.Messages messages) {
         this(messages, null);
@@ -32,6 +37,8 @@ public class FormBinder {
         return bind(mapping, data, "");
     }
     public BindObject bind(Framework.Mapping<?> mapping, Map<String, String> data, String root) {
+        logger.debug("start binding ... from '{}'", root);
+
         List<Map.Entry<String, String>> errors = mapping.validate(root, data, messages, Options.EMPTY);
         if (errors.isEmpty()) {
             Object vObj = mapping.convert(root, data);
@@ -55,6 +62,8 @@ public class FormBinder {
         return validate(mapping, data, "");
     }
     public <Err> Optional<Err> validate(Framework.Mapping<?> mapping, Map<String, String> data, String root) {
+        logger.debug("start validating ... from '{}'", root);
+
         List<Map.Entry<String, String>> errors = mapping.validate(root, data, messages, Options.EMPTY);
         if (errors.isEmpty()) return Optional.empty();
         else {

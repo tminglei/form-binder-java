@@ -202,7 +202,7 @@ public class FrameworkUtils {
 
     // make a Constraint which will try to check and collect errors
     public static <T> Framework.Constraint
-            checking(Function<String, T> check, String messageOrKey, boolean isKey, String... extraFormatArgs) {
+            checking(Function<String, T> check, String messageOrKey, boolean isKey, String... extraMessageArgs) {
         return mkSimpleConstraint(((label, vString, messages) -> {
             logger.debug("checking for {}", vString);
 
@@ -213,8 +213,8 @@ public class FrameworkUtils {
                     return null;
                 } catch (Exception ex) {
                     String msgTemplate = isKey ? messages.get(messageOrKey) : messageOrKey;
-                    List<String> formatArgs = appendList(Arrays.asList(vString), extraFormatArgs);
-                    return String.format(msgTemplate, formatArgs.toArray());
+                    List<String> messageArgs = appendList(Arrays.asList(vString), extraMessageArgs);
+                    return String.format(msgTemplate, messageArgs.toArray());
                 }
             }
         }));
@@ -223,20 +223,19 @@ public class FrameworkUtils {
     // make a compound Constraint, which checks whether any inputting constraints passed
     public static Framework.Constraint anyPassed(Framework.Constraint... constraints) {
         return ((name, data, messages, options) -> {
-            List<List<Map.Entry<String, String>>> errErrors = new ArrayList<>();
+            List<Map.Entry<String, String>> errErrors = new ArrayList<>();
             for(Framework.Constraint constraint : constraints) {
                 List<Map.Entry<String, String>> errors = constraint.apply(name, data, messages, options);
-                if (errors.isEmpty()) return errors;
+                if (errors.isEmpty()) return Collections.EMPTY_LIST;
                 else {
-                    errErrors.add(errors);
+                    errErrors.addAll(errors);
                 }
             }
             String label = getLabel(name, messages, options);
-            String errorStr = errErrors.stream()
-                    .flatMap(errs -> errs.stream().map(e -> e.getValue()))
+            String errStr = errErrors.stream().map(e -> e.getValue())
                     .collect(Collectors.joining(", ", "[", "]"));
             return Arrays.asList(entry(name,
-                    String.format(messages.get("error.anypassed"), label, errorStr)));
+                    String.format(messages.get("error.anypassed"), label, errStr)));
         });
     }
 
