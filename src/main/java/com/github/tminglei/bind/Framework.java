@@ -136,7 +136,7 @@ public class Framework {
         private final Function<T, R> transform;
         private final List<ExtraConstraint<R>> extraConstraints;
 
-        private final Logger log = LoggerFactory.getLogger(TransformMapping.class);
+        private final Logger logger = LoggerFactory.getLogger(TransformMapping.class);
 
         TransformMapping(Mapping<T> base, Function<T, R> transform) {
             this(base, transform, Collections.EMPTY_LIST);
@@ -165,7 +165,7 @@ public class Framework {
 
         @Override
         public R convert(String name, Map<String, String> data) {
-            log.debug("transforming for {}", name);
+            logger.debug("transforming {}", name);
             return transform.apply(base.convert(name, data));
         }
 
@@ -190,7 +190,7 @@ public class Framework {
         private final List<ExtraConstraint<T>> extraConstraints;
         private final BiFunction<String, Map<String, String>, T> doConvert;
 
-        private final Logger log = LoggerFactory.getLogger(FieldMapping.class);
+        private final Logger logger = LoggerFactory.getLogger(FieldMapping.class);
 
         FieldMapping(InputMode inputMode, BiFunction<String, Map<String, String>, T> doConvert) {
             this(inputMode, doConvert, FrameworkUtils.PassValidating, Collections.EMPTY_LIST, Options.EMPTY);
@@ -235,8 +235,7 @@ public class Framework {
 
         @Override
         public T convert(String name, Map<String, String> data) {
-            log.debug("converting for {}", name);
-
+            logger.debug("converting {}", name);
             Map<String, String> newData = processDataRec(name, data, options(), options()._processors());
             return doConvert.apply(name, newData);
         }
@@ -244,7 +243,7 @@ public class Framework {
         @Override
         public List<Map.Entry<String, String>> validate(String name, Map<String, String> data,
                                                 Messages messages, Options parentOptions) {
-            log.debug("validating for {}", name);
+            logger.debug("validating {}", name);
 
             Options theOptions = options().merge(parentOptions);
             Map<String, String> newData = processDataRec(name, data, theOptions, theOptions._processors());
@@ -274,7 +273,7 @@ public class Framework {
         private final List<Map.Entry<String, Mapping<?>>> fields;
         private final List<ExtraConstraint<BindObject>> extraConstraints;
 
-        private final Logger log = LoggerFactory.getLogger(GroupMapping.class);
+        private final Logger logger = LoggerFactory.getLogger(GroupMapping.class);
 
         GroupMapping(List<Map.Entry<String, Mapping<?>>> fields) {
             this(fields, Collections.EMPTY_LIST, Options.EMPTY);
@@ -310,7 +309,7 @@ public class Framework {
 
         @Override
         public BindObject convert(String name, Map<String, String> data) {
-            log.debug("converting for {}", name);
+            logger.debug("converting {}", name);
 
             Map<String, String> newData = processDataRec(name, data, options, options._processors());
             return isEmptyInput(name, newData, options._inputMode()) ? null
@@ -332,7 +331,7 @@ public class Framework {
         @Override
         public List<Map.Entry<String, String>> validate(String name, Map<String, String> data,
                                                 Messages messages, Options parentOptions) {
-            log.debug("validating for {}", name);
+            logger.debug("validating {}", name);
 
             Options theOptions = options().merge(parentOptions);
             Map<String, String> newData = processDataRec(name, data, theOptions, theOptions._processors());

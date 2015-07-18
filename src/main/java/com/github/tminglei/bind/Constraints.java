@@ -121,7 +121,7 @@ public class Constraints {
     }
     public static Framework.Constraint pattern(String pattern, String message) {
         return mkSimpleConstraint((label, vString, messages) -> {
-            logger.debug("checking pattern for '{}'", vString);
+            logger.debug("checking pattern '{}' for '{}'", pattern, vString);
 
             if (vString != null && !vString.matches(pattern)) {
                 String msgTemplate = message != null ? message : messages.get("error.pattern");
@@ -135,7 +135,7 @@ public class Constraints {
     }
     public static Framework.Constraint patternNot(String pattern, String message) {
         return mkSimpleConstraint((label, vString, messages) -> {
-            logger.debug("checking pattern-not for '{}'", vString);
+            logger.debug("checking pattern-not '{}' for '{}'", pattern, vString);
 
             if (vString != null && vString.matches(pattern)) {
                 String msgTemplate = message != null ? message : messages.get("error.patternnot");

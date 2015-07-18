@@ -181,7 +181,8 @@ public class FrameworkUtils {
     // i18n on: use i18n label, if exists; else use label; else use last field name from full name
     // i18n off: use label; else use last field name from full name
     public static String getLabel(String fullName, Framework.Messages messages, Options options) {
-        logger.trace("getting label for {} with i18n:{}, _label:{}", fullName, options.i18n(), options._label());
+        logger.trace("getting label for '{}' with options (i18n: {}, _label: {})",
+                fullName, options.i18n(), options._label());
 
         String[] parts = splitName(fullName);   // parts: (parent, name/index, isArray)
         boolean isArray = Boolean.parseBoolean(parts[2]);
@@ -223,6 +224,8 @@ public class FrameworkUtils {
     // make a compound Constraint, which checks whether any inputting constraints passed
     public static Framework.Constraint anyPassed(Framework.Constraint... constraints) {
         return ((name, data, messages, options) -> {
+            logger.debug("checking any passed for {}", name);
+
             List<Map.Entry<String, String>> errErrors = new ArrayList<>();
             for(Framework.Constraint constraint : constraints) {
                 List<Map.Entry<String, String>> errors = constraint.apply(name, data, messages, options);
@@ -231,6 +234,7 @@ public class FrameworkUtils {
                     errErrors.addAll(errors);
                 }
             }
+
             String label = getLabel(name, messages, options);
             String errStr = errErrors.stream().map(e -> e.getValue())
                     .collect(Collectors.joining(", ", "[", "]"));

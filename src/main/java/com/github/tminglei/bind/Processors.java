@@ -94,7 +94,7 @@ public class Processors {
     }
     public static Framework.PreProcessor expandJson(String prefix) {
         return ((prefix1, data, options) -> {
-            logger.debug("expanding json at {}", (prefix == null ? prefix1 : prefix));
+            logger.debug("expanding json at '{}'", (prefix == null ? prefix1 : prefix));
 
             String thePrefix = prefix == null ? prefix1 : prefix;
             String jsonStr  = data.get(thePrefix);
@@ -127,7 +127,7 @@ public class Processors {
     }
     public static Framework.PreProcessor expandJsonKeys(String prefix) {
         return ((prefix1, data, options) -> {
-            logger.debug("expanding json keys at {}", (prefix == null ? prefix1 : prefix));
+            logger.debug("expanding json keys at '{}'", (prefix == null ? prefix1 : prefix));
 
             Map<String, String> data1 = expandJson(prefix).apply(prefix1, data, options);
             Map<String, String> data2 = expandListKeys(prefix).apply(prefix1, data1, options);
@@ -144,7 +144,7 @@ public class Processors {
     }
     public static Framework.PreProcessor expandListKeys(String prefix) {
         return ((prefix1, data, options) -> {
-            logger.debug("expanding list keys at {}", (prefix == null ? prefix1 : prefix));
+            logger.debug("expanding list keys at '{}'", (prefix == null ? prefix1 : prefix));
 
             String thePrefix = prefix == null ? prefix1 : prefix;
             Pattern p = Pattern.compile("^" + Pattern.quote(thePrefix) + "\\[[\\d]+\\].*");
@@ -169,7 +169,7 @@ public class Processors {
      */
     public static Framework.PreProcessor changePrefix(String from, String to) {
         return ((prefix, data, options) -> {
-            logger.debug("changing prefix at {} from {} to {}", prefix, from, to);
+            logger.debug("changing prefix at '{}' from '{}' to '{}'", prefix, from, to);
 
             return data.entrySet().stream()
                 .map(e -> {
@@ -244,7 +244,7 @@ public class Processors {
      */
     public static Framework.TouchedChecker listTouched(List<String> touched) {
         return ((prefix, data) -> {
-            logger.debug("checking touched in list for {}", prefix);
+            logger.debug("checking touched in list for '{}'", prefix);
 
             return touched.stream()
                     .filter(key -> key.startsWith(prefix))
@@ -260,7 +260,8 @@ public class Processors {
      */
     public static Framework.TouchedChecker prefixTouched(String dataPrefix, String touchedPrefix) {
         return ((prefix, data) -> {
-            logger.debug("checking touched with data prefix {} and touched prefix {} for {}", dataPrefix, touchedPrefix, prefix);
+            logger.debug("checking touched with data prefix '{}' and touched prefix '{}' for '{}'",
+                    dataPrefix, touchedPrefix, prefix);
 
             String prefixToBeChecked = prefix.replaceAll("^" + Pattern.quote(dataPrefix), touchedPrefix);
             return data.keySet().stream()
