@@ -5,7 +5,7 @@
 
     <groupId>com.github.tminglei</groupId>
     <artifactId>form-binder-java</artifactId>
-    <version>0.5.0-SNAPSHOT</version>
+    <version>0.10.0</version>
     <packaging>jar</packaging>
 
     <name>form-binder-java</name>
@@ -110,6 +110,27 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.6</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.5.2</version>
             </plugin>
         </plugins>
     </build>
