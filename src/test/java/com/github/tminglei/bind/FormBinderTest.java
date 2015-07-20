@@ -20,9 +20,9 @@ public class FormBinderTest {
     private Mapping<BindObject> mapping =
         mapping(
             field("id", vLong()),
-            field("data", fb(expandJson()).to(mapping(
-                field("email", fb(required("%s is required")).to(text(maxLength(20, "%s: length > %s"), email("%s: invalid email")))),
-                field("price", fb(omitLeft("$")).to(vFloat())),
+            field("data", attach(expandJson()).to(mapping(
+                field("email", attach(required("%s is required")).to(text(maxLength(20, "%s: length > %s"), email("%s: invalid email")))),
+                field("price", attach(omitLeft("$")).to(vFloat())),
                 field("count", vInt().verifying(min(3), max(10)))
             )).label("xx").verifying((label, vObj, messages1) -> {
                 float price = vObj.get("price");

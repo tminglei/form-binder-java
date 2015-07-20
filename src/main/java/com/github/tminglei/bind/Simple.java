@@ -2,8 +2,6 @@ package com.github.tminglei.bind;
 
 import java.util.*;
 
-import static com.github.tminglei.bind.FrameworkUtils.*;
-
 /**
  * helper class to easy usage
  */
@@ -29,22 +27,12 @@ public class Simple extends Framework {
     }
 
     /**
-     * help method to initialize a Binding, which was used to
-     * bind a name w/ or w/o some constraints/pre-processors to a mapping
-     * @param name field name (short name)
-     * @return new created Binding
-     */
-    public static  Binding  fb(String name) {
-        return new Binding(name);
-    }
-
-    /**
      * help method to initialize a Attaching, which was used to
      * attach some constraints w/ or w/o some pre-processors to a mapping
      * @param constraints constraints
      * @return new created Attaching
      */
-    public static Attaching fb(Framework.Constraint... constraints) {
+    public static Attaching attach(Framework.Constraint... constraints) {
         return new Attaching(Arrays.asList(constraints), null);
     }
 
@@ -54,64 +42,11 @@ public class Simple extends Framework {
      * @param processors pre-processors
      * @return new created Attaching
      */
-    public static Attaching fb(Framework.PreProcessor... processors) {
+    public static Attaching attach(Framework.PreProcessor... processors) {
         return new Attaching(null, Arrays.asList(processors));
     }
 
     ////////////////////////////////////////////////////////////////////////////////
-
-    private static <T> Framework.Mapping<T> //(prepend) attach constraints and pre-processors to a mapping
-                attach(Framework.Mapping<T> mapping, List<Framework.Constraint> constraints, List<Framework.PreProcessor> processors) {
-        Framework.Mapping<T> mapping1 = mapping.options(o ->
-                o.prepend_constraints(constraints.toArray(new Framework.Constraint[0])));
-        Framework.Mapping<T> mapping2 = mapping1.options(o ->
-                o.prepend_processors(processors.toArray(new Framework.PreProcessor[0])));
-        return mapping2;
-    }
-
-    /**
-     * used to bind a field name to a mapping w/ or w/o constraints/pre-processors
-     */
-    public static class Binding {
-        private String name;
-        private List<Framework.Constraint> constraints
-                = new ArrayList<>();
-        private List<Framework.PreProcessor> processors
-                = new ArrayList<>();
-
-        Binding(String name) {
-            this.name = name;
-        }
-
-        /**
-         * mix in some constraints
-         * @param constraints constraints
-         * @return the Binding
-         */
-        public Binding then(Framework.Constraint... constraints) {
-            this.constraints.addAll(Arrays.asList(constraints));
-            return this;
-        }
-
-        /**
-         * pipe in some pre-processors
-         * @param processors pre-processors
-         * @return the Binding
-         */
-        public Binding pipe(Framework.PreProcessor... processors) {
-            this.processors.addAll(Arrays.asList(processors));
-            return this;
-        }
-
-        /**
-         * bind to target mapping
-         * @param mapping target mapping
-         * @return result field entry
-         */
-        public Map.Entry<String, Framework.Mapping<?>> to(Framework.Mapping<?> mapping) {
-            return entry(name, attach(mapping, constraints, processors));
-        }
-    }
 
     /**
      * used to attach constraints/pre-processors to a mapping
@@ -154,7 +89,11 @@ public class Simple extends Framework {
          * @return result mapping
          */
         public <T> Framework.Mapping<T> to(Framework.Mapping<T> mapping) {
-            return attach(mapping, constraints, processors);
+            Framework.Mapping<T> mapping1 = mapping.options(o ->
+                    o.prepend_constraints(constraints.toArray(new Framework.Constraint[0])));
+            Framework.Mapping<T> mapping2 = mapping1.options(o ->
+                    o.prepend_processors(processors.toArray(new Framework.PreProcessor[0])));
+            return mapping2;
         }
     }
 }
