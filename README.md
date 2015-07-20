@@ -24,7 +24,7 @@ To use `form-binder-java`, pls add the dependency to your `maven` project file:
 <dependency>
   <groupId>com.github.tminglei</groupId>
   <artifactId>form-binder-java</artifactId>
-  <version>0.10.0</version>
+  <version>0.10.1</version>
 </dependency>
 ```
 
