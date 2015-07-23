@@ -248,11 +248,7 @@ public class Framework {
             Options theOptions = options().merge(parentOptions);
             Map<String, String> newData = processDataRec(name, data, theOptions, theOptions._processors());
 
-            if (isEmptyInput(name, newData, theOptions._inputMode())
-                    && theOptions.ignoreEmpty().orElse(false)
-                    && (theOptions.touched() == null || ! theOptions.touched().apply(name, newData))) {
-                return Collections.EMPTY_LIST;
-            }
+            if (isUntouchedEmpty(name, newData, theOptions)) return Collections.EMPTY_LIST;
             else {
                 List<Constraint> validators = appendList(theOptions._ignoreConstraints() ? null : theOptions._constraints(), moreValidate);
                 List<Map.Entry<String, String>> errors = validateRec(name, newData, messages, theOptions, validators);
@@ -336,11 +332,7 @@ public class Framework {
             Options theOptions = options().merge(parentOptions);
             Map<String, String> newData = processDataRec(name, data, theOptions, theOptions._processors());
 
-            if (isEmptyInput(name, newData, theOptions._inputMode())
-                    && theOptions.ignoreEmpty().orElse(false)
-                    && (theOptions.touched() == null || ! theOptions.touched().apply(name, newData))) {
-                return Collections.EMPTY_LIST;
-            }
+            if (isUntouchedEmpty(name, newData, theOptions)) return Collections.EMPTY_LIST;
             else {
                 List<Constraint> validators = appendList(theOptions._constraints(),
                         (name1, data1, messages1, options1) -> {

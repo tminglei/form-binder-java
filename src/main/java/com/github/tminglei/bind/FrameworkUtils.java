@@ -131,6 +131,12 @@ public class FrameworkUtils {
 
     ///
 
+    public static boolean isUntouchedEmpty(String name, Map<String, String> data, Options options) {
+        return isEmptyInput(name, data, options._inputMode())
+                &&  options.ignoreEmpty().orElse(false)
+                && (options.touched() == null || ! options.touched().apply(name, data));
+    }
+
     public static Map<String, String>
             processDataRec(String prefix, Map<String, String> data, Options options,
                            List<Framework.PreProcessor> remainingProcessors) {
@@ -145,36 +151,40 @@ public class FrameworkUtils {
 
     public static List<Map.Entry<String, String>>
             validateRec(String name, Map<String, String> data, Framework.Messages messages, Options options,
-                        List<Framework.Constraint> remainingValidators) {
-        if (remainingValidators.isEmpty()) return Collections.EMPTY_LIST;
-        else {
-            Framework.Constraint currValidator = remainingValidators.get(0);
-            List<Framework.Constraint> newRemainingValidators = remainingValidators.subList(1, remainingValidators.size());
-
-            List<Map.Entry<String, String>> errors = currValidator.apply(name, data, messages, options);
-            List<Map.Entry<String, String>> errors1 = errors.isEmpty() || options.eagerCheck().orElse(false)
-                    ? validateRec(name, data, messages, options, newRemainingValidators)
-                    : Collections.EMPTY_LIST;
-            return mergeList(errors, errors1);
+                        List<Framework.Constraint> constraints) {
+        if (options.eagerCheck().orElse(false)) {
+            return constraints.stream()
+                    .flatMap(c -> c.apply(name, data, messages, options).stream())
+                    .collect(Collectors.toList());
+        } else {
+            if (constraints.isEmpty()) return Collections.EMPTY_LIST;
+            else {
+                List<Map.Entry<String, String>> errors = constraints.get(0).apply(name, data, messages, options);
+                return errors.isEmpty()
+                        ? validateRec(name, data, messages, options, constraints.subList(1, constraints.size()))
+                        : errors;
+            }
         }
     }
 
     public static <T> List<Map.Entry<String, String>>
             extraValidateRec(String name, T vObj, Framework.Messages messages, Options options,
-                             List<Framework.ExtraConstraint<T>> remainingValidators) {
-        if (remainingValidators.isEmpty()) return new ArrayList<>();
-        else {
-            Framework.ExtraConstraint<T> currValidator = remainingValidators.get(0);
-            List<Framework.ExtraConstraint<T>> newRemainingValidators = remainingValidators.subList(1, remainingValidators.size());
-
-            String label = getLabel(name, messages, options);
-            List<Map.Entry<String, String>> errors = currValidator.apply(label, vObj, messages)
-                    .stream().map(msg -> entry(name, msg))
+                             List<Framework.ExtraConstraint<T>> constraints) {
+        String label = getLabel(name, messages, options);
+        if (options.eagerCheck().orElse(false)) {
+            return constraints.stream()
+                    .flatMap(c -> c.apply(label, vObj, messages).stream().map(msg -> entry(name, msg)))
                     .collect(Collectors.toList());
-            List<Map.Entry<String, String>> errors1 = errors.isEmpty() || options.eagerCheck().orElse(false)
-                    ? extraValidateRec(name, vObj, messages, options, newRemainingValidators)
-                    : Collections.EMPTY_LIST;
-            return mergeList(errors, errors1);
+        } else {
+            if (constraints.isEmpty()) return new ArrayList<>();
+            else {
+                List<Map.Entry<String, String>> errors = constraints.get(0).apply(label, vObj, messages)
+                        .stream().map(msg -> entry(name, msg))
+                        .collect(Collectors.toList());
+                return errors.isEmpty()
+                        ? extraValidateRec(name, vObj, messages, options, constraints.subList(1, constraints.size()))
+                        : errors;
+            }
         }
     }
 
