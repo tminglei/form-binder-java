@@ -8,6 +8,34 @@ import java.util.*;
 public class Simple extends Framework {
 
     /**
+     * create data map from Map<String, String[]> and other params
+     * @param params params of type of Map<String, String[]>
+     * @param others other params
+     * @return
+     */
+    public static Map<String, String> data(Map<String, String[]> params, Map.Entry<String, String>... others) {
+        Map<String, String> result = new HashMap<>();
+        // expand params
+        for(Map.Entry<String, String[]> entry : params.entrySet()) {
+            if (entry.getValue() == null || entry.getValue().length == 0)
+                continue;
+            else if (entry.getValue().length == 1)
+                result.put(entry.getKey(), entry.getValue()[0]);
+            else {
+                for(int i = 0; i < entry.getValue().length; i++) {
+                    String key = entry.getKey() + "[" + i + "]";
+                    result.put(key, entry.getValue()[i]);
+                }
+            }
+        }
+        // merge in others
+        for(Map.Entry<String, String> entry : others) {
+            result.put(entry.getKey(), entry.getValue());
+        }
+        return result;
+    }
+
+    /**
      * shortcut method to construct group mapping
      * @param fields fields for the group mapping
      * @return new created mapping
