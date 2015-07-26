@@ -19,11 +19,11 @@ public class Simple extends Framework {
         for(Map.Entry<String, String[]> entry : params.entrySet()) {
             if (entry.getValue() == null || entry.getValue().length == 0)
                 continue;
-            else if (entry.getValue().length == 1)
+            else if (entry.getValue().length == 1 && ! entry.getKey().endsWith("[]"))
                 result.put(entry.getKey(), entry.getValue()[0]);
             else {
                 for(int i = 0; i < entry.getValue().length; i++) {
-                    String key = entry.getKey() + "[" + i + "]";
+                    String key = entry.getKey().replaceAll("\\[\\]$", "") + "[" + i + "]";
                     result.put(key, entry.getValue()[i]);
                 }
             }
