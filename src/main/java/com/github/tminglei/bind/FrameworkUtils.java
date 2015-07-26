@@ -256,7 +256,7 @@ public class FrameworkUtils {
     // Computes the available indexes for the given key in this set of data.
     public static List<Integer> indexes(String name, Map<String, String> data) {
         logger.debug("get indexes for {}", name);
-
+        // matches: 'prefix[index]...'
         Pattern keyPattern = Pattern.compile("^" + Pattern.quote(name) + "\\[(\\d+)\\].*$");
         return data.keySet().stream()
                 .map(key -> {
@@ -272,8 +272,8 @@ public class FrameworkUtils {
     // Computes the available keys for the given prefix in this set of data.
     public static List<String> keys(String prefix, Map<String, String> data) {
         logger.debug("get keys for {}", prefix);
-
-        Pattern keyPattern = Pattern.compile("^" + Pattern.quote(prefix) + "\\.(\"?[^\\.\"]+\"?).*$");
+        // matches: 'prefix.xxx...' | 'prefix."xxx.t"...'
+        Pattern keyPattern = Pattern.compile("^" + Pattern.quote(prefix) + "\\.(\"[^\"]+\"|[^\\.]+).*$");
         return data.keySet().stream()
                 .map(key -> {
                     Matcher m = keyPattern.matcher(key);

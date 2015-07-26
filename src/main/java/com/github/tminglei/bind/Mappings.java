@@ -344,8 +344,9 @@ public class Mappings {
                     return keys(name, data).stream()
                         .map(key -> {
                             String keyName = isEmptyStr(name) ? key : name + "." + key;
+                            String unquotedKey = key.replaceAll("^\"?([^\"]+)\"?$", "$1");
                             return entry(
-                                kBase.convert(key, mmap(entry(key, key))),
+                                kBase.convert(key, mmap(entry(key, unquotedKey))),
                                 vBase.convert(keyName, data)
                             );
                         })
@@ -360,8 +361,9 @@ public class Mappings {
                     return keys(name, data).stream()
                         .flatMap(key -> {
                             String keyName = isEmptyStr(name) ? key : name + "." + key;
+                            String unquotedKey = key.replaceAll("^\"?([^\"]+)\"?$", "$1");
                             return mergeList(
-                                kBase.validate(key, mmap(entry(key, key)), messages, options),
+                                kBase.validate(key, mmap(entry(key, unquotedKey)), messages, options),
                                 vBase.validate(keyName, data, messages, options)
                             ).stream();
                         })
