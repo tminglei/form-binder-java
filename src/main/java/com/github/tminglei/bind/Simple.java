@@ -8,10 +8,10 @@ import java.util.*;
 public class Simple extends Framework {
 
     /**
-     * create data map from Map<String, String[]> and other params
-     * @param params params of type of Map<String, String[]>
+     * create data map from a map (name -* value array) and other params
+     * @param params params of type of Map(String -* String[])
      * @param others other params
-     * @return
+     * @return new created data map
      */
     public static Map<String, String> data(Map<String, String[]> params, Map.Entry<String, String>... others) {
         Map<String, String> result = new HashMap<>();
