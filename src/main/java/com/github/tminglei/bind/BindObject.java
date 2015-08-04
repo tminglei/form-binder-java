@@ -57,7 +57,7 @@ public class BindObject implements Iterable<Map.Entry<String, Object>> {
      * @return the final result value
      */
     public <T> T get() {
-        return (T) (data.containsKey(DEFAULT_KEY) ? data.get(DEFAULT_KEY) : FrameworkUtils.bind2map(this));
+        return (T) data.get(DEFAULT_KEY);
     }
 
     /**
@@ -67,6 +67,18 @@ public class BindObject implements Iterable<Map.Entry<String, Object>> {
      */
     public <T> T get(String name) {
         return (T) data.get(name);
+    }
+
+    /**
+     * convert to specified type (NOTE: only Map is supported currently)
+     * @param target target type class
+     * @param <T>    target type
+     * @return converted object
+     */
+    public <T> T to(Class<T> target) {
+        if (target == Map.class) {
+            return (T) FrameworkUtils.bind2map(this);
+        } else throw new IllegalArgumentException("Unsupported type: " + target);
     }
 
     ///--
