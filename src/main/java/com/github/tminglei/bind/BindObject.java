@@ -80,7 +80,7 @@ public class BindObject implements Iterable<Map.Entry<String, Object>> {
         } else {
             buf.append("{ ");
             data.entrySet().stream().forEach(e -> {
-                buf.append(e.getKey()).append(": ").append(e.getValue());
+                buf.append(e.getKey()).append(": ").append(e.getValue()).append(", ");
             });
             buf.append(" }");
         }

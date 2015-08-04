@@ -310,10 +310,10 @@ public class FrameworkUtils {
         logger.trace("convert bind obj to map ...");
 
         Map<String, Object> result = new HashMap<>();
-        for(Map.Entry<String, Object> entry : bindObj) {
-            if (entry.getValue() instanceof BindObject) {
-                result.put(entry.getKey(), bind2map( (BindObject) entry.getValue() ));
-            } else result.put(entry.getKey(), entry.getValue());
+        for(Map.Entry<String, Object> e : bindObj) {
+            if (e.getValue() instanceof BindObject) {
+                result.put(e.getKey(), bind2map( (BindObject) e.getValue() ));
+            } else result.put(e.getKey(), e.getValue());
         }
         return result;
     }
