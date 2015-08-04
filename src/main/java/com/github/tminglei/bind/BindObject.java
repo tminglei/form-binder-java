@@ -57,7 +57,7 @@ public class BindObject implements Iterable<Map.Entry<String, Object>> {
      * @return the final result value
      */
     public <T> T get() {
-        return (T) data.get(DEFAULT_KEY);
+        return (T) (data.containsKey(DEFAULT_KEY) ? data.get(DEFAULT_KEY) : FrameworkUtils.bind2map(this));
     }
 
     /**
