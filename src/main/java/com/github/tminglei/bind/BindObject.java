@@ -70,6 +70,14 @@ public class BindObject implements Iterable<Map.Entry<String, Object>> {
     }
 
     /**
+     * @param name field name
+     * @return true if exists; false if not
+     */
+    public boolean has(String name) {
+        return data.get(name) != null;
+    }
+
+    /**
      * convert to specified type (NOTE: only Map is supported currently)
      * @param target target type class
      * @param <T>    target type
