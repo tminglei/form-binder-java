@@ -305,16 +305,4 @@ public class FrameworkUtils {
             return mmap(entry(prefix, json.asText()));
         }
     }
-
-    public static Map<String, Object> bind2map(BindObject bindObj) {
-        logger.trace("convert bind obj to map ...");
-
-        Map<String, Object> result = new HashMap<>();
-        for(Map.Entry<String, Object> e : bindObj) {
-            if (e.getValue() instanceof BindObject) {
-                result.put(e.getKey(), bind2map( (BindObject) e.getValue() ));
-            } else result.put(e.getKey(), e.getValue());
-        }
-        return result;
-    }
 }

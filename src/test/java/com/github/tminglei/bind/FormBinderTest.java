@@ -72,15 +72,6 @@ public class FormBinderTest {
                 }
             }
         }
-        /// test `to map` support
-        assertEquals(bindObj.to(Map.class), mmap(
-                entry("id", Long.valueOf(133)),
-                entry("data", mmap(
-                        entry("email", "etttt@example.com"),
-                        entry("price", Float.valueOf(137.5f)),
-                        entry("count", Integer.valueOf(5))
-                ))
-        ));
     }
 
     @Test
