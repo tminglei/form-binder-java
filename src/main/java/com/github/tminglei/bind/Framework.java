@@ -38,6 +38,10 @@ public class Framework {
     public interface TouchedChecker {
         boolean apply(String prefix, Map<String, String> data);
     }
+
+    public interface Cloneable extends java.lang.Cloneable {
+        Cloneable clone();
+    }
     ///
     public enum InputMode {
         SINGLE, MULTIPLE, POLYMORPHIC
@@ -68,6 +72,15 @@ public class Framework {
          */
         default Mapping<T> label(String label) {
             return options(o -> o._label(label));
+        }
+
+        /**
+         * change extensions associated with the mapping
+         * @param setting function used to change the extensions
+         * @return the mapping
+         */
+        default Mapping<T> ext(Function<Cloneable, Cloneable> setting) {
+            return options(o -> o.ext(setting.apply(o.ext())));
         }
 
         /**
@@ -278,6 +291,10 @@ public class Framework {
             this.fields = unmodifiableList(fields);
             this.extraConstraints = unmodifiableList(extraConstraints);
             this.options = options._inputMode(InputMode.MULTIPLE);
+        }
+
+        public List<Map.Entry<String, Mapping<?>>> fields() {
+            return this.fields;
         }
 
         @Override

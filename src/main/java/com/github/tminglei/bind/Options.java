@@ -20,6 +20,8 @@ public class Options {
     private boolean _ignoreConstraints = false;
     private List<Framework.Constraint> _constraints = Collections.EMPTY_LIST;
     private List<Framework.PreProcessor> _processors = Collections.EMPTY_LIST;
+    // extension object
+    private Framework.Cloneable _ext;
 
     public Options() {}
     public Options(Boolean i18n, Boolean eagerCheck, Boolean ignoreEmpty, Framework.TouchedChecker touched) {
@@ -29,12 +31,12 @@ public class Options {
         this.touched = touched;
     }
 
-    public Options merge(Options parent) {
+    public Options merge(Options other) {
         Options clone = this.clone();
-        clone.i18n = i18n != null ? i18n : parent.i18n;
-        clone.eagerCheck = eagerCheck != null ? eagerCheck : parent.eagerCheck;
-        clone.ignoreEmpty = ignoreEmpty != null ? ignoreEmpty : parent.ignoreEmpty;
-        clone.touched = touched != null ? touched : parent.touched;
+        clone.i18n = i18n != null ? i18n : other.i18n;
+        clone.eagerCheck = eagerCheck != null ? eagerCheck : other.eagerCheck;
+        clone.ignoreEmpty = ignoreEmpty != null ? ignoreEmpty : other.ignoreEmpty;
+        clone.touched = touched != null ? touched : other.touched;
         return clone;
     }
 
@@ -158,6 +160,15 @@ public class Options {
         return clone;
     }
 
+    ///
+    public Framework.Cloneable ext() {
+        return this._ext != null ? _ext.clone() : null;
+    }
+    public Options ext(Framework.Cloneable ext) {
+        this._ext = ext;
+        return this;
+    }
+
     /////////////////////////////////////////////////////////////////////////////////////
 
     public Options clone() {
@@ -167,6 +178,7 @@ public class Options {
         clone._ignoreConstraints = this._ignoreConstraints;
         clone._constraints = this._constraints;
         clone._processors = this._processors;
+        clone._ext = this._ext != null ? this._ext.clone() : null;
         return clone;
     }
 }
