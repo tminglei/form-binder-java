@@ -40,7 +40,7 @@ public class Simple extends Framework {
      * @param fields fields for the group mapping
      * @return new created mapping
      */
-    public static Mapping<BindObject> mapping(Map.Entry<String, Mapping<?>>... fields) {
+    public static GroupMapping mapping(Map.Entry<String, Mapping<?>>... fields) {
         return new GroupMapping(Arrays.asList(fields));
     }
 
