@@ -171,14 +171,14 @@ public class Options {
 
     /////////////////////////////////////////////////////////////////////////////////////
 
-    public Options clone() {
+    protected Options clone() {
         Options clone = new Options(this.i18n, this.eagerCheck, this.ignoreEmpty, this.touched);
         clone._inputMode = this._inputMode;
         clone._label = this._label;
         clone._ignoreConstraints = this._ignoreConstraints;
         clone._constraints = this._constraints;
         clone._processors = this._processors;
-        clone._ext = this._ext != null ? this._ext.clone() : null;
+        clone._ext = this.ext();
         return clone;
     }
 }
