@@ -31,12 +31,12 @@ public class Framework {
         List<String> apply(String label, T vObj, Messages messages);
     }
     @FunctionalInterface
-    public interface SimpleConstraint {
-        String apply(String label, String vString, Messages messages);
-    }
-    @FunctionalInterface
     public interface TouchedChecker {
         boolean apply(String prefix, Map<String, String> data);
+    }
+    @FunctionalInterface
+    public interface TriFunction<T1,T2,T3,R> {
+        R apply(T1 p1, T2 p2, T3 p3);
     }
 
     public interface Cloneable extends java.lang.Cloneable {

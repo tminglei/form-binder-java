@@ -116,7 +116,7 @@ public class FrameworkUtils {
 
     // make a constraint from `(label, vString, messages) => [error]` (ps: vString may be NULL/EMPTY)
     public static Framework.Constraint
-            mkSimpleConstraint(Framework.SimpleConstraint validate) {
+            mkSimpleConstraint(Framework.TriFunction<String, String, Framework.Messages, String> validate) {
         return ((name, data, messages, options) -> {
             if (options._inputMode() != Framework.InputMode.SINGLE) {
                 throw new IllegalArgumentException("The constraint should only be used to SINGLE INPUT mapping!");
