@@ -116,10 +116,12 @@ public class Framework {
         /**
          * attach some extra constraints, which was used to do some extra checking
          * after string was converted to target value, to the mapping
-         * @param extraConstraints extra constraints
+         * @param newConstraints extra constraints
          * @return the mapping
          */
-        Mapping<T> verifying(ExtraConstraint<T>... extraConstraints);
+        default Mapping<T> verifying(ExtraConstraint<T>... newConstraints) {
+            return options(o -> o.append_extraConstraints(newConstraints));
+        }
 
         ///
 
@@ -188,9 +190,8 @@ public class Framework {
         }
 
         @Override
-        public Mapping<R> verifying(ExtraConstraint<R>... extraConstraints) {
-            return new TransformMapping(base, transform,
-                    (List<ExtraConstraint<R>>) appendList(this.extraConstraints, extraConstraints));
+        public Mapping<R> verifying(ExtraConstraint<R>... newConstraints) {
+            return new TransformMapping(base, transform, (List<ExtraConstraint<R>>) appendList(this.extraConstraints, newConstraints));
         }
 
         @Override
@@ -217,23 +218,21 @@ public class Framework {
     public static class FieldMapping<T> implements Mapping<T> {
         private final Options options;
         private final Constraint moreValidate;
-        private final List<ExtraConstraint<T>> extraConstraints;
         private final BiFunction<String, Map<String, String>, T> doConvert;
         private final MappingMeta meta;
 
         private final Logger logger = LoggerFactory.getLogger(FieldMapping.class);
 
         FieldMapping(InputMode inputMode, BiFunction<String, Map<String, String>, T> doConvert, MappingMeta meta) {
-            this(inputMode, doConvert, FrameworkUtils.PassValidating, Collections.EMPTY_LIST, Options.EMPTY, meta);
+            this(inputMode, doConvert, FrameworkUtils.PassValidating, Options.EMPTY, meta);
         }
         FieldMapping(InputMode inputMode, BiFunction<String, Map<String, String>, T> doConvert, Constraint moreValidate, MappingMeta meta) {
-            this(inputMode, doConvert, moreValidate, Collections.EMPTY_LIST, Options.EMPTY, meta);
+            this(inputMode, doConvert, moreValidate, Options.EMPTY, meta);
         }
         FieldMapping(InputMode inputMode, BiFunction<String, Map<String, String>, T> doConvert,
-                     Constraint moreValidate, List<ExtraConstraint<T>> extraConstraints, Options options, MappingMeta meta) {
+                     Constraint moreValidate, Options options, MappingMeta meta) {
             this.doConvert = doConvert;
             this.moreValidate = moreValidate;
-            this.extraConstraints = unmodifiableList(extraConstraints);
             this.options = options._inputMode(inputMode);
             this.meta = meta;
         }
@@ -254,20 +253,7 @@ public class Framework {
                     this.options()._inputMode(),
                     this.doConvert,
                     this.moreValidate,
-                    this.extraConstraints,
                     setting.apply(this.options()),
-                    this.meta
-                );
-        }
-
-        @Override
-        public Mapping<T> verifying(ExtraConstraint<T>... extraConstraints) {
-            return new FieldMapping<T>(
-                    this.options()._inputMode(),
-                    this.doConvert,
-                    this.moreValidate,
-                    appendList(this.extraConstraints, extraConstraints),
-                    this.options(),
                     this.meta
                 );
         }
@@ -293,7 +279,7 @@ public class Framework {
                 List<Map.Entry<String, String>> errors = validateRec(name, newData, messages, theOptions, validators);
                 if (errors.isEmpty()) {
                     return Optional.ofNullable(doConvert.apply(name, newData))
-                            .map(v -> extraValidateRec(name, v, messages, theOptions, extraConstraints))
+                            .map(v -> extraValidateRec(name, v, messages, theOptions, theOptions._extraConstraints()))
                             .orElse(Collections.EMPTY_LIST);
                 } else return errors;
             }
@@ -306,17 +292,15 @@ public class Framework {
     public static class GroupMapping implements Mapping<BindObject> {
         private final Options options;
         private final List<Map.Entry<String, Mapping<?>>> fields;
-        private final List<ExtraConstraint<BindObject>> extraConstraints;
         private final MappingMeta meta = new MappingMeta(BindObject.class);
 
         private final Logger logger = LoggerFactory.getLogger(GroupMapping.class);
 
         GroupMapping(List<Map.Entry<String, Mapping<?>>> fields) {
-            this(fields, Collections.EMPTY_LIST, Options.EMPTY);
+            this(fields, Options.EMPTY);
         }
-        GroupMapping(List<Map.Entry<String, Mapping<?>>> fields, List<ExtraConstraint<BindObject>> extraConstraints, Options options) {
+        GroupMapping(List<Map.Entry<String, Mapping<?>>> fields, Options options) {
             this.fields = unmodifiableList(fields);
-            this.extraConstraints = unmodifiableList(extraConstraints);
             this.options = options._inputMode(InputMode.MULTIPLE);
         }
 
@@ -338,17 +322,7 @@ public class Framework {
         public Mapping<BindObject> options(Function<Options, Options> setting) {
             return new GroupMapping(
                     this.fields,
-                    this.extraConstraints,
                     setting.apply(this.options())
-                );
-        }
-
-        @Override
-        public Mapping<BindObject> verifying(ExtraConstraint<BindObject>... extraConstraints) {
-            return new GroupMapping(
-                    this.fields,
-                    appendList(this.extraConstraints, extraConstraints),
-                    this.options()
                 );
         }
 
@@ -400,7 +374,7 @@ public class Framework {
                     if (isEmptyInput(name, newData, theOptions._inputMode())) return Collections.EMPTY_LIST;
                     else {
                         BindObject vObj = doConvert(name, newData);
-                        return extraValidateRec(name, vObj, messages, theOptions, extraConstraints);
+                        return extraValidateRec(name, vObj, messages, theOptions, theOptions._extraConstraints());
                     }
                 }
                 return errors;
