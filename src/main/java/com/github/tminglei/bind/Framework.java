@@ -42,16 +42,28 @@ public class Framework {
     public interface Cloneable extends java.lang.Cloneable {
         Cloneable clone();
     }
+    public interface Metable<M> {
+        default M meta() { return null; }
+    }
     ///
     public enum InputMode {
         SINGLE, MULTIPLE, POLYMORPHIC
+    }
+    public static class MappingMeta {
+        public final Class<?> targetType;
+        public final Mapping<?>[] baseMappings;
+
+        public MappingMeta(Class<?> targetType, Mapping<?>... baseMappings) {
+            this.targetType = targetType;
+            this.baseMappings = baseMappings;
+        }
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////
     /**
      * A mapping, w/ constraints/processors/options, was used to validate/convert input data
      */
-    public interface Mapping<T> {
+    public interface Mapping<T> extends Metable<MappingMeta> {
 
         /**
          * @return options associated with the mapping
@@ -161,6 +173,11 @@ public class Framework {
         }
 
         @Override
+        public MappingMeta meta() {
+            return base.meta();
+        }
+
+        @Override
         public Options options() {
             return base.options();
         }
@@ -202,21 +219,28 @@ public class Framework {
         private final Constraint moreValidate;
         private final List<ExtraConstraint<T>> extraConstraints;
         private final BiFunction<String, Map<String, String>, T> doConvert;
+        private final MappingMeta meta;
 
         private final Logger logger = LoggerFactory.getLogger(FieldMapping.class);
 
-        FieldMapping(InputMode inputMode, BiFunction<String, Map<String, String>, T> doConvert) {
-            this(inputMode, doConvert, FrameworkUtils.PassValidating, Collections.EMPTY_LIST, Options.EMPTY);
+        FieldMapping(InputMode inputMode, BiFunction<String, Map<String, String>, T> doConvert, MappingMeta meta) {
+            this(inputMode, doConvert, FrameworkUtils.PassValidating, Collections.EMPTY_LIST, Options.EMPTY, meta);
         }
-        FieldMapping(InputMode inputMode, BiFunction<String, Map<String, String>, T> doConvert, Constraint moreValidate) {
-            this(inputMode, doConvert, moreValidate, Collections.EMPTY_LIST, Options.EMPTY);
+        FieldMapping(InputMode inputMode, BiFunction<String, Map<String, String>, T> doConvert, Constraint moreValidate, MappingMeta meta) {
+            this(inputMode, doConvert, moreValidate, Collections.EMPTY_LIST, Options.EMPTY, meta);
         }
         FieldMapping(InputMode inputMode, BiFunction<String, Map<String, String>, T> doConvert,
-                     Constraint moreValidate, List<ExtraConstraint<T>> extraConstraints, Options options) {
+                     Constraint moreValidate, List<ExtraConstraint<T>> extraConstraints, Options options, MappingMeta meta) {
             this.doConvert = doConvert;
             this.moreValidate = moreValidate;
             this.extraConstraints = unmodifiableList(extraConstraints);
             this.options = options._inputMode(inputMode);
+            this.meta = meta;
+        }
+
+        @Override
+        public MappingMeta meta() {
+            return meta;
         }
 
         @Override
@@ -231,7 +255,8 @@ public class Framework {
                     this.doConvert,
                     this.moreValidate,
                     this.extraConstraints,
-                    setting.apply(this.options())
+                    setting.apply(this.options()),
+                    this.meta
                 );
         }
 
@@ -242,7 +267,8 @@ public class Framework {
                     this.doConvert,
                     this.moreValidate,
                     appendList(this.extraConstraints, extraConstraints),
-                    this.options()
+                    this.options(),
+                    this.meta
                 );
         }
 
@@ -281,6 +307,7 @@ public class Framework {
         private final Options options;
         private final List<Map.Entry<String, Mapping<?>>> fields;
         private final List<ExtraConstraint<BindObject>> extraConstraints;
+        private final MappingMeta meta = new MappingMeta(BindObject.class);
 
         private final Logger logger = LoggerFactory.getLogger(GroupMapping.class);
 
@@ -294,7 +321,12 @@ public class Framework {
         }
 
         public List<Map.Entry<String, Mapping<?>>> fields() {
-            return this.fields;
+            return fields;
+        }
+
+        @Override
+        public MappingMeta meta() {
+            return meta;
         }
 
         @Override

@@ -29,7 +29,8 @@ public class Mappings {
     public static Framework.Mapping<String> text(Framework.Constraint... constraints) {
         return new Framework.FieldMapping(
                 Framework.InputMode.SINGLE,
-                mkSimpleConverter(Function.identity())
+                mkSimpleConverter(Function.identity()),
+                new Framework.MappingMeta(String.class)
             ).constraint(constraints);
         }
 
@@ -43,7 +44,7 @@ public class Mappings {
                 Framework.InputMode.SINGLE,
                 mkSimpleConverter(s ->
                     isEmptyStr(s) ? false : Boolean.parseBoolean(s)
-                )
+                ), new Framework.MappingMeta(Boolean.class)
             ).constraint(checking(Boolean::parseBoolean, "error.boolean", true))
                 .constraint(constraints);
         }
@@ -58,7 +59,7 @@ public class Mappings {
                 Framework.InputMode.SINGLE,
                 mkSimpleConverter(s ->
                     isEmptyStr(s) ? 0 : Integer.parseInt(s)
-                )
+                ), new Framework.MappingMeta(Integer.class)
             ).constraint(checking(Integer::parseInt, "error.number", true))
                 .constraint(constraints);
         }
@@ -73,7 +74,7 @@ public class Mappings {
                 Framework.InputMode.SINGLE,
                 mkSimpleConverter(s ->
                     isEmptyStr(s) ? 0.0d : Double.parseDouble(s)
-                )
+                ), new Framework.MappingMeta(Double.class)
             ).constraint(checking(Double::parseDouble, "error.double", true))
                 .constraint(constraints);
         }
@@ -88,7 +89,7 @@ public class Mappings {
                 Framework.InputMode.SINGLE,
                 mkSimpleConverter(s ->
                     isEmptyStr(s) ? 0.0f : Float.parseFloat(s)
-                )
+                ), new Framework.MappingMeta(Float.class)
             ).constraint(checking(Float::parseFloat, "error.float", true))
                 .constraint(constraints);
         }
@@ -103,7 +104,7 @@ public class Mappings {
                 Framework.InputMode.SINGLE,
                 mkSimpleConverter(s ->
                     isEmptyStr(s) ? 0l : Long.parseLong(s)
-                )
+                ), new Framework.MappingMeta(Long.class)
             ).constraint(checking(Long::parseLong, "error.long", true))
                 .constraint(constraints);
         }
@@ -118,7 +119,7 @@ public class Mappings {
                 Framework.InputMode.SINGLE,
                 mkSimpleConverter(s ->
                     isEmptyStr(s) ? BigDecimal.ZERO : new BigDecimal(s)
-                )
+                ), new Framework.MappingMeta(BigDecimal.class)
             ).constraint(checking(BigDecimal::new, "error.bigdecimal", true))
                 .constraint(constraints);
         }
@@ -133,7 +134,7 @@ public class Mappings {
                 Framework.InputMode.SINGLE,
                 mkSimpleConverter(s ->
                     isEmptyStr(s) ? BigInteger.ZERO : new BigInteger(s)
-                )
+                ), new Framework.MappingMeta(BigInteger.class)
             ).constraint(checking(BigInteger::new, "error.bigint", true))
                 .constraint(constraints);
         }
@@ -148,7 +149,7 @@ public class Mappings {
                 Framework.InputMode.SINGLE,
                 mkSimpleConverter(s ->
                     isEmptyStr(s) ? null : UUID.fromString(s)
-                )
+                ), new Framework.MappingMeta(UUID.class)
             ).constraint(checking(UUID::fromString, "error.uuid", true))
                 .constraint(constraints);
         }
@@ -173,7 +174,7 @@ public class Mappings {
                     } else {
                         return LocalDate.parse(s, formatter);
                     }
-                })
+                }), new Framework.MappingMeta(LocalDate.class)
             ).constraint(anyPassed(
                     checking(s -> new Date(Long.parseLong(s)), "'%s' not a date long", false),
                     checking(formatter::parse, "error.pattern", true, pattern)
@@ -200,7 +201,7 @@ public class Mappings {
                     } else {
                         return LocalDateTime.parse(s, formatter);
                     }
-                })
+                }), new Framework.MappingMeta(LocalDateTime.class)
             ).constraint(anyPassed(
                     checking(s -> new Date(Long.parseLong(s)), "'%s' not a date long", false),
                     checking(formatter::parse, "error.pattern", true, pattern)
@@ -227,7 +228,7 @@ public class Mappings {
                     } else {
                         return LocalTime.parse(s, formatter);
                     }
-                })
+                }), new Framework.MappingMeta(LocalTime.class)
             ).constraint(anyPassed(
                     checking(s -> new Date(Long.parseLong(s)), "'%s' not a date long", false),
                     checking(formatter::parse, "error.pattern", true, pattern)
@@ -246,7 +247,8 @@ public class Mappings {
     public static <T> Framework.Mapping<T> ignored(T instead) {
         return new Framework.FieldMapping<T>(
                 Framework.InputMode.POLYMORPHIC,
-                ((name, data) -> instead)
+                ((name, data) -> instead),
+                new Framework.MappingMeta(instead.getClass())
             ).options(o -> o._ignoreConstraints(true));
         }
 
@@ -291,7 +293,7 @@ public class Mappings {
                                 .options(o -> o._label(o._label().orElse(options._label().orElse(null))))
                                 .validate(name, data, messages, options);
                     }
-                })
+                }), new Framework.MappingMeta(Optional.class, base)
             ).options(o -> o._ignoreConstraints(true))
                 .constraint(constraints);
         }
@@ -319,7 +321,7 @@ public class Mappings {
                     return indexes(name, data).stream()
                             .flatMap(i -> base.validate(name + "[" + i + "]", data, messages, options).stream())
                             .collect(Collectors.toList());
-                })
+                }), new Framework.MappingMeta(List.class, base)
             ).constraint(constraints);
         }
 
@@ -368,7 +370,7 @@ public class Mappings {
                             ).stream();
                         })
                         .collect(Collectors.toList());
-                })
+                }), new Framework.MappingMeta(Map.class, kBase, vBase)
             ).constraint(constraints);
         }
 
