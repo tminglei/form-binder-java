@@ -53,31 +53,45 @@ public class Constraints {
         }
 
     public static Framework.Constraint maxLength(int length) {
-        return maxLength(length, null);
+        return maxLength(length, true);
+    }
+    public static Framework.Constraint maxLength(int length, boolean withIt) {
+        return maxLength(length, null, withIt);
     }
     public static Framework.Constraint maxLength(int length, String message) {
+        return maxLength(length, message, true);
+    }
+    public static Framework.Constraint maxLength(int length, String message, boolean withIt) {
         return mkSimpleConstraint(
-            (label, vString, messages) -> {
-                logger.debug("checking max-length ({}) for '{}'", length, vString);
+                (label, vString, messages) -> {
+                    logger.debug("checking max-length ({}) for '{}'", length, vString);
 
-                if (vString != null && vString.length() > length) {
-                    String msgTemplate = message != null ? message : messages.get("error.maxlength");
-                    return String.format(msgTemplate, vString, length);
-                } else return null;
-            }, mkExtensionMeta("maxLength", length));
+                    if (vString != null && ((withIt && vString.length() > length)
+                            || (!withIt && vString.length() >= length))) {
+                        String msgTemplate = message != null ? message : messages.get("error.maxlength");
+                        return String.format(msgTemplate, vString, length, withIt);
+                    } else return null;
+                }, mkExtensionMeta("maxLength", length));
         }
 
     public static Framework.Constraint minLength(int length) {
-        return minLength(length, null);
+        return minLength(length, true);
+    }
+    public static Framework.Constraint minLength(int length, boolean withIt) {
+        return minLength(length, null, withIt);
     }
     public static Framework.Constraint minLength(int length, String message) {
+        return minLength(length, message, true);
+    }
+    public static Framework.Constraint minLength(int length, String message, boolean withIt) {
         return mkSimpleConstraint(
             (label, vString, messages) -> {
                 logger.debug("checking min-length ({}) for '{}'", length, vString);
 
-                if (vString != null && vString.length() < length) {
+                if (vString != null && ((withIt && vString.length() < length)
+                        || (!withIt && vString.length() <= length))) {
                     String msgTemplate = message != null ? message : messages.get("error.minlength");
-                    return String.format(msgTemplate, vString, length);
+                    return String.format(msgTemplate, vString, length, withIt);
                 } else return null;
             }, mkExtensionMeta("minLength", length));
         }
@@ -183,36 +197,60 @@ public class Constraints {
 
     public static <T extends Comparable<T>> Framework.ExtraConstraint<T>
                 min(T minVal) {
-        return min(minVal, null);
+        return min(minVal, true);
+    }
+    public static <T extends Comparable<T>> Framework.ExtraConstraint<T>
+                min(T minVal, boolean withIt) {
+        return min(minVal, null, withIt);
     }
     public static <T extends Comparable<T>> Framework.ExtraConstraint<T>
                 min(T minVal, String message) {
+        return min(minVal, message, true);
+    }
+    public static <T extends Comparable<T>> Framework.ExtraConstraint<T>
+                min(T minVal, String message, boolean withIt) {
         return mkExtraConstraintWithMeta(
             (label, value, messages) -> {
                 logger.debug("checking min value ({}) for {}", minVal, value);
 
-                if (value.compareTo(minVal) < 0) {
+                if ((withIt && value.compareTo(minVal) < 0)
+                        || (!withIt && value.compareTo(minVal) <= 0)) {
                     String msgTemplate = message != null ? message : messages.get("error.min");
-                    return Arrays.asList(String.format(msgTemplate, value, minVal));
+                    return Arrays.asList(String.format(msgTemplate, value, minVal, withIt));
                 } else return Collections.EMPTY_LIST;
-            }, mkExtensionMeta("min", minVal));
+            }, new Framework.ExtensionMeta(
+                    "min",
+                    "min(" + minVal + " " + (withIt ? "w/" : "w/o") + " boundary)",
+                    Arrays.asList(minVal, withIt)));
         }
 
     public static <T extends Comparable<T>> Framework.ExtraConstraint<T>
                 max(T maxVal) {
-        return max(maxVal, null);
+        return max(maxVal, true);
+    }
+    public static <T extends Comparable<T>> Framework.ExtraConstraint<T>
+                max(T maxVal, boolean withIt) {
+        return max(maxVal, null, withIt);
     }
     public static <T extends Comparable<T>> Framework.ExtraConstraint<T>
                 max(T maxVal, String message) {
+        return max(maxVal, message, true);
+    }
+    public static <T extends Comparable<T>> Framework.ExtraConstraint<T>
+                max(T maxVal, String message, boolean withIt) {
         return mkExtraConstraintWithMeta(
             (label, value, messages) -> {
                 logger.debug("checking max value ({}) for {}", maxVal, value);
 
-                if (value.compareTo(maxVal) > 0) {
+                if ((withIt && value.compareTo(maxVal) > 0)
+                        || (!withIt && value.compareTo(maxVal) >= 0)) {
                     String msgTemplate = message != null ? message : messages.get("error.max");
-                    return Arrays.asList(String.format(msgTemplate, value, maxVal));
+                    return Arrays.asList(String.format(msgTemplate, value, maxVal, withIt));
                 } else return Collections.EMPTY_LIST;
-            }, mkExtensionMeta("max", maxVal));
+            }, new Framework.ExtensionMeta(
+                "max",
+                "max(" + maxVal + " " + (withIt ? "w/" : "w/o") + " boundary)",
+                Arrays.asList(maxVal, withIt)));
         }
 
 }

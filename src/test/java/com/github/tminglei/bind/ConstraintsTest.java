@@ -81,7 +81,7 @@ public class ConstraintsTest {
         assertEquals(maxlength.apply("", mmap(entry("", "wetyyuu")), messages, new Options()._label("")._inputMode(InputMode.SINGLE)),
                 Collections.EMPTY_LIST);
         assertEquals(maxlength.apply("", mmap(entry("", "wetyettyiiie")), messages, new Options()._label("")._inputMode(InputMode.SINGLE)),
-                Arrays.asList(entry("", "'wetyettyiiie' cannot be longer than 10 characters")));
+                Arrays.asList(entry("", "'wetyettyiiie' must be shorter than 10 characters (include boundary: true)")));
         assertEquals(maxlength.apply("", mmap(entry("", "tuewerri97")), messages, new Options()._label("")._inputMode(InputMode.SINGLE)),
                 Collections.EMPTY_LIST);
     }
@@ -105,11 +105,25 @@ public class ConstraintsTest {
         Constraint minlength = Constraints.minLength(3);
 
         assertEquals(minlength.apply("", mmap(entry("", "er")), messages, new Options()._label("")._inputMode(InputMode.SINGLE)),
-                Arrays.asList(entry("", "'er' cannot be shorter than 3 characters")));
+                Arrays.asList(entry("", "'er' must be longer than 3 characters (include boundary: true)")));
         assertEquals(minlength.apply("", mmap(entry("", "ert6")), messages, new Options()._label("")._inputMode(InputMode.SINGLE)),
                 Collections.EMPTY_LIST);
         assertEquals(minlength.apply("", mmap(entry("", "tee")), messages, new Options()._label("")._inputMode(InputMode.SINGLE)),
                 Collections.EMPTY_LIST);
+    }
+
+    @Test
+    public void testMinLength_WithoutBoundary() {
+        System.out.println(green(">> min length - w/o boundary"));
+
+        Constraint minlength = Constraints.minLength(3, false);
+
+        assertEquals(minlength.apply("", mmap(entry("", "er")), messages, new Options()._label("")._inputMode(InputMode.SINGLE)),
+                Arrays.asList(entry("", "'er' must be longer than 3 characters (include boundary: false)")));
+        assertEquals(minlength.apply("", mmap(entry("", "ert6")), messages, new Options()._label("")._inputMode(InputMode.SINGLE)),
+                Collections.EMPTY_LIST);
+        assertEquals(minlength.apply("", mmap(entry("", "tee")), messages, new Options()._label("")._inputMode(InputMode.SINGLE)),
+                Arrays.asList(entry("", "'tee' must be longer than 3 characters (include boundary: false)")));
     }
 
     @Test

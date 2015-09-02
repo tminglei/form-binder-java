@@ -57,8 +57,8 @@ public class ExtensionMetaTest {
 
         ExtraConstraint<Integer> min = Constraints.min(10);
         assertEquals(min.meta().name, "min");
-        assertEquals(min.meta().desc, "min(10)");
-        assertEquals(min.meta().params, Arrays.asList(10));
+        assertEquals(min.meta().desc, "min(10 w/ boundary)");
+        assertEquals(min.meta().params, Arrays.asList(10, true));
     }
 
     // for pre-processors

@@ -135,7 +135,7 @@ public class GroupMappingsTest {
         Map<String, String> data = mmap(entry("price", "23.5f"), entry("count", "15"));
 
         assertEquals(mapping2.validate("", data, messages, Options.EMPTY),
-                Arrays.asList(entry("count", "'15' cannot be greater than 10")));
+                Arrays.asList(entry("count", "'15' must be lower than 10 (include boundary: true)")));
     }
 
     @Test

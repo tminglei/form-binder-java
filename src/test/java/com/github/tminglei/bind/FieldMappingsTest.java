@@ -172,7 +172,19 @@ public class FieldMappingsTest {
         Map<String, String> data = mmap(entry("int", "345"));
 
         assertEquals(integer.validate("int", data, messages, Options.EMPTY),
-                Arrays.asList(entry("int", "'345' cannot be lower than 1000")));
+                Arrays.asList(entry("int", "'345' must be greater than 1000 (include boundary: true)")));
+    }
+
+    @Test
+    public void testInt_OutOfScopeData_WithoutBoundary() {
+        System.out.println(green(">> int - out-of-scope data w/ boundary"));
+
+        Mapping<Integer> integer = attach(omit(",")).to(Mappings.vInt())
+                .verifying(min(1000, false), max(10000));
+        Map<String, String> data = mmap(entry("int", "1000"));
+
+        assertEquals(integer.validate("int", data, messages, Options.EMPTY),
+                Arrays.asList(entry("int", "'1000' must be greater than 1000 (include boundary: false)")));
     }
 
     @Test
@@ -220,7 +232,7 @@ public class FieldMappingsTest {
         Map<String, String> data = mmap(entry("int", ""));
 
         assertEquals(integer.validate("int", data, messages, Options.EMPTY),
-                Arrays.asList(entry("int", "'0' cannot be lower than 1000")));
+                Arrays.asList(entry("int", "'0' must be greater than 1000 (include boundary: true)")));
         assertEquals(integer.convert("int", data), Integer.valueOf(0));
     }
 
