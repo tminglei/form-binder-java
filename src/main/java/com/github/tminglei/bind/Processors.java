@@ -88,7 +88,7 @@ public class Processors {
                     ));
             }, meta != null ? meta : new Framework.ExtensionMeta(
                 "replaceMatched",
-                "replace(match '" + pattern + "' with '" + replacement + "')",
+                "replace(matched '" + pattern + "' with '" + replacement + "')",
                 Arrays.asList(pattern, replacement)));
         }
 

@@ -79,7 +79,7 @@ public class ExtensionMetaTest {
 
         PreProcessor omit = Processors.replaceMatched("^\\$", "");
         assertEquals(omit.meta().name, "replaceMatched");
-        assertEquals(omit.meta().desc, "replace(match '^\\$' with '')");
+        assertEquals(omit.meta().desc, "replace(matched '^\\$' with '')");
         assertEquals(omit.meta().params, Arrays.asList("^\\$", ""));
     }
 
