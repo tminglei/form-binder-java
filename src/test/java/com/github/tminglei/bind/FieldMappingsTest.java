@@ -479,7 +479,7 @@ public class FieldMappingsTest {
         Map<String, String> data = mmap(entry("uuid", "tesstt"));
 
         assertEquals(uuid.validate("uuid", data, messages, Options.EMPTY),
-                Arrays.asList(entry("uuid", "'tesstt' missing or not a valid uuid")));
+                Arrays.asList(entry("uuid", "'tesstt' is not a valid uuid")));
     }
 
     @Test

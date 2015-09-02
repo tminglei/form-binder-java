@@ -108,6 +108,14 @@ public class FrameworkUtils {
 
     ///
 
+    public static Framework.ExtensionMeta mkExtensionMeta(String name, Object... params) {
+        List<?> paramList = Arrays.asList(params);
+        String paramStr = paramList.isEmpty() ? "" : paramList.stream()
+                .map(t -> t == null ? "" : t.toString()).reduce((l, r) -> l + ", " + r).get();
+        String desc = name + "(" + paramStr + ")";
+        return new Framework.ExtensionMeta(name, desc, paramList);
+    }
+
     // make an internal converter from `(vString) => value`
     public static <T> BiFunction<String, Map<String, String>, T>
             mkSimpleConverter(Function<String, T> convert) {
@@ -116,17 +124,64 @@ public class FrameworkUtils {
 
     // make a constraint from `(label, vString, messages) => [error]` (ps: vString may be NULL/EMPTY)
     public static Framework.Constraint
-            mkSimpleConstraint(Framework.TriFunction<String, String, Framework.Messages, String> validate) {
-        return ((name, data, messages, options) -> {
-            if (options._inputMode() != Framework.InputMode.SINGLE) {
-                throw new IllegalArgumentException("The constraint should only be used to SINGLE INPUT mapping!");
-            } else {
-                String label = getLabel(name, messages, options);
-                String error = validate.apply(label, data.get(name), messages);
-                return isEmptyStr(error) ? Collections.EMPTY_LIST
-                        : Arrays.asList(entry(name, error));
+            mkSimpleConstraint(Framework.Function3<String, String, Framework.Messages, String> validate,
+                               Framework.ExtensionMeta meta) {
+        return mkConstraintWithMeta(
+            (name, data, messages, options) -> {
+                if (options._inputMode() != Framework.InputMode.SINGLE) {
+                    throw new IllegalArgumentException("The constraint should only be used to SINGLE INPUT mapping!");
+                } else {
+                    String label = getLabel(name, messages, options);
+                    String error = validate.apply(label, data.get(name), messages);
+                    return isEmptyStr(error) ? Collections.EMPTY_LIST
+                            : Arrays.asList(entry(name, error));
+                }
+            }, meta);
+        }
+
+    public static Framework.Constraint
+            mkConstraintWithMeta(Framework.Function4<String, Map<String, String>, Framework.Messages, Options, List<Map.Entry<String, String>>> validate,
+                                 Framework.ExtensionMeta meta) {
+        return new Framework.Constraint() {
+            @Override
+            public Framework.ExtensionMeta meta() {
+                return meta;
             }
-        });
+            @Override
+            public List<Map.Entry<String, String>> apply(String name, Map<String, String> data, Framework.Messages messages, Options options) {
+                return validate.apply(name, data, messages, options);
+            }
+        };
+    }
+
+    public static <T> Framework.ExtraConstraint<T>
+            mkExtraConstraintWithMeta(Framework.Function3<String, T, Framework.Messages, List<String>> validate,
+                                      Framework.ExtensionMeta meta) {
+        return new Framework.ExtraConstraint<T>() {
+            @Override
+            public Framework.ExtensionMeta meta() {
+                return meta;
+            }
+            @Override
+            public List<String> apply(String label, T vObj, Framework.Messages messages) {
+                return validate.apply(label, vObj, messages);
+            }
+        };
+    }
+
+    public static Framework.PreProcessor
+            mkPreProcessorWithMeta(Framework.Function3<String, Map<String, String>, Options, Map<String, String>> process,
+                                   Framework.ExtensionMeta meta) {
+        return new Framework.PreProcessor() {
+            @Override
+            public Framework.ExtensionMeta meta() {
+                return meta;
+            }
+            @Override
+            public Map<String, String> apply(String prefix, Map<String, String> data, Options options) {
+                return process.apply(prefix, data, options);
+            }
+        };
     }
 
     ///
@@ -228,7 +283,7 @@ public class FrameworkUtils {
                     return String.format(msgTemplate, messageArgs.toArray());
                 }
             }
-        }));
+        }), null);
     }
 
     // make a compound Constraint, which checks whether any inputting constraints passed

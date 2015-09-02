@@ -19,15 +19,15 @@ public class Framework {
         String get(String key);
     }
     @FunctionalInterface
-    public interface PreProcessor {
+    public interface PreProcessor extends Metable<ExtensionMeta> {
         Map<String, String> apply(String prefix, Map<String, String> data, Options options);
     }
     @FunctionalInterface
-    public interface Constraint {
+    public interface Constraint extends Metable<ExtensionMeta> {
         List<Map.Entry<String, String>> apply(String name, Map<String, String> data, Messages messages, Options options);
     }
     @FunctionalInterface
-    public interface ExtraConstraint<T> {
+    public interface ExtraConstraint<T> extends Metable<ExtensionMeta> {
         List<String> apply(String label, T vObj, Messages messages);
     }
     @FunctionalInterface
@@ -35,8 +35,12 @@ public class Framework {
         boolean apply(String prefix, Map<String, String> data);
     }
     @FunctionalInterface
-    public interface TriFunction<T1,T2,T3,R> {
+    public interface Function3<T1,T2,T3,R> {
         R apply(T1 p1, T2 p2, T3 p3);
+    }
+    @FunctionalInterface
+    public interface Function4<T1,T2,T3,T4,R> {
+        R apply(T1 p1, T2 p2, T3 p3, T4 p4);
     }
 
     public interface Cloneable extends java.lang.Cloneable {
@@ -56,6 +60,17 @@ public class Framework {
         public MappingMeta(Class<?> targetType, Mapping<?>... baseMappings) {
             this.targetType = targetType;
             this.baseMappings = baseMappings;
+        }
+    }
+    public static class ExtensionMeta {
+        public final String name;
+        public final String desc;
+        public final List<?> params;
+
+        public ExtensionMeta(String name, String desc, List<?> params) {
+            this.name = name;
+            this.desc = desc;
+            this.params = unmodifiableList(params);
         }
     }
 

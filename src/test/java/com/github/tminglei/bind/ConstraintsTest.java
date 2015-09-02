@@ -260,7 +260,7 @@ public class ConstraintsTest {
     public void testEmail_InvalidEmailAddresses() {
         System.out.println(green(">> email - invalid email addresses"));
 
-        Constraint email = Constraints.email("'%s' not valid");
+        Constraint email = Constraints.email();
 
         Arrays.asList(
                 "Abc.example.com", //(an @ character must separate the local and domain parts)
@@ -273,7 +273,7 @@ public class ConstraintsTest {
                 "john.doe@example..com" //(double dot after @)
         ).stream().forEach(emailAddr -> {
             assertEquals(email.apply("", mmap(entry("", emailAddr)), messages, new Options()._label("")._inputMode(InputMode.SINGLE)),
-                    Arrays.asList(entry("", "'" + emailAddr + "' not valid")));
+                    Arrays.asList(entry("", "'" + emailAddr + "' is not a valid email")));
         });
     }
 
