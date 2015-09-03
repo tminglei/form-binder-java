@@ -23,7 +23,7 @@ public class Options {
     private List<Framework.ExtraConstraint<?>> _extraConstraints = Collections.EMPTY_LIST;
     private List<Framework.PreProcessor> _processors = Collections.EMPTY_LIST;
     // extension object
-    private Framework.Cloneable _ext;
+    private Framework.Extensible _ext;
 
     public Options() {}
     public Options(Boolean i18n, Boolean eagerCheck, Boolean ignoreEmpty, Framework.TouchedChecker touched) {
@@ -177,10 +177,10 @@ public class Options {
     }
 
     ///
-    Framework.Cloneable ext() {
+    Framework.Extensible _ext() {
         return this._ext != null ? _ext.clone() : null;
     }
-    Options ext(Framework.Cloneable ext) {
+    Options _ext(Framework.Extensible ext) {
         this._ext = ext;
         return this;
     }
@@ -195,7 +195,7 @@ public class Options {
         clone._constraints = this._constraints;
         clone._extraConstraints = this._extraConstraints;
         clone._processors = this._processors;
-        clone._ext = this.ext();
+        clone._ext = this._ext;
         return clone;
     }
 }

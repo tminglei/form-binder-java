@@ -20,12 +20,12 @@ public class MappingExtTest {
         System.out.println(green(">> ext setting/checking"));
 
         GroupMapping mapping = mapping(
-                field("id", vLong().ext(toExt(e -> e.in("path").desc("pet id")))),
-                field("name", text().ext(toExt(e -> e.in("query").desc("pet name"))))
+                field("id", vLong().$ext(toExt(e -> e.in("path").desc("pet id")))),
+                field("name", text().$ext(toExt(e -> e.in("query").desc("pet name"))))
             );
 
-        Framework.Cloneable idExt = mapping.fields().get(0).getValue().options().ext();
-        Framework.Cloneable nameExt = mapping.fields().get(1).getValue().options().ext();
+        Extensible idExt = mapping.fields().get(0).getValue().options()._ext();
+        Extensible nameExt = mapping.fields().get(1).getValue().options()._ext();
 
         assertEquals(idExt, new Ext().in("path").desc("pet id"));
         assertEquals(nameExt, new Ext().in("query").desc("pet name"));

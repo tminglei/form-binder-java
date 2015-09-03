@@ -43,8 +43,8 @@ public class Framework {
         R apply(T1 p1, T2 p2, T3 p3, T4 p4);
     }
 
-    public interface Cloneable extends java.lang.Cloneable {
-        Cloneable clone();
+    public interface Extensible extends java.lang.Cloneable {
+        Extensible clone();
     }
     public interface Metable<M> {
         default M meta() { return null; }
@@ -106,8 +106,8 @@ public class Framework {
          * @param setting function used to change the extensions
          * @return the mapping
          */
-        default Mapping<T> ext(Function<Cloneable, Cloneable> setting) {
-            return options(o -> o.ext(setting.apply(o.ext())));
+        default Mapping<T> $ext(Function<Extensible, Extensible> setting) {
+            return options(o -> o._ext(setting.apply(o._ext())));
         }
 
         /**

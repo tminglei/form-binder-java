@@ -30,7 +30,7 @@ public class Utils {
 
     ///////////////////////////////////////////////////////////////////
 
-    public static Function<Framework.Cloneable, Framework.Cloneable>
+    public static Function<Framework.Extensible, Framework.Extensible>
                     toExt(Function<Ext, Ext> setting) {
         return (c -> {
             Ext ext = c != null ? (Ext) c : new Ext();
@@ -38,7 +38,7 @@ public class Utils {
         });
     }
 
-    public static class Ext implements Framework.Cloneable {
+    public static class Ext implements Framework.Extensible {
         private String in = "";
         private String desc = "";
 
@@ -52,7 +52,7 @@ public class Utils {
         }
 
         @Override
-        public Framework.Cloneable clone() {
+        public Framework.Extensible clone() {
             Ext clone = new Ext();
             clone.in = this.in;
             clone.desc = this.desc;
