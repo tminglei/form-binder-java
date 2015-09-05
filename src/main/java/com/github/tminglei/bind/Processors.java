@@ -233,7 +233,7 @@ public class Processors {
             logger.debug("converting errors list to errors tree");
 
             Map<String, Object> root = new HashMap<>();
-            Map<String, Object> workList = mmap(entry("", root));
+            Map<String, Object> workList = newmap(entry("", root));
             for(Map.Entry<String, String> error : errors) {
                 String name = error.getKey().replaceAll("\\[", ".").replaceAll("\\]", "");
                 List<String> workObj = (List<String>) workObject(workList, name + "._errors", true);

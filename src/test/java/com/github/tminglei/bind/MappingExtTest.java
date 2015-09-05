@@ -20,8 +20,8 @@ public class MappingExtTest {
         System.out.println(green(">> ext setting/checking"));
 
         GroupMapping mapping = mapping(
-                field("id", vLong().$ext(toExt(e -> e.in("path").desc("pet id")))),
-                field("name", text().$ext(toExt(e -> e.in("query").desc("pet name"))))
+                field("id", vLong().$ext(e -> ext(e).in("path").desc("pet id"))),
+                field("name", text().$ext(e -> ext(e).in("query").desc("pet name")))
             );
 
         Extensible idExt = mapping.fields().get(0).getValue().options()._ext();

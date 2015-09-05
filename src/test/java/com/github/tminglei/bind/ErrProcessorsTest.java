@@ -29,11 +29,11 @@ public class ErrProcessorsTest {
                 entry("a", "ttt"),
                 entry("c", "te")
             );
-        Map<String, List<String>> foldedErrs = mmap(
+        Map<String, List<String>> foldedErrs = newmap(
                 entry("a", Arrays.asList("tttt", "ttt")),
                 entry("t[1]", Arrays.asList("tewte", "tewee")),
                 entry("c", Arrays.asList("te"))
-            );
+        );
 
         assertEquals(Processors.foldErrs().apply(errors), foldedErrs);
     }
@@ -50,22 +50,22 @@ public class ErrProcessorsTest {
                 entry("a.x", "xx"),
                 entry("c", "te")
             );
-        Map<String, Object> errsTree = mmap(
-                entry("a", mmap(
+        Map<String, Object> errsTree = newmap(
+                entry("a", newmap(
                         entry("_errors", Arrays.asList("tttt", "ttt")),
-                        entry("x", mmap(
+                        entry("x", newmap(
                                 entry("_errors", Arrays.asList("xx"))
-                            ))
-                    )),
-                entry("t", mmap(
-                        entry("1", mmap(
+                        ))
+                )),
+                entry("t", newmap(
+                        entry("1", newmap(
                                 entry("_errors", Arrays.asList("tewte", "tewee"))
-                            ))
-                    )),
-                entry("c", mmap(
+                        ))
+                )),
+                entry("c", newmap(
                         entry("_errors", Arrays.asList("te"))
-                    ))
-            );
+                ))
+        );
 
         assertEquals(Processors.errsTree().apply(errors), errsTree);
     }

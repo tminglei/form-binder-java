@@ -44,7 +44,7 @@ public class FrameworkUtils {
         return new AbstractMap.SimpleImmutableEntry(key, value);
     }
     // make map
-    public static <K, V> Map<K, V> mmap(Map.Entry<K, V>... entries) {
+    public static <K, V> Map<K, V> newmap(Map.Entry<K, V>... entries) {
         Map<K, V> result = new HashMap<>();
         for(Map.Entry<K, V> entry : entries) {
             result.put(entry.getKey(), entry.getValue());
@@ -357,7 +357,7 @@ public class FrameworkUtils {
             });
             return result;
         } else {
-            return mmap(entry(prefix, json.asText()));
+            return newmap(entry(prefix, json.asText()));
         }
     }
 }

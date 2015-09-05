@@ -117,10 +117,8 @@ public class Simple extends Framework {
          * @return result mapping
          */
         public <T> Framework.Mapping<T> to(Framework.Mapping<T> mapping) {
-            Framework.Mapping<T> mapping1 = mapping.options(o ->
-                    o.prepend_constraints(constraints.toArray(new Framework.Constraint[0])));
-            Framework.Mapping<T> mapping2 = mapping1.options(o ->
-                    o.prepend_processors(processors.toArray(new Framework.PreProcessor[0])));
+            Framework.Mapping<T> mapping1 = mapping.options(o -> o.prepend_constraints(constraints));
+            Framework.Mapping<T> mapping2 = mapping1.options(o -> o.prepend_processors(processors));
             return mapping2;
         }
     }

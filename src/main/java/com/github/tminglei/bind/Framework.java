@@ -106,8 +106,11 @@ public class Framework {
          * @param setting function used to change the extensions
          * @return the mapping
          */
-        default Mapping<T> $ext(Function<Extensible, Extensible> setting) {
-            return options(o -> o._ext(setting.apply(o._ext())));
+        default <E extends Extensible> Mapping<T> $ext(Function<E, E> setting) {
+            return options(o -> {
+                E ext = (E) (o._ext() != null ? o._ext().clone() : null);
+                return o._ext(setting.apply(ext));
+            });
         }
 
         /**
@@ -116,7 +119,7 @@ public class Framework {
          * @return the mapping
          */
         default Mapping<T> processor(PreProcessor... newProcessors) {
-            return options(o -> o.append_processors(newProcessors));
+            return options(o -> o.append_processors(Arrays.asList(newProcessors)));
         }
 
         /**
@@ -125,7 +128,7 @@ public class Framework {
          * @return the mapping
          */
         default Mapping<T> constraint(Constraint... newConstraints) {
-            return options(o -> o.append_constraints(newConstraints));
+            return options(o -> o.append_constraints(Arrays.asList(newConstraints)));
         }
 
         /**
@@ -135,7 +138,7 @@ public class Framework {
          * @return the mapping
          */
         default Mapping<T> verifying(ExtraConstraint<T>... newConstraints) {
-            return options(o -> o.append_extraConstraints(newConstraints));
+            return options(o -> o.append_extraConstraints(Arrays.asList(newConstraints)));
         }
 
         ///

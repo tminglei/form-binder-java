@@ -27,14 +27,14 @@ public class GeneralMappingsTest {
 
         Mapping<Integer> ignored = Mappings.ignored(35);
 
-        Map<String, String> data1 = mmap(
+        Map<String, String> data1 = newmap(
                 entry("number", "t135")
-            );
+        );
         assertEquals(ignored.validate("number", data1, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(ignored.convert("number", data1), Integer.valueOf(35));
 
-        Map<String, String> data2 = mmap(entry("number", "135"));
+        Map<String, String> data2 = newmap(entry("number", "135"));
         assertEquals(ignored.validate("number", data2, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(ignored.convert("number", data2), Integer.valueOf(35));
@@ -45,18 +45,18 @@ public class GeneralMappingsTest {
         System.out.println(green(">> ignored - compound"));
 
         Mapping<BindObject> ignored = Mappings.ignored(new BindObject(
-                mmap(entry("id", 135), entry("name", "ttest"))));
+                newmap(entry("id", 135), entry("name", "ttest"))));
 
-        Map<String, String> data1 = mmap(
+        Map<String, String> data1 = newmap(
                 entry("id", "t135"),
                 entry("tt", "teee")
-            );
+        );
         assertEquals(ignored.validate("", data1, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(ignored.convert("", data1).get("id"), Integer.valueOf(135));
         assertEquals(ignored.convert("", data1).get("name"), "ttest");
 
-        Map<String, String> data2 = mmap();
+        Map<String, String> data2 = newmap();
         assertEquals(ignored.validate("", data2, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(ignored.convert("", data2).get("id"), Integer.valueOf(135));
@@ -71,18 +71,18 @@ public class GeneralMappingsTest {
 
         Mapping<Integer> defaultVal = Mappings.defaultVal(Mappings.vInt(), 101);
 
-        Map<String, String> data1 = mmap(
+        Map<String, String> data1 = newmap(
                 entry("number", "t122345")
-            );
+        );
         assertEquals(defaultVal.validate("number", data1, messages, Options.EMPTY),
                 Arrays.asList(entry("number", "'t122345' must be a number")));
 
-        Map<String, String> data2 = mmap(entry("number", "122345"));
+        Map<String, String> data2 = newmap(entry("number", "122345"));
         assertEquals(defaultVal.validate("number", data2, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(defaultVal.convert("number", data2), Integer.valueOf(122345));
 
-        Map<String, String> data3 = mmap();
+        Map<String, String> data3 = newmap();
         assertEquals(defaultVal.validate("number", data3, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(defaultVal.convert("number", data3), Integer.valueOf(101));
@@ -95,18 +95,18 @@ public class GeneralMappingsTest {
         Mapping<BindObject> defaultVal = Mappings.defaultVal(mapping(
                 field("id", Mappings.vInt()),
                 field("name", Mappings.text())
-        ), new BindObject(mmap(entry("id", 101), entry("name", "haha"))));
+        ), new BindObject(newmap(entry("id", 101), entry("name", "haha"))));
 
-        Map<String, String> data1 = mmap(
+        Map<String, String> data1 = newmap(
                 entry("id", "1123"),
                 entry("name", "tttt")
-            );
+        );
         assertEquals(defaultVal.validate("", data1, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(defaultVal.convert("", data1).get("id"), Integer.valueOf(1123));
         assertEquals(defaultVal.convert("", data1).get("name"), "tttt");
 
-        Map<String, String> data2 = mmap();
+        Map<String, String> data2 = newmap();
         assertEquals(defaultVal.validate("", data2, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(defaultVal.convert("", data2).get("id"), Integer.valueOf(101));
@@ -121,12 +121,12 @@ public class GeneralMappingsTest {
 
         Mapping<Optional<Integer>> optional = Mappings.optional(Mappings.vInt());
 
-        Map<String, String> data1 = mmap();
+        Map<String, String> data1 = newmap();
         assertEquals(optional.validate("number", data1, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(optional.convert("number", data1), Optional.<Integer>empty());
 
-        Map<String, String> data2 = mmap(entry("number", "101"));
+        Map<String, String> data2 = newmap(entry("number", "101"));
         assertEquals(optional.validate("number", data2, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(optional.convert("number", data2), Optional.of(101));
@@ -141,12 +141,12 @@ public class GeneralMappingsTest {
                 field("name", Mappings.text())
             ));
 
-        Map<String, String> data1 = mmap();
+        Map<String, String> data1 = newmap();
         assertEquals(optional.validate("", data1, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(optional.convert("", data1), Optional.<BindObject>empty());
 
-        Map<String, String> data2 = mmap(entry("id", "111"), entry("name", "tt"));
+        Map<String, String> data2 = newmap(entry("id", "111"), entry("name", "tt"));
         assertEquals(optional.validate("", data2, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(optional.convert("", data2).get().get("id"), Integer.valueOf(111));
@@ -161,15 +161,15 @@ public class GeneralMappingsTest {
 
         Mapping<List<Integer>> list = Mappings.list(Mappings.vInt());
 
-        Map<String, String> data1 = mmap(
+        Map<String, String> data1 = newmap(
                 entry("list[1]", "101"),
                 entry("list[0]", "100")
-            );
+        );
         assertEquals(list.validate("list", data1, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(list.convert("list", data1), Arrays.asList(100, 101));
 
-        Map<String, String> data2 = mmap();
+        Map<String, String> data2 = newmap();
         assertEquals(list.validate("list", data2, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(list.convert("list", data2), Collections.EMPTY_LIST);
@@ -184,16 +184,16 @@ public class GeneralMappingsTest {
                 field("name", Mappings.text())
             ));
 
-        Map<String, String> data1 = mmap(
+        Map<String, String> data1 = newmap(
                 entry("list[1].id", "123"),
                 entry("list[1].name", "ttt")
-            );
+        );
         assertEquals(list.validate("list", data1, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(list.convert("list", data1).get(0).get("id"), Integer.valueOf(123));
         assertEquals(list.convert("list", data1).get(0).get("name"), "ttt");
 
-        Map<String, String> data2 = mmap();
+        Map<String, String> data2 = newmap();
         assertEquals(list.validate("list", data2, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(list.convert("list", data2), Collections.EMPTY_LIST);
@@ -207,15 +207,15 @@ public class GeneralMappingsTest {
 
         Mapping<Map<String, Integer>> map = Mappings.map(Mappings.vInt());
 
-        Map<String, String> data1 = mmap(
+        Map<String, String> data1 = newmap(
                 entry("map.t1", "101"),
                 entry("map.t2", "102")
-            );
+        );
         assertEquals(map.validate("map", data1, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
-        assertEquals(map.convert("map", data1), mmap(entry("t1", 101), entry("t2", 102)));
+        assertEquals(map.convert("map", data1), newmap(entry("t1", 101), entry("t2", 102)));
 
-        Map<String, String> data2 = mmap();
+        Map<String, String> data2 = newmap();
         assertEquals(map.validate("map", data2, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(map.convert("map", data2), Collections.EMPTY_MAP);
@@ -230,12 +230,12 @@ public class GeneralMappingsTest {
                 field("name", Mappings.text())
             ));
 
-        Map<String, String> data1 = mmap(
+        Map<String, String> data1 = newmap(
                 entry("map.t1.id", "113"),
                 entry("map.t1.name", "ttt"),
                 entry("map.t2.id", "114"),
                 entry("map.t2.name", "tttt")
-            );
+        );
         assertEquals(map.validate("map", data1, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(map.convert("map", data1).get("t1").get("id"), Integer.valueOf(113));
@@ -243,7 +243,7 @@ public class GeneralMappingsTest {
         assertEquals(map.convert("map", data1).get("t2").get("id"), Integer.valueOf(114));
         assertEquals(map.convert("map", data1).get("t2").get("name"), "tttt");
 
-        Map<String, String> data2 = mmap();
+        Map<String, String> data2 = newmap();
         assertEquals(map.validate("map", data2, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(map.convert("map", data2), Collections.EMPTY_MAP);
@@ -255,16 +255,16 @@ public class GeneralMappingsTest {
 
         Mapping<Map<Long, String>> map = Mappings.map(Mappings.vLong(), Mappings.text());
 
-        Map<String, String> data1 = mmap(
+        Map<String, String> data1 = newmap(
                 entry("map.101", "ttt"),
                 entry("map.102", "tet")
-            );
+        );
         assertEquals(map.validate("map", data1, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
-        assertEquals(map.convert("map", data1), mmap(
+        assertEquals(map.convert("map", data1), newmap(
                 entry(101l, "ttt"), entry(102l, "tet")));
 
-        Map<String, String> data2 = mmap();
+        Map<String, String> data2 = newmap();
         assertEquals(map.validate("map", data2, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(map.convert("map", data2), Collections.EMPTY_MAP);

@@ -97,92 +97,93 @@ public class Options {
     }
 
     //-- internal options
-    Framework.InputMode _inputMode() {
+    public Framework.InputMode _inputMode() {
         return this._inputMode;
     }
-    Options _inputMode(Framework.InputMode inputMode) {
+    public Options _inputMode(Framework.InputMode inputMode) {
         Options clone = this.clone();
         clone._inputMode = inputMode;
         return clone;
     }
 
-    Optional<String> _label() {
+    public Optional<String> _label() {
         return Optional.ofNullable(this._label);
     }
-    Options _label(String label) {
+    public Options _label(String label) {
         Options clone = this.clone();
         clone._label = label;
         return clone;
     }
 
-    boolean _ignoreConstraints() {
+    public boolean _ignoreConstraints() {
         return this._ignoreConstraints;
     }
-    Options _ignoreConstraints(boolean ignore) {
+    public Options _ignoreConstraints(boolean ignore) {
         Options clone = this.clone();
         clone._ignoreConstraints = ignore;
         return clone;
     }
 
-    List<Framework.Constraint> _constraints() {
+    public List<Framework.Constraint> _constraints() {
         return this._constraints;
     }
-    Options _constraints(List<Framework.Constraint> constraints) {
+    public Options _constraints(List<Framework.Constraint> constraints) {
         Options clone = this.clone();
         clone._constraints = unmodifiableList(constraints);
         return clone;
     }
-    Options append_constraints(Framework.Constraint... constraints) {
+    public Options append_constraints(List<Framework.Constraint> constraints) {
         Options clone = this.clone();
-        clone._constraints = unmodifiableList(appendList(clone._constraints, constraints));
+        clone._constraints = unmodifiableList(mergeList(clone._constraints, constraints));
         return clone;
     }
-    Options prepend_constraints(Framework.Constraint... constraints) {
+    public Options prepend_constraints(List<Framework.Constraint> constraints) {
         Options clone = this.clone();
-        clone._constraints = unmodifiableList(mergeList(Arrays.asList(constraints), clone._constraints));
+        clone._constraints = unmodifiableList(mergeList(constraints, clone._constraints));
         return clone;
     }
 
-    List<Framework.PreProcessor> _processors() {
+    public List<Framework.PreProcessor> _processors() {
         return this._processors;
     }
-    Options _processors(List<Framework.PreProcessor> processors) {
+    public Options _processors(List<Framework.PreProcessor> processors) {
         Options clone = this.clone();
         clone._processors = unmodifiableList(processors);
         return clone;
     }
-    Options append_processors(Framework.PreProcessor... processors) {
+    public Options append_processors(List<Framework.PreProcessor> processors) {
         Options clone = this.clone();
-        clone._processors = unmodifiableList(appendList(clone._processors, processors));
+        clone._processors = unmodifiableList(mergeList(clone._processors, processors));
         return clone;
     }
-    Options prepend_processors(Framework.PreProcessor... processors) {
+    public Options prepend_processors(List<Framework.PreProcessor> processors) {
         Options clone = this.clone();
-        clone._processors = unmodifiableList(mergeList(Arrays.asList(processors), clone._processors));
+        clone._processors = unmodifiableList(mergeList(processors, clone._processors));
         return clone;
     }
 
-    <T> List<Framework.ExtraConstraint<T>> _extraConstraints() {
+    public <T> List<Framework.ExtraConstraint<T>> _extraConstraints() {
         return this._extraConstraints.stream().map(c -> (Framework.ExtraConstraint<T>) c).collect(Collectors.toList());
     }
-    Options _extraConstraints(List<Framework.ExtraConstraint<?>> extraConstraints) {
+    public Options _extraConstraints(List<Framework.ExtraConstraint<?>> extraConstraints) {
         Options clone = this.clone();
         clone._extraConstraints = unmodifiableList(extraConstraints);
         return clone;
     }
-    Options append_extraConstraints(Framework.ExtraConstraint<?>... extraConstraints) {
+    public Options append_extraConstraints(List<Framework.ExtraConstraint<?>> extraConstraints) {
         Options clone = this.clone();
-        clone._extraConstraints = unmodifiableList(appendList(clone._extraConstraints, extraConstraints));
+        clone._extraConstraints = unmodifiableList(mergeList(clone._extraConstraints, extraConstraints));
         return clone;
     }
 
     ///
-    Framework.Extensible _ext() {
-        return this._ext != null ? _ext.clone() : null;
+    public Framework.Extensible _ext() {
+        return this._ext;
     }
-    Options _ext(Framework.Extensible ext) {
-        this._ext = ext;
-        return this;
+    public Options _ext(Framework.Extensible ext) {
+        Options clone = this.clone();
+        clone._ext = ext;
+        return clone;
     }
 
     /////////////////////////////////////////////////////////////////////////////////////

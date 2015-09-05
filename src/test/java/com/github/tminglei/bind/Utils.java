@@ -30,12 +30,8 @@ public class Utils {
 
     ///////////////////////////////////////////////////////////////////
 
-    public static Function<Framework.Extensible, Framework.Extensible>
-                    toExt(Function<Ext, Ext> setting) {
-        return (c -> {
-            Ext ext = c != null ? (Ext) c : new Ext();
-            return setting.apply(ext);
-        });
+    public static Ext ext(Framework.Extensible ext) {
+        return ext != null ? (Ext) ext : new Ext();
     }
 
     public static class Ext implements Framework.Extensible {

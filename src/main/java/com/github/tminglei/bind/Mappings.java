@@ -288,8 +288,7 @@ public class Mappings {
                     if (isEmptyInput(name, data, base.options()._inputMode())) {
                         return Collections.EMPTY_LIST;
                     } else { // merge the optional's constraints/label to base mapping then do validating
-                        return base.options(o -> o.append_constraints(
-                                    options._constraints().toArray(new Framework.Constraint[0])))
+                        return base.options(o -> o.append_constraints(options._constraints()))
                                 .options(o -> o._label(o._label().orElse(options._label().orElse(null))))
                                 .validate(name, data, messages, options);
                     }
@@ -348,7 +347,7 @@ public class Mappings {
                             String keyName = isEmptyStr(name) ? key : name + "." + key;
                             String unquotedKey = key.replaceAll("^\"?([^\"]+)\"?$", "$1");
                             return entry(
-                                kBase.convert(key, mmap(entry(key, unquotedKey))),
+                                kBase.convert(key, newmap(entry(key, unquotedKey))),
                                 vBase.convert(keyName, data)
                             );
                         })
@@ -365,7 +364,7 @@ public class Mappings {
                             String keyName = isEmptyStr(name) ? key : name + "." + key;
                             String unquotedKey = key.replaceAll("^\"?([^\"]+)\"?$", "$1");
                             return mergeList(
-                                kBase.validate(key, mmap(entry(key, unquotedKey)), messages, options),
+                                kBase.validate(key, newmap(entry(key, unquotedKey)), messages, options),
                                 vBase.validate(keyName, data, messages, options)
                             ).stream();
                         })
