@@ -43,7 +43,7 @@ public class FormBinder {
         if (errors.isEmpty()) {
             Object vObj = mapping.convert(root, data);
             return vObj instanceof BindObject ? (BindObject) vObj
-                    : new BindObject(mmap(entry(BindObject.DEFAULT_KEY, vObj)));
+                    : new BindObject(newmap(entry(BindObject.DEFAULT_KEY, vObj)));
         } else {
             if (errProcessor != null) {
                 return new BindObject(errProcessor.apply(errors));

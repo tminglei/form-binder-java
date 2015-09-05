@@ -19,35 +19,66 @@ public class Framework {
         String get(String key);
     }
     @FunctionalInterface
-    public interface PreProcessor {
+    public interface PreProcessor extends Metable<ExtensionMeta> {
         Map<String, String> apply(String prefix, Map<String, String> data, Options options);
     }
     @FunctionalInterface
-    public interface Constraint {
+    public interface Constraint extends Metable<ExtensionMeta> {
         List<Map.Entry<String, String>> apply(String name, Map<String, String> data, Messages messages, Options options);
     }
     @FunctionalInterface
-    public interface ExtraConstraint<T> {
+    public interface ExtraConstraint<T> extends Metable<ExtensionMeta> {
         List<String> apply(String label, T vObj, Messages messages);
-    }
-    @FunctionalInterface
-    public interface SimpleConstraint {
-        String apply(String label, String vString, Messages messages);
     }
     @FunctionalInterface
     public interface TouchedChecker {
         boolean apply(String prefix, Map<String, String> data);
     }
+    @FunctionalInterface
+    public interface Function3<T1,T2,T3,R> {
+        R apply(T1 p1, T2 p2, T3 p3);
+    }
+    @FunctionalInterface
+    public interface Function4<T1,T2,T3,T4,R> {
+        R apply(T1 p1, T2 p2, T3 p3, T4 p4);
+    }
+
+    public interface Extensible extends java.lang.Cloneable {
+        Extensible clone();
+    }
+    public interface Metable<M> {
+        default M meta() { return null; }
+    }
     ///
     public enum InputMode {
         SINGLE, MULTIPLE, POLYMORPHIC
+    }
+    public static class MappingMeta {
+        public final Class<?> targetType;
+        public final Mapping<?>[] baseMappings;
+
+        public MappingMeta(Class<?> targetType, Mapping<?>... baseMappings) {
+            this.targetType = targetType;
+            this.baseMappings = baseMappings;
+        }
+    }
+    public static class ExtensionMeta {
+        public final String name;
+        public final String desc;
+        public final List<?> params;
+
+        public ExtensionMeta(String name, String desc, List<?> params) {
+            this.name = name;
+            this.desc = desc;
+            this.params = unmodifiableList(params);
+        }
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////
     /**
      * A mapping, w/ constraints/processors/options, was used to validate/convert input data
      */
-    public interface Mapping<T> {
+    public interface Mapping<T> extends Metable<MappingMeta> {
 
         /**
          * @return options associated with the mapping
@@ -71,12 +102,24 @@ public class Framework {
         }
 
         /**
+         * change extensions associated with the mapping
+         * @param setting function used to change the extensions
+         * @return the mapping
+         */
+        default <E extends Extensible> Mapping<T> $ext(Function<E, E> setting) {
+            return options(o -> {
+                E ext = (E) (o._ext() != null ? o._ext().clone() : null);
+                return o._ext(setting.apply(ext));
+            });
+        }
+
+        /**
          * attach some pre-processors to the mapping
          * @param newProcessors pre-processors
          * @return the mapping
          */
         default Mapping<T> processor(PreProcessor... newProcessors) {
-            return options(o -> o.append_processors(newProcessors));
+            return options(o -> o.append_processors(Arrays.asList(newProcessors)));
         }
 
         /**
@@ -85,16 +128,18 @@ public class Framework {
          * @return the mapping
          */
         default Mapping<T> constraint(Constraint... newConstraints) {
-            return options(o -> o.append_constraints(newConstraints));
+            return options(o -> o.append_constraints(Arrays.asList(newConstraints)));
         }
 
         /**
          * attach some extra constraints, which was used to do some extra checking
          * after string was converted to target value, to the mapping
-         * @param extraConstraints extra constraints
+         * @param newConstraints extra constraints
          * @return the mapping
          */
-        Mapping<T> verifying(ExtraConstraint<T>... extraConstraints);
+        default Mapping<T> verifying(ExtraConstraint<T>... newConstraints) {
+            return options(o -> o.append_extraConstraints(Arrays.asList(newConstraints)));
+        }
 
         ///
 
@@ -148,6 +193,11 @@ public class Framework {
         }
 
         @Override
+        public MappingMeta meta() {
+            return base.meta();
+        }
+
+        @Override
         public Options options() {
             return base.options();
         }
@@ -158,9 +208,8 @@ public class Framework {
         }
 
         @Override
-        public Mapping<R> verifying(ExtraConstraint<R>... extraConstraints) {
-            return new TransformMapping(base, transform,
-                    (List<ExtraConstraint<R>>) appendList(this.extraConstraints, extraConstraints));
+        public Mapping<R> verifying(ExtraConstraint<R>... newConstraints) {
+            return new TransformMapping(base, transform, (List<ExtraConstraint<R>>) appendList(this.extraConstraints, newConstraints));
         }
 
         @Override
@@ -187,23 +236,28 @@ public class Framework {
     public static class FieldMapping<T> implements Mapping<T> {
         private final Options options;
         private final Constraint moreValidate;
-        private final List<ExtraConstraint<T>> extraConstraints;
         private final BiFunction<String, Map<String, String>, T> doConvert;
+        private final MappingMeta meta;
 
         private final Logger logger = LoggerFactory.getLogger(FieldMapping.class);
 
-        FieldMapping(InputMode inputMode, BiFunction<String, Map<String, String>, T> doConvert) {
-            this(inputMode, doConvert, FrameworkUtils.PassValidating, Collections.EMPTY_LIST, Options.EMPTY);
+        FieldMapping(InputMode inputMode, BiFunction<String, Map<String, String>, T> doConvert, MappingMeta meta) {
+            this(inputMode, doConvert, FrameworkUtils.PassValidating, Options.EMPTY, meta);
         }
-        FieldMapping(InputMode inputMode, BiFunction<String, Map<String, String>, T> doConvert, Constraint moreValidate) {
-            this(inputMode, doConvert, moreValidate, Collections.EMPTY_LIST, Options.EMPTY);
+        FieldMapping(InputMode inputMode, BiFunction<String, Map<String, String>, T> doConvert, Constraint moreValidate, MappingMeta meta) {
+            this(inputMode, doConvert, moreValidate, Options.EMPTY, meta);
         }
         FieldMapping(InputMode inputMode, BiFunction<String, Map<String, String>, T> doConvert,
-                     Constraint moreValidate, List<ExtraConstraint<T>> extraConstraints, Options options) {
+                     Constraint moreValidate, Options options, MappingMeta meta) {
             this.doConvert = doConvert;
             this.moreValidate = moreValidate;
-            this.extraConstraints = unmodifiableList(extraConstraints);
             this.options = options._inputMode(inputMode);
+            this.meta = meta;
+        }
+
+        @Override
+        public MappingMeta meta() {
+            return meta;
         }
 
         @Override
@@ -217,19 +271,8 @@ public class Framework {
                     this.options()._inputMode(),
                     this.doConvert,
                     this.moreValidate,
-                    this.extraConstraints,
-                    setting.apply(this.options())
-                );
-        }
-
-        @Override
-        public Mapping<T> verifying(ExtraConstraint<T>... extraConstraints) {
-            return new FieldMapping<T>(
-                    this.options()._inputMode(),
-                    this.doConvert,
-                    this.moreValidate,
-                    appendList(this.extraConstraints, extraConstraints),
-                    this.options()
+                    setting.apply(this.options()),
+                    this.meta
                 );
         }
 
@@ -254,7 +297,7 @@ public class Framework {
                 List<Map.Entry<String, String>> errors = validateRec(name, newData, messages, theOptions, validators);
                 if (errors.isEmpty()) {
                     return Optional.ofNullable(doConvert.apply(name, newData))
-                            .map(v -> extraValidateRec(name, v, messages, theOptions, extraConstraints))
+                            .map(v -> extraValidateRec(name, v, messages, theOptions, theOptions._extraConstraints()))
                             .orElse(Collections.EMPTY_LIST);
                 } else return errors;
             }
@@ -267,17 +310,25 @@ public class Framework {
     public static class GroupMapping implements Mapping<BindObject> {
         private final Options options;
         private final List<Map.Entry<String, Mapping<?>>> fields;
-        private final List<ExtraConstraint<BindObject>> extraConstraints;
+        private final MappingMeta meta = new MappingMeta(BindObject.class);
 
         private final Logger logger = LoggerFactory.getLogger(GroupMapping.class);
 
         GroupMapping(List<Map.Entry<String, Mapping<?>>> fields) {
-            this(fields, Collections.EMPTY_LIST, Options.EMPTY);
+            this(fields, Options.EMPTY);
         }
-        GroupMapping(List<Map.Entry<String, Mapping<?>>> fields, List<ExtraConstraint<BindObject>> extraConstraints, Options options) {
+        GroupMapping(List<Map.Entry<String, Mapping<?>>> fields, Options options) {
             this.fields = unmodifiableList(fields);
-            this.extraConstraints = unmodifiableList(extraConstraints);
             this.options = options._inputMode(InputMode.MULTIPLE);
+        }
+
+        public List<Map.Entry<String, Mapping<?>>> fields() {
+            return fields;
+        }
+
+        @Override
+        public MappingMeta meta() {
+            return meta;
         }
 
         @Override
@@ -289,17 +340,7 @@ public class Framework {
         public Mapping<BindObject> options(Function<Options, Options> setting) {
             return new GroupMapping(
                     this.fields,
-                    this.extraConstraints,
                     setting.apply(this.options())
-                );
-        }
-
-        @Override
-        public Mapping<BindObject> verifying(ExtraConstraint<BindObject>... extraConstraints) {
-            return new GroupMapping(
-                    this.fields,
-                    appendList(this.extraConstraints, extraConstraints),
-                    this.options()
                 );
         }
 
@@ -351,7 +392,7 @@ public class Framework {
                     if (isEmptyInput(name, newData, theOptions._inputMode())) return Collections.EMPTY_LIST;
                     else {
                         BindObject vObj = doConvert(name, newData);
-                        return extraValidateRec(name, vObj, messages, theOptions, extraConstraints);
+                        return extraValidateRec(name, vObj, messages, theOptions, theOptions._extraConstraints());
                     }
                 }
                 return errors;

@@ -8,7 +8,6 @@ import org.testng.annotations.Test;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 import static org.testng.Assert.*;
@@ -27,11 +26,11 @@ public class FrameworkUtilsTest {
     public void testIsEmptyInput() {
         System.out.println(green(">> is empty input"));
 
-        Map<String, String> data = mmap(
+        Map<String, String> data = newmap(
                 entry("a", null),
                 entry("b", "t"),
                 entry("c.t", "xxx")
-            );
+        );
 
         assertEquals(FrameworkUtils.isEmptyInput("a", data, null), true);
         assertEquals(FrameworkUtils.isEmptyInput("a", data, InputMode.SINGLE), true);
@@ -82,12 +81,12 @@ public class FrameworkUtilsTest {
     public void testIndexes() {
         System.out.println(green(">> indexes"));
 
-        Map<String, String> data = mmap(
+        Map<String, String> data = newmap(
                 entry("a", "tt"),
                 entry("b[3]", "tx"),
                 entry("b[0]", "t1"),
                 entry("b[1]", "ts")
-            );
+        );
 
         assertEquals(FrameworkUtils.indexes("b", data),
                 Arrays.asList(0, 1, 3));
@@ -99,11 +98,11 @@ public class FrameworkUtilsTest {
     public void testKeys() {
         System.out.println(green(">> keys"));
 
-        Map<String, String> data = mmap(
+        Map<String, String> data = newmap(
                 entry("a.b", "te"),
                 entry("a.t", "tt"),
                 entry("c", "tew")
-            );
+        );
 
         assertEquals(FrameworkUtils.keys("a", data),
                 Arrays.asList("b", "t"));
@@ -118,22 +117,22 @@ public class FrameworkUtilsTest {
         JsonNode json = new ObjectMapper().readTree(
                 "{\"data\": {\"email\":null, \"price\":337.5, \"count\":5}, \"touched\": [\"email\", \"price\"]}");
 
-        Map<String, String> expected1 = mmap(
+        Map<String, String> expected1 = newmap(
                 entry("data.email", "null"),
                 entry("data.price", "337.5"),
                 entry("data.count", "5"),
                 entry("touched[0]", "email"),
                 entry("touched[1]", "price")
-            );
+        );
         assertEquals(FrameworkUtils.json2map("", json), expected1);
 
-        Map<String, String> expected2 = mmap(
+        Map<String, String> expected2 = newmap(
                 entry("t.data.email", "null"),
                 entry("t.data.price", "337.5"),
                 entry("t.data.count", "5"),
                 entry("t.touched[0]", "email"),
                 entry("t.touched[1]", "price")
-            );
+        );
         assertEquals(FrameworkUtils.json2map("t", json), expected2);
     }
 }

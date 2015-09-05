@@ -25,12 +25,12 @@ public class PreProcessorsTest {
 
         PreProcessor trim = Processors.trim();
 
-        assertEquals(trim.apply("", mmap(entry("", null)), Options.EMPTY),
-                mmap(entry("", "")));
-        assertEquals(trim.apply("", mmap(entry("", " yuu")), Options.EMPTY),
-                mmap(entry("", "yuu")));
-        assertEquals(trim.apply("a", mmap(entry("a", " eyuu ")), Options.EMPTY),
-                mmap(entry("a", "eyuu")));
+        assertEquals(trim.apply("", newmap(entry("", null)), Options.EMPTY),
+                newmap(entry("", "")));
+        assertEquals(trim.apply("", newmap(entry("", " yuu")), Options.EMPTY),
+                newmap(entry("", "yuu")));
+        assertEquals(trim.apply("a", newmap(entry("a", " eyuu ")), Options.EMPTY),
+                newmap(entry("a", "eyuu")));
     }
 
     @Test
@@ -39,12 +39,12 @@ public class PreProcessorsTest {
 
         PreProcessor trim = Processors.trim();
 
-        assertEquals(trim.apply("", mmap(entry("a", null), entry("b", " t1")), Options.EMPTY),
-                mmap(entry("a", ""), entry("b", "t1")));
-        assertEquals(trim.apply("t", mmap(entry("", " yuu"), entry("t.a", " ")), Options.EMPTY),
-                mmap(entry("", " yuu"), entry("t.a", "")));
-        assertEquals(trim.apply("a", mmap(entry("a[1]", " eyuu ")), Options.EMPTY),
-                mmap(entry("a[1]", "eyuu")));
+        assertEquals(trim.apply("", newmap(entry("a", null), entry("b", " t1")), Options.EMPTY),
+                newmap(entry("a", ""), entry("b", "t1")));
+        assertEquals(trim.apply("t", newmap(entry("", " yuu"), entry("t.a", " ")), Options.EMPTY),
+                newmap(entry("", " yuu"), entry("t.a", "")));
+        assertEquals(trim.apply("a", newmap(entry("a[1]", " eyuu ")), Options.EMPTY),
+                newmap(entry("a[1]", "eyuu")));
     }
 
     // omit test
@@ -55,12 +55,12 @@ public class PreProcessorsTest {
 
         PreProcessor omit = Processors.omit(",");
 
-        assertEquals(omit.apply("", mmap(entry("", null)), Options.EMPTY),
-                mmap(entry("", "")));
-        assertEquals(omit.apply("", mmap(entry("", "123,334")), Options.EMPTY),
-                mmap(entry("", "123334")));
-        assertEquals(omit.apply("a", mmap(entry("a", "2.345e+5")), Options.EMPTY),
-                mmap(entry("a", "2.345e+5")));
+        assertEquals(omit.apply("", newmap(entry("", null)), Options.EMPTY),
+                newmap(entry("", "")));
+        assertEquals(omit.apply("", newmap(entry("", "123,334")), Options.EMPTY),
+                newmap(entry("", "123334")));
+        assertEquals(omit.apply("a", newmap(entry("a", "2.345e+5")), Options.EMPTY),
+                newmap(entry("a", "2.345e+5")));
     }
 
     @Test
@@ -69,10 +69,10 @@ public class PreProcessorsTest {
 
         PreProcessor omit = Processors.omit(",");
 
-        assertEquals(omit.apply("", mmap(entry("", null), entry("b", "123,334")), Options.EMPTY),
-                mmap(entry("", ""), entry("b", "123334")));
-        assertEquals(omit.apply("a", mmap(entry("", "123,334"), entry("a[1]", "2.345e+5")), Options.EMPTY),
-                mmap(entry("", "123,334"), entry("a[1]", "2.345e+5")));
+        assertEquals(omit.apply("", newmap(entry("", null), entry("b", "123,334")), Options.EMPTY),
+                newmap(entry("", ""), entry("b", "123334")));
+        assertEquals(omit.apply("a", newmap(entry("", "123,334"), entry("a[1]", "2.345e+5")), Options.EMPTY),
+                newmap(entry("", "123,334"), entry("a[1]", "2.345e+5")));
     }
 
     // omit-left test
@@ -83,10 +83,10 @@ public class PreProcessorsTest {
 
         PreProcessor omitLeft = Processors.omitLeft("$");
 
-        assertEquals(omitLeft.apply("", mmap(entry("", null)), Options.EMPTY),
-                mmap(entry("", "")));
-        assertEquals(omitLeft.apply("a", mmap(entry("a", "$3,567")), Options.EMPTY),
-                mmap(entry("a", "3,567")));
+        assertEquals(omitLeft.apply("", newmap(entry("", null)), Options.EMPTY),
+                newmap(entry("", "")));
+        assertEquals(omitLeft.apply("a", newmap(entry("a", "$3,567")), Options.EMPTY),
+                newmap(entry("a", "3,567")));
     }
 
     @Test
@@ -95,10 +95,10 @@ public class PreProcessorsTest {
 
         PreProcessor omitLeft = Processors.omitLeft("$");
 
-        assertEquals(omitLeft.apply("a", mmap(entry("", "$3,567"), entry("a", "$356")), Options.EMPTY),
-                mmap(entry("", "$3,567"), entry("a", "356")));
-        assertEquals(omitLeft.apply("a", mmap(entry("a[1]", "$3,567"), entry("a[2]", "$356")), Options.EMPTY),
-                mmap(entry("a[1]", "3,567"), entry("a[2]", "356")));
+        assertEquals(omitLeft.apply("a", newmap(entry("", "$3,567"), entry("a", "$356")), Options.EMPTY),
+                newmap(entry("", "$3,567"), entry("a", "356")));
+        assertEquals(omitLeft.apply("a", newmap(entry("a[1]", "$3,567"), entry("a[2]", "$356")), Options.EMPTY),
+                newmap(entry("a[1]", "3,567"), entry("a[2]", "356")));
     }
 
     // omit-right test
@@ -109,10 +109,10 @@ public class PreProcessorsTest {
 
         PreProcessor omitRight = Processors.omitRight("-tat");
 
-        assertEquals(omitRight.apply("", mmap(entry("", null)), Options.EMPTY),
-                mmap(entry("", "")));
-        assertEquals(omitRight.apply("a", mmap(entry("a", "tewwwtt-tat")), Options.EMPTY),
-                mmap(entry("a", "tewwwtt")));
+        assertEquals(omitRight.apply("", newmap(entry("", null)), Options.EMPTY),
+                newmap(entry("", "")));
+        assertEquals(omitRight.apply("a", newmap(entry("a", "tewwwtt-tat")), Options.EMPTY),
+                newmap(entry("a", "tewwwtt")));
     }
 
     @Test
@@ -121,10 +121,10 @@ public class PreProcessorsTest {
 
         PreProcessor omitRight = Processors.omitRight("-tat");
 
-        assertEquals(omitRight.apply("a", mmap(entry("", "tewwwtt-tat"), entry("a", "tew-tat")), Options.EMPTY),
-                mmap(entry("", "tewwwtt-tat"), entry("a", "tew")));
-        assertEquals(omitRight.apply("a", mmap(entry("a[0]", "tewwwtt-tat"), entry("a[1]", "tew-tat")), Options.EMPTY),
-                mmap(entry("a[0]", "tewwwtt"), entry("a[1]", "tew")));
+        assertEquals(omitRight.apply("a", newmap(entry("", "tewwwtt-tat"), entry("a", "tew-tat")), Options.EMPTY),
+                newmap(entry("", "tewwwtt-tat"), entry("a", "tew")));
+        assertEquals(omitRight.apply("a", newmap(entry("a[0]", "tewwwtt-tat"), entry("a[1]", "tew-tat")), Options.EMPTY),
+                newmap(entry("a[0]", "tewwwtt"), entry("a[1]", "tew")));
     }
 
     // omit-redundant test
@@ -135,10 +135,10 @@ public class PreProcessorsTest {
 
         PreProcessor omitRedundant = Processors.omitRedundant(" ");
 
-        assertEquals(omitRedundant.apply("", mmap(entry("", null)), Options.EMPTY),
-                mmap(entry("", "")));
-        assertEquals(omitRedundant.apply("a", mmap(entry("a", " a  teee  86y")), Options.EMPTY),
-                mmap(entry("a", " a teee 86y")));
+        assertEquals(omitRedundant.apply("", newmap(entry("", null)), Options.EMPTY),
+                newmap(entry("", "")));
+        assertEquals(omitRedundant.apply("a", newmap(entry("a", " a  teee  86y")), Options.EMPTY),
+                newmap(entry("a", " a teee 86y")));
     }
 
     @Test
@@ -147,10 +147,10 @@ public class PreProcessorsTest {
 
         PreProcessor omitRedundant = Processors.omitRedundant(" ");
 
-        assertEquals(omitRedundant.apply("a", mmap(entry("", " a  teee  86y"), entry("a", " a  teee  86")), Options.EMPTY),
-                mmap(entry("", " a  teee  86y"), entry("a", " a teee 86")));
-        assertEquals(omitRedundant.apply("a", mmap(entry("a[0]", " a  teee  86y"), entry("a[1]", " a  teee  86")), Options.EMPTY),
-                mmap(entry("a[0]", " a teee 86y"), entry("a[1]", " a teee 86")));
+        assertEquals(omitRedundant.apply("a", newmap(entry("", " a  teee  86y"), entry("a", " a  teee  86")), Options.EMPTY),
+                newmap(entry("", " a  teee  86y"), entry("a", " a teee 86")));
+        assertEquals(omitRedundant.apply("a", newmap(entry("a[0]", " a  teee  86y"), entry("a[1]", " a  teee  86")), Options.EMPTY),
+                newmap(entry("a[0]", " a teee 86y"), entry("a[1]", " a teee 86")));
     }
 
     // omit-matched test
@@ -161,12 +161,12 @@ public class PreProcessorsTest {
 
         PreProcessor omitMatched = Processors.omitMatched("-\\d\\d$");
 
-        assertEquals(omitMatched.apply("", mmap(entry("", null)), Options.EMPTY),
-                mmap(entry("", "")));
-        assertEquals(omitMatched.apply("", mmap(entry("", "2342-334-12")), Options.EMPTY),
-                mmap(entry("", "2342-334")));
-        assertEquals(omitMatched.apply("a", mmap(entry("a", "2342-334")), Options.EMPTY),
-                mmap(entry("a", "2342-334")));
+        assertEquals(omitMatched.apply("", newmap(entry("", null)), Options.EMPTY),
+                newmap(entry("", "")));
+        assertEquals(omitMatched.apply("", newmap(entry("", "2342-334-12")), Options.EMPTY),
+                newmap(entry("", "2342-334")));
+        assertEquals(omitMatched.apply("a", newmap(entry("a", "2342-334")), Options.EMPTY),
+                newmap(entry("a", "2342-334")));
     }
 
     @Test
@@ -175,10 +175,10 @@ public class PreProcessorsTest {
 
         PreProcessor omitMatched = Processors.omitMatched("-\\d\\d$");
 
-        assertEquals(omitMatched.apply("", mmap(entry("", "2342-334-12"), entry("a", "2342-334-13")), Options.EMPTY),
-                mmap(entry("", "2342-334"), entry("a", "2342-334")));
-        assertEquals(omitMatched.apply("a", mmap(entry("", "2342-334-12"), entry("a", "2342-334")), Options.EMPTY),
-                mmap(entry("", "2342-334-12"), entry("a", "2342-334")));
+        assertEquals(omitMatched.apply("", newmap(entry("", "2342-334-12"), entry("a", "2342-334-13")), Options.EMPTY),
+                newmap(entry("", "2342-334"), entry("a", "2342-334")));
+        assertEquals(omitMatched.apply("a", newmap(entry("", "2342-334-12"), entry("a", "2342-334")), Options.EMPTY),
+                newmap(entry("", "2342-334-12"), entry("a", "2342-334")));
     }
 
     // replace-matched test
@@ -189,12 +189,12 @@ public class PreProcessorsTest {
 
         PreProcessor replaceMatched = Processors.replaceMatched("-\\d\\d$", "-1");
 
-        assertEquals(replaceMatched.apply("", mmap(entry("", null)), Options.EMPTY),
-                mmap(entry("", "")));
-        assertEquals(replaceMatched.apply("", mmap(entry("", "2342-334-12")), Options.EMPTY),
-                mmap(entry("", "2342-334-1")));
-        assertEquals(replaceMatched.apply("a", mmap(entry("a", "2342-334")), Options.EMPTY),
-                mmap(entry("a", "2342-334")));
+        assertEquals(replaceMatched.apply("", newmap(entry("", null)), Options.EMPTY),
+                newmap(entry("", "")));
+        assertEquals(replaceMatched.apply("", newmap(entry("", "2342-334-12")), Options.EMPTY),
+                newmap(entry("", "2342-334-1")));
+        assertEquals(replaceMatched.apply("a", newmap(entry("a", "2342-334")), Options.EMPTY),
+                newmap(entry("a", "2342-334")));
     }
 
     @Test
@@ -203,10 +203,10 @@ public class PreProcessorsTest {
 
         PreProcessor replaceMatched = Processors.replaceMatched("-\\d\\d$", "-1");
 
-        assertEquals(replaceMatched.apply("", mmap(entry("", "2342-334-12"), entry("a", "2342-334-13")), Options.EMPTY),
-                mmap(entry("", "2342-334-1"), entry("a", "2342-334-1")));
-        assertEquals(replaceMatched.apply("a", mmap(entry("", "2342-334-12"), entry("a", "2342-334")), Options.EMPTY),
-                mmap(entry("", "2342-334-12"), entry("a", "2342-334")));
+        assertEquals(replaceMatched.apply("", newmap(entry("", "2342-334-12"), entry("a", "2342-334-13")), Options.EMPTY),
+                newmap(entry("", "2342-334-1"), entry("a", "2342-334-1")));
+        assertEquals(replaceMatched.apply("a", newmap(entry("", "2342-334-12"), entry("a", "2342-334")), Options.EMPTY),
+                newmap(entry("", "2342-334-12"), entry("a", "2342-334")));
     }
 
     // expand-json test
@@ -217,17 +217,17 @@ public class PreProcessorsTest {
 
         PreProcessor expandJson = Processors.expandJson();
 
-        Map<String, String> rawData = mmap(
+        Map<String, String> rawData = newmap(
                 entry("aa", "wett"),
                 entry("json", "{\"id\":123, \"name\":\"tewd\", \"dr-1\":[33,45]}")
-            );
-        Map<String, String> expected = mmap(
+        );
+        Map<String, String> expected = newmap(
                 entry("aa", "wett"),
                 entry("json.id", "123"),
                 entry("json.name", "tewd"),
                 entry("json.dr-1[0]", "33"),
                 entry("json.dr-1[1]", "45")
-            );
+        );
 
         assertEquals(expandJson.apply("json", rawData, Options.EMPTY),
                 expected);
@@ -239,7 +239,7 @@ public class PreProcessorsTest {
 
         PreProcessor expandJson = Processors.expandJson();
 
-        Map<String, String> nullData = mmap(entry("aa", "wett"));
+        Map<String, String> nullData = newmap(entry("aa", "wett"));
         try {
             assertEquals(expandJson.apply("json", nullData, Options.EMPTY),
                     nullData);
@@ -247,18 +247,18 @@ public class PreProcessorsTest {
             // expected
         }
 
-        Map<String, String> nullData1 = mmap(entry("aa", "wett"), entry("json", null));
+        Map<String, String> nullData1 = newmap(entry("aa", "wett"), entry("json", null));
         try {
             assertEquals(expandJson.apply("json", nullData1, Options.EMPTY),
-                    mmap(entry("aa", "wett")));
+                    newmap(entry("aa", "wett")));
         } catch (NullPointerException e) {
             // expected
         }
 
-        Map<String, String> emptyData1 = mmap(entry("aa", "wett"), entry("json", ""));
+        Map<String, String> emptyData1 = newmap(entry("aa", "wett"), entry("json", ""));
         try {
             assertEquals(expandJson.apply("json", emptyData1, Options.EMPTY),
-                    mmap(entry("aa", "wett")));
+                    newmap(entry("aa", "wett")));
         } catch (IllegalArgumentException e) {
             // expected
         }
@@ -270,17 +270,17 @@ public class PreProcessorsTest {
 
         PreProcessor expandJson = Processors.expandJson("json");
 
-        Map<String, String> rawData = mmap(
+        Map<String, String> rawData = newmap(
                 entry("aa", "wett"),
                 entry("json", "{\"id\":123, \"name\":\"tewd\", \"dr-1\":[33,45]}")
-            );
-        Map<String, String> expected = mmap(
+        );
+        Map<String, String> expected = newmap(
                 entry("aa", "wett"),
                 entry("json.id", "123"),
                 entry("json.name", "tewd"),
                 entry("json.dr-1[0]", "33"),
                 entry("json.dr-1[1]", "45")
-            );
+        );
 
         assertEquals(expandJson.apply("", rawData, Options.EMPTY),
                 expected);
@@ -294,18 +294,18 @@ public class PreProcessorsTest {
 
         PreProcessor expandListKeys = Processors.expandListKeys();
 
-        Map<String, String> rawData = mmap(
+        Map<String, String> rawData = newmap(
                 entry("aa", "wett"),
                 entry("touched[0]", "a[0]"),
                 entry("touched[1]", "b"),
                 entry("touched[2]", "c.t")
-            );
-        Map<String, String> expected = mmap(
+        );
+        Map<String, String> expected = newmap(
                 entry("aa", "wett"),
                 entry("touched.a[0]", "true"),
                 entry("touched.b", "true"),
                 entry("touched.c.t", "true")
-            );
+        );
 
         assertEquals(expandListKeys.apply("touched", rawData, Options.EMPTY),
                 expected);
@@ -317,18 +317,18 @@ public class PreProcessorsTest {
 
         PreProcessor expandJsonKeys = Processors.expandJsonKeys("touched");
 
-        Map<String, String> rawData = mmap(
+        Map<String, String> rawData = newmap(
                 entry("aa", "wett"),
                 entry("touched[0]", "a[0]"),
                 entry("touched[1]", "b"),
                 entry("touched[2]", "c.t")
-            );
-        Map<String, String> expected = mmap(
+        );
+        Map<String, String> expected = newmap(
                 entry("aa", "wett"),
                 entry("touched.a[0]", "true"),
                 entry("touched.b", "true"),
                 entry("touched.c.t", "true")
-            );
+        );
 
         assertEquals(expandJsonKeys.apply("", rawData, Options.EMPTY),
                 expected);
@@ -343,16 +343,16 @@ public class PreProcessorsTest {
 
         PreProcessor expandJsonKeys = Processors.expandJsonKeys();
 
-        Map<String, String> rawData = mmap(
+        Map<String, String> rawData = newmap(
                 entry("aa", "wett"),
                 entry("touched", "[\"a[0]\",\"b\", \"c.t\"]")
-            );
-        Map<String, String> expected = mmap(
+        );
+        Map<String, String> expected = newmap(
                 entry("aa", "wett"),
                 entry("touched.a[0]", "true"),
                 entry("touched.b", "true"),
                 entry("touched.c.t", "true")
-            );
+        );
 
         assertEquals(expandJsonKeys.apply("touched", rawData, Options.EMPTY),
                 expected);
@@ -364,16 +364,16 @@ public class PreProcessorsTest {
 
         PreProcessor expandJsonKeys = Processors.expandJsonKeys("touched");
 
-        Map<String, String> rawData = mmap(
+        Map<String, String> rawData = newmap(
                 entry("aa", "wett"),
                 entry("touched", "[\"a[0]\",\"b\", \"c.t\"]")
-            );
-        Map<String, String> expected = mmap(
+        );
+        Map<String, String> expected = newmap(
                 entry("aa", "wett"),
                 entry("touched.a[0]", "true"),
                 entry("touched.b", "true"),
                 entry("touched.c.t", "true")
-            );
+        );
 
         assertEquals(expandJsonKeys.apply("", rawData, Options.EMPTY),
                 expected);
@@ -387,20 +387,20 @@ public class PreProcessorsTest {
 
         PreProcessor changePrefix = Processors.changePrefix("json", "data");
 
-        Map<String, String> data = mmap(
+        Map<String, String> data = newmap(
                 entry("aa", "wett"),
                 entry("json.id", "123"),
                 entry("json.name", "tewd"),
                 entry("json.dr-1[0]", "33"),
                 entry("json.dr-1[1]", "45")
-            );
-        Map<String, String> expected = mmap(
+        );
+        Map<String, String> expected = newmap(
                 entry("aa", "wett"),
                 entry("data.id", "123"),
                 entry("data.name", "tewd"),
                 entry("data.dr-1[0]", "33"),
                 entry("data.dr-1[1]", "45")
-            );
+        );
 
         assertEquals(changePrefix.apply("", data, Options.EMPTY),
                 expected);
@@ -412,22 +412,22 @@ public class PreProcessorsTest {
 
         PreProcessor changePrefix = Processors.changePrefix("json.x", "");
 
-        Map<String, String> data = mmap(
+        Map<String, String> data = newmap(
                 entry("aa", "wett"),
                 entry("t.json.x", "test"),
                 entry("t.json.x.id", "123"),
                 entry("t.json.x.name", "tewd"),
                 entry("t.json.x.dr-1[0]", "33"),
                 entry("t.json.x.dr-1[1]", "45")
-            );
-        Map<String, String> expected = mmap(
+        );
+        Map<String, String> expected = newmap(
                 entry("aa", "wett"),
                 entry("t", "test"),
                 entry("t.id", "123"),
                 entry("t.name", "tewd"),
                 entry("t.dr-1[0]", "33"),
                 entry("t.dr-1[1]", "45")
-            );
+        );
 
         assertEquals(changePrefix.apply("t", data, Options.EMPTY),
                 expected);

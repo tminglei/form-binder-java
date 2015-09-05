@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +25,7 @@ public class Processors {
     ///////////////////////////////////  pre-defined pre-processors  //////////////////////////
 
     public static Framework.PreProcessor trim() {
-        return ((prefix, data, options) -> {
+        return mkPreProcessorWithMeta((prefix, data, options) -> {
             logger.debug("trimming '{}'", prefix);
 
             return data.entrySet().stream()
@@ -41,31 +42,34 @@ public class Processors {
                             Map.Entry::getKey,
                             Map.Entry::getValue
                     ));
-            });
+            }, mkExtensionMeta("trim"));
         }
 
     public static Framework.PreProcessor omit(String str) {
-        return replaceMatched(Pattern.quote(str), "");
+        return replaceMatched(Pattern.quote(str), "", mkExtensionMeta("omit", str));
     }
 
     public static Framework.PreProcessor omitLeft(String str) {
-        return replaceMatched("^" + Pattern.quote(str), "");
+        return replaceMatched("^" + Pattern.quote(str), "", mkExtensionMeta("omitLeft", str));
     }
 
     public static Framework.PreProcessor omitRight(String str) {
-        return replaceMatched(Pattern.quote(str) + "$", "");
+        return replaceMatched(Pattern.quote(str) + "$", "", mkExtensionMeta("omitRight", str));
     }
 
     public static Framework.PreProcessor omitRedundant(String str) {
-        return replaceMatched("["+Pattern.quote(str)+"]+", str);
+        return replaceMatched("["+Pattern.quote(str)+"]+", str, mkExtensionMeta("omitRedundant", str));
     }
 
     public static Framework.PreProcessor omitMatched(String pattern) {
-        return replaceMatched(pattern, "");
+        return replaceMatched(pattern, "", mkExtensionMeta("omitMatched", pattern));
     }
 
     public static Framework.PreProcessor replaceMatched(String pattern, String replacement) {
-        return ((prefix, data, options) -> {
+        return replaceMatched(pattern, replacement, null);
+    }
+    static Framework.PreProcessor replaceMatched(String pattern, String replacement, Framework.ExtensionMeta meta) {
+        return mkPreProcessorWithMeta((prefix, data, options) -> {
             logger.debug("replacing '{}' with '{}'", pattern, replacement);
 
             return data.entrySet().stream()
@@ -74,15 +78,18 @@ public class Processors {
                         else {
                             String v = e.getValue();
                             return entry(
-                                e.getKey(),
-                                v != null ? v.replaceAll(pattern, replacement) : ""
+                                    e.getKey(),
+                                    v != null ? v.replaceAll(pattern, replacement) : ""
                             );
                         }
                     }).collect(Collectors.toMap(
                             Map.Entry::getKey,
                             Map.Entry::getValue
                     ));
-            });
+            }, meta != null ? meta : new Framework.ExtensionMeta(
+                "replaceMatched",
+                "replace(matched '" + pattern + "' with '" + replacement + "')",
+                Arrays.asList(pattern, replacement)));
         }
 
     /**
@@ -93,11 +100,11 @@ public class Processors {
         return expandJson(null);
     }
     public static Framework.PreProcessor expandJson(String prefix) {
-        return ((prefix1, data, options) -> {
+        return mkPreProcessorWithMeta((prefix1, data, options) -> {
             logger.debug("expanding json at '{}'", (prefix == null ? prefix1 : prefix));
 
             String thePrefix = prefix == null ? prefix1 : prefix;
-            String jsonStr  = data.get(thePrefix);
+            String jsonStr = data.get(thePrefix);
 
             Map<String, String> newData = new HashMap<>(data);
             newData.remove(thePrefix); // remove old one to avoid disturbing other processing
@@ -111,11 +118,10 @@ public class Processors {
                 }
 
                 return newData;
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 throw new IllegalArgumentException("Illegal json string at: " + thePrefix + " - \n" + jsonStr, e);
             }
-        });
+        }, mkExtensionMeta("expandJson", prefix));
     }
 
     /**
@@ -126,13 +132,13 @@ public class Processors {
         return expandJsonKeys(null);
     }
     public static Framework.PreProcessor expandJsonKeys(String prefix) {
-        return ((prefix1, data, options) -> {
+        return mkPreProcessorWithMeta((prefix1, data, options) -> {
             logger.debug("expanding json keys at '{}'", (prefix == null ? prefix1 : prefix));
 
             Map<String, String> data1 = expandJson(prefix).apply(prefix1, data, options);
             Map<String, String> data2 = expandListKeys(prefix).apply(prefix1, data1, options);
             return data2;
-        });
+        }, mkExtensionMeta("expandJsonKeys", prefix));
     }
 
     /**
@@ -143,7 +149,7 @@ public class Processors {
         return expandListKeys(null);
     }
     public static Framework.PreProcessor expandListKeys(String prefix) {
-        return ((prefix1, data, options) -> {
+        return mkPreProcessorWithMeta((prefix1, data, options) -> {
             logger.debug("expanding list keys at '{}'", (prefix == null ? prefix1 : prefix));
 
             String thePrefix = prefix == null ? prefix1 : prefix;
@@ -158,7 +164,7 @@ public class Processors {
                             Map.Entry::getKey,
                             Map.Entry::getValue
                     ));
-            });
+            }, mkExtensionMeta("expandListKeys", prefix));
         }
 
     /**
@@ -168,28 +174,30 @@ public class Processors {
      * @return new created pre-processor
      */
     public static Framework.PreProcessor changePrefix(String from, String to) {
-        return ((prefix, data, options) -> {
+        return mkPreProcessorWithMeta((prefix, data, options) -> {
             logger.debug("changing prefix at '{}' from '{}' to '{}'", prefix, from, to);
 
             return data.entrySet().stream()
-                .map(e -> {
-                    if (!e.getKey().startsWith(prefix)) return e;
-                    else {
-                        String tail = e.getKey().substring(prefix.length())
-                                .replaceFirst("^[\\.]?" + Pattern.quote(from), to)
-                                .replaceFirst("^\\.", "");
-                        String newKey = isEmptyStr(tail) ? prefix
-                                : (prefix +"."+ tail).replaceFirst("^\\.", "");
-                        return entry(
-                            newKey,
-                            e.getValue()
-                        );
-                    }
-                }).collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        Map.Entry::getValue
-                ));
-            });
+                    .map(e -> {
+                        if (!e.getKey().startsWith(prefix)) return e;
+                        else {
+                            String tail = e.getKey().substring(prefix.length())
+                                    .replaceFirst("^[\\.]?" + Pattern.quote(from), to)
+                                    .replaceFirst("^\\.", "");
+                            String newKey = isEmptyStr(tail) ? prefix
+                                    : (prefix + "." + tail).replaceFirst("^\\.", "");
+                            return entry(
+                                    newKey,
+                                    e.getValue()
+                            );
+                        }
+                    }).collect(Collectors.toMap(
+                            Map.Entry::getKey,
+                            Map.Entry::getValue
+                    ));
+            }, new Framework.ExtensionMeta("changePrefix",
+                    "changePrefix(from '" +from+ "' to '" +to+ "')",
+                    Arrays.asList(from, to)));
         }
 
     /////////////////////////////////  pre-defined post err-processors  /////////////////////
@@ -225,7 +233,7 @@ public class Processors {
             logger.debug("converting errors list to errors tree");
 
             Map<String, Object> root = new HashMap<>();
-            Map<String, Object> workList = mmap(entry("", root));
+            Map<String, Object> workList = newmap(entry("", root));
             for(Map.Entry<String, String> error : errors) {
                 String name = error.getKey().replaceAll("\\[", ".").replaceAll("\\]", "");
                 List<String> workObj = (List<String>) workObject(workList, name + "._errors", true);

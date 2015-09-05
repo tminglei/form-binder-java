@@ -1,5 +1,7 @@
 package com.github.tminglei.bind;
 
+import java.util.function.Function;
+
 public class Utils {
 
     static final String ANSI_RESET = "\u001B[0m";
@@ -25,4 +27,42 @@ public class Utils {
         return ANSI_CYAN + message + ANSI_RESET;
     }
 
+
+    ///////////////////////////////////////////////////////////////////
+
+    public static Ext ext(Framework.Extensible ext) {
+        return ext != null ? (Ext) ext : new Ext();
+    }
+
+    public static class Ext implements Framework.Extensible {
+        private String in = "";
+        private String desc = "";
+
+        public Ext in(String where) {
+            this.in = where;
+            return this;
+        }
+        public Ext desc(String desc) {
+            this.desc = desc;
+            return this;
+        }
+
+        @Override
+        public Framework.Extensible clone() {
+            Ext clone = new Ext();
+            clone.in = this.in;
+            clone.desc = this.desc;
+            return clone;
+        }
+
+        ///
+        @Override
+        public boolean equals(Object obj) {
+            if (obj instanceof Ext) {
+                Ext other = (Ext) obj;
+                return in.equals(other.in)
+                    && desc.equals(other.desc);
+            } else return false;
+        }
+    }
 }

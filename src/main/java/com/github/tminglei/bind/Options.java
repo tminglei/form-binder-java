@@ -1,6 +1,7 @@
 package com.github.tminglei.bind;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.github.tminglei.bind.FrameworkUtils.*;
 
@@ -19,7 +20,10 @@ public class Options {
     private String  _label = null;
     private boolean _ignoreConstraints = false;
     private List<Framework.Constraint> _constraints = Collections.EMPTY_LIST;
+    private List<Framework.ExtraConstraint<?>> _extraConstraints = Collections.EMPTY_LIST;
     private List<Framework.PreProcessor> _processors = Collections.EMPTY_LIST;
+    // extension object
+    private Framework.Extensible _ext;
 
     public Options() {}
     public Options(Boolean i18n, Boolean eagerCheck, Boolean ignoreEmpty, Framework.TouchedChecker touched) {
@@ -29,12 +33,12 @@ public class Options {
         this.touched = touched;
     }
 
-    public Options merge(Options parent) {
+    public Options merge(Options other) {
         Options clone = this.clone();
-        clone.i18n = i18n != null ? i18n : parent.i18n;
-        clone.eagerCheck = eagerCheck != null ? eagerCheck : parent.eagerCheck;
-        clone.ignoreEmpty = ignoreEmpty != null ? ignoreEmpty : parent.ignoreEmpty;
-        clone.touched = touched != null ? touched : parent.touched;
+        clone.i18n = i18n != null ? i18n : other.i18n;
+        clone.eagerCheck = eagerCheck != null ? eagerCheck : other.eagerCheck;
+        clone.ignoreEmpty = ignoreEmpty != null ? ignoreEmpty : other.ignoreEmpty;
+        clone.touched = touched != null ? touched : other.touched;
         return clone;
     }
 
@@ -128,14 +132,14 @@ public class Options {
         clone._constraints = unmodifiableList(constraints);
         return clone;
     }
-    public Options append_constraints(Framework.Constraint... constraints) {
+    public Options append_constraints(List<Framework.Constraint> constraints) {
         Options clone = this.clone();
-        clone._constraints = unmodifiableList(appendList(clone._constraints, constraints));
+        clone._constraints = unmodifiableList(mergeList(clone._constraints, constraints));
         return clone;
     }
-    public Options prepend_constraints(Framework.Constraint... constraints) {
+    public Options prepend_constraints(List<Framework.Constraint> constraints) {
         Options clone = this.clone();
-        clone._constraints = unmodifiableList(mergeList(Arrays.asList(constraints), clone._constraints));
+        clone._constraints = unmodifiableList(mergeList(constraints, clone._constraints));
         return clone;
     }
 
@@ -147,26 +151,52 @@ public class Options {
         clone._processors = unmodifiableList(processors);
         return clone;
     }
-    public Options append_processors(Framework.PreProcessor... processors) {
+    public Options append_processors(List<Framework.PreProcessor> processors) {
         Options clone = this.clone();
-        clone._processors = unmodifiableList(appendList(clone._processors, processors));
+        clone._processors = unmodifiableList(mergeList(clone._processors, processors));
         return clone;
     }
-    public Options prepend_processors(Framework.PreProcessor... processors) {
+    public Options prepend_processors(List<Framework.PreProcessor> processors) {
         Options clone = this.clone();
-        clone._processors = unmodifiableList(mergeList(Arrays.asList(processors), clone._processors));
+        clone._processors = unmodifiableList(mergeList(processors, clone._processors));
+        return clone;
+    }
+
+    public <T> List<Framework.ExtraConstraint<T>> _extraConstraints() {
+        return this._extraConstraints.stream().map(c -> (Framework.ExtraConstraint<T>) c).collect(Collectors.toList());
+    }
+    public Options _extraConstraints(List<Framework.ExtraConstraint<?>> extraConstraints) {
+        Options clone = this.clone();
+        clone._extraConstraints = unmodifiableList(extraConstraints);
+        return clone;
+    }
+    public Options append_extraConstraints(List<Framework.ExtraConstraint<?>> extraConstraints) {
+        Options clone = this.clone();
+        clone._extraConstraints = unmodifiableList(mergeList(clone._extraConstraints, extraConstraints));
+        return clone;
+    }
+
+    ///
+    public Framework.Extensible _ext() {
+        return this._ext;
+    }
+    public Options _ext(Framework.Extensible ext) {
+        Options clone = this.clone();
+        clone._ext = ext;
         return clone;
     }
 
     /////////////////////////////////////////////////////////////////////////////////////
 
-    public Options clone() {
+    protected Options clone() {
         Options clone = new Options(this.i18n, this.eagerCheck, this.ignoreEmpty, this.touched);
         clone._inputMode = this._inputMode;
         clone._label = this._label;
         clone._ignoreConstraints = this._ignoreConstraints;
         clone._constraints = this._constraints;
+        clone._extraConstraints = this._extraConstraints;
         clone._processors = this._processors;
+        clone._ext = this._ext;
         return clone;
     }
 }

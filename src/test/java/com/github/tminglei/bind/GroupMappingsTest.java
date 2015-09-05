@@ -55,7 +55,7 @@ public class GroupMappingsTest {
     public void testGroupMapping1_InvalidData() {
         System.out.println(green(">> group mapping 1 - invalid data"));
 
-        Map<String, String> data = mmap(entry("count", "t5"));
+        Map<String, String> data = newmap(entry("count", "t5"));
 
         assertEquals(mapping1.validate("", data, messages, Options.EMPTY),
                 Arrays.asList(entry("count", "'t5' must be a number")));
@@ -65,7 +65,7 @@ public class GroupMappingsTest {
     public void testGroupMapping1_ValidData() {
         System.out.println(green(">> group mapping 1 - valid data"));
 
-        Map<String, String> data = mmap(entry("count", "5"));
+        Map<String, String> data = newmap(entry("count", "5"));
 
         assertEquals(mapping1.validate("", data, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
@@ -76,7 +76,7 @@ public class GroupMappingsTest {
     public void testGroupMapping1_OutOfScopeData() {
         System.out.println(green(">> group mapping 1 - out of scope data"));
 
-        Map<String, String> data = mmap(entry("count", "15"));
+        Map<String, String> data = newmap(entry("count", "15"));
 
         assertEquals(mapping1.validate("", data, messages, Options.EMPTY),
                 Arrays.asList(entry("", "count cannot greater then 10")));
@@ -86,7 +86,7 @@ public class GroupMappingsTest {
     public void testGroupMapping1_NullData() {
         System.out.println(green(">> group mapping 1 - null data"));
 
-        Map<String, String> data = mmap();
+        Map<String, String> data = newmap();
 
         assertEquals(mapping1.validate("", data, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
@@ -97,7 +97,7 @@ public class GroupMappingsTest {
     public void testGroupMapping1_EmptyData() {
         System.out.println(green(">> group mapping 1 - empty data"));
 
-        Map<String, String> data = mmap(entry("", ""));
+        Map<String, String> data = newmap(entry("", ""));
 
         assertEquals(mapping1.validate("", data, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
@@ -110,7 +110,7 @@ public class GroupMappingsTest {
     public void testGroupMapping2_InvalidData() {
         System.out.println(green(">> group mapping 2 - invalid data"));
 
-        Map<String, String> data = mmap(entry("price", "23.5f"), entry("count", "t5"));
+        Map<String, String> data = newmap(entry("price", "23.5f"), entry("count", "t5"));
 
         assertEquals(mapping2.validate("", data, messages, Options.EMPTY),
                 Arrays.asList(entry("count", "'t5' must be a number")));
@@ -120,7 +120,7 @@ public class GroupMappingsTest {
     public void testGroupMapping2_ValidData() {
         System.out.println(green(">> group mapping 2 - valid data"));
 
-        Map<String, String> data = mmap(entry("price", "23.5f"), entry("count", "5"));
+        Map<String, String> data = newmap(entry("price", "23.5f"), entry("count", "5"));
 
         assertEquals(mapping2.validate("", data, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
@@ -132,17 +132,17 @@ public class GroupMappingsTest {
     public void testGroupMapping2_OutOfScopeData1() {
         System.out.println(green(">> group mapping 2 - out of scope data 1"));
 
-        Map<String, String> data = mmap(entry("price", "23.5f"), entry("count", "15"));
+        Map<String, String> data = newmap(entry("price", "23.5f"), entry("count", "15"));
 
         assertEquals(mapping2.validate("", data, messages, Options.EMPTY),
-                Arrays.asList(entry("count", "'15' cannot be greater than 10")));
+                Arrays.asList(entry("count", "'15' must be lower than 10 (include boundary: true)")));
     }
 
     @Test
     public void testGroupMapping2_OutOfScopeData2() {
         System.out.println(green(">> group mapping 2 - out of scope data 2"));
 
-        Map<String, String> data = mmap(entry("price", "123.5f"), entry("count", "9"));
+        Map<String, String> data = newmap(entry("price", "123.5f"), entry("count", "9"));
 
         assertEquals(mapping2.validate("", data, messages, Options.EMPTY),
                 Arrays.asList(entry("", "total cost too much!")));
@@ -152,7 +152,7 @@ public class GroupMappingsTest {
     public void testGroupMapping2_NullData() {
         System.out.println(green(">> group mapping 2 - null data"));
 
-        Map<String, String> data = mmap();
+        Map<String, String> data = newmap();
 
         assertEquals(mapping2.validate("", data, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
@@ -163,7 +163,7 @@ public class GroupMappingsTest {
     public void testGroupMapping2_EmptyData() {
         System.out.println(green(">> group mapping 2 - empty data"));
 
-        Map<String, String> data = mmap(entry("count", "9"));
+        Map<String, String> data = newmap(entry("count", "9"));
 
         assertEquals(mapping2.validate("", data, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
@@ -178,10 +178,10 @@ public class GroupMappingsTest {
         System.out.println(green(">> group mapping - with eager check"));
 
         Mapping<BindObject> mapping = mappingx.options(o -> o.eagerCheck(true));
-        Map<String, String> data = mmap(
+        Map<String, String> data = newmap(
                 entry("email", "etttt.att#example-1111111.com"),
                 entry("count", "20")
-            );
+        );
 
         assertEquals(mapping.validate("", data, messages, Options.EMPTY),
                 Arrays.asList(
@@ -196,8 +196,8 @@ public class GroupMappingsTest {
     public void testGroupMapping_WithIgnoreEmpty() {
         System.out.println(green(">> group mapping - with ignore empty"));
 
-        Map<String, String> nullData = mmap();
-        Map<String, String> emptyData = mmap(entry("count", ""));
+        Map<String, String> nullData = newmap();
+        Map<String, String> emptyData = newmap(entry("count", ""));
 
         assertEquals(mappingx.validate("", nullData, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
@@ -217,7 +217,7 @@ public class GroupMappingsTest {
         System.out.println(green(">> group mapping - with ignore empty and touched"));
 
         Mapping<BindObject> mapping = mappingx.options(o -> o.ignoreEmpty(true));
-        Map<String, String> data = mmap(entry("count", ""));
+        Map<String, String> data = newmap(entry("count", ""));
 
         assertEquals(mapping.validate("", data, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);

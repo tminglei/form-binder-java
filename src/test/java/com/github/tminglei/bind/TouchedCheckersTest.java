@@ -26,9 +26,9 @@ public class TouchedCheckersTest {
                 Arrays.asList("data.email", "data.price", "id")
             );
 
-        assertEquals(checker.apply("nonexist", mmap()), false);
-        assertEquals(checker.apply("id", mmap()), true);
-        assertEquals(checker.apply("data", mmap()), true);
+        assertEquals(checker.apply("nonexist", newmap()), false);
+        assertEquals(checker.apply("id", newmap()), true);
+        assertEquals(checker.apply("data", newmap()), true);
     }
 
     @Test
@@ -36,12 +36,12 @@ public class TouchedCheckersTest {
         System.out.println(green(">> prefix-based touched checker"));
 
         TouchedChecker checker = Processors.prefixTouched("data", "touched");
-        Map<String, String> data = mmap(
+        Map<String, String> data = newmap(
                 entry("id", "tee"),
                 entry("data.email", null),
                 entry("data.price", "135"),
                 entry("touched.email", "true")
-            );
+        );
 
         assertEquals(checker.apply("c", data), false);
         assertEquals(checker.apply("data.email", data), true);
