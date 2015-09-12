@@ -95,7 +95,7 @@ public <Err> Optional<Err> validate(Framework.Mapping<?> mapping, Map<String, St
 > _** ignoreEmpty + touched, will let form-binder re-check touched empty field/values._  
 > _*** if i18n is on, the label you input should be a message key instead of a value._
 
-#### Extensible object and meta info
+#### Extensible object and meta info:
 If you want to associate some extra data to a mapping, now you can do it like this:
 ```java
 Mapping<BindObject> pet = mapping(
@@ -110,7 +110,7 @@ Mapping<BindObject> pet = mapping(
     field("status", petStatus)
 ).$ext(o -> ext(o).desc("pet info"));
 ```
-> with this and meta info, which can be fetched from a `Mapping` / `PreProcessor` / `Constraint` / `ExtraConstraint` with `[instance].meta()`, `form-binder-java` allows third party tools, like [binder-swagger-java](https://github.com/tminglei/binder-swagger-java), to deeply know its structure and details, then based on it to do more, just like they based on java reflections.
+> _With this and meta info, which can be fetched from a mapping / pre-processor / constraint / extra-constraint with `[instance].meta()`, `form-binder-java` allows third party tools, like [binder-swagger-java](https://github.com/tminglei/binder-swagger-java), to deeply know its structure and details, then based on it to do more, just like they based on java reflections._
 
 
 _p.s. for more dev and usage details pls check the [source codes](https://github.com/tminglei/form-binder-java/tree/master/src/main/java/com/github/tminglei/bind) and [test cases](https://github.com/tminglei/form-binder-java/tree/master/src/test/java/com/github/tminglei/bind)._
