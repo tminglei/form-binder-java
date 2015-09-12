@@ -20,7 +20,7 @@ Features
 Usage
 -------------
 To use `form-binder-java`, pls add the dependency to your `maven` project file:
-```
+```xml
 <dependency>
   <groupId>com.github.tminglei</groupId>
   <artifactId>form-binder-java</artifactId>
@@ -76,7 +76,7 @@ public <Err> Optional<Err> validate(Framework.Mapping<?> mapping, Map<String, St
 
 #### Extension Types:  
 (1) **ErrProcessor**: used to process error seq, like converting it to json  
-(2) **PreProcessor**: used to pre-process data, like omitting `$` from `$3,013`  
+(2) **PreProcessor**: used to pre-process data, like omitting `$` and `,` from `$3,013`  
 (3) **Constraint**: used to validate raw string data  
 (4) **ExtraConstraint**: used to valdate converted value  
 
@@ -91,9 +91,26 @@ public <Err> Optional<Err> validate(Framework.Mapping<?> mapping, Map<String, St
 5) **ignoreEmpty**: `option`, not check empty field/values, especially they're not touched by user  
 6) **touched**: `function`, check whether a field was touched by user; if yes, they can't be empty if they're required  
 
-> _* By default, form-binder would return right after encountered a validation error._  
+> _* By default, `form-binder-java` would return right after encountered a validation error._  
 > _** ignoreEmpty + touched, will let form-binder re-check touched empty field/values._  
 > _*** if i18n is on, the label you input should be a message key instead of a value._
+
+#### Extensible object and meta info
+If you want to associate some extra data to a mapping, now you can do it like this:
+```java
+Mapping<BindObject> pet = mapping(
+    field("id", vLong().$ext(o -> ext(o).desc("pet id"))),
+    field("name", text(required()).$ext(o -> ext(o).desc("pet name"))),
+    field("category", attach(required()).to(mapping(
+        field("id", vLong(required())),
+        field("name", text(required()))
+    )).$ext(o -> ext(o).desc("category belonged to"))),
+    field("photoUrls", list(text()).$ext(o -> ext(o).desc("pet's photo urls"))),
+    field("tags", list(text()).$ext(o -> ext(o).desc("tags for the pet"))),
+    field("status", petStatus)
+).$ext(o -> ext(o).desc("pet info"));
+```
+> with this and meta info, which can be fetched from a `Mapping` / `PreProcessor` / `Constraint` / `ExtraConstraint` with `[instance].meta()`, `form-binder-java` allows third party tools, like [binder-swagger-java](https://github.com/tminglei/binder-swagger-java), to deeply know its structure and details, then based on it to do more, just like they based on java reflections.
 
 
 _p.s. for more dev and usage details pls check the [source codes](https://github.com/tminglei/form-binder-java/tree/master/src/main/java/com/github/tminglei/bind) and [test cases](https://github.com/tminglei/form-binder-java/tree/master/src/test/java/com/github/tminglei/bind)._
