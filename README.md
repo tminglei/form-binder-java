@@ -110,7 +110,7 @@ Mapping<BindObject> pet = mapping(
     field("status", petStatus)
 ).$ext(o -> ext(o).desc("pet info"));
 ```
-> _With this and meta info, which can be fetched from a mapping / pre-processor / constraint / extra-constraint with `[instance].meta()`, `form-binder-java` allows third party tools, like [binder-swagger-java](https://github.com/tminglei/binder-swagger-java), to deeply know its structure and details, then based on it to do more, just like they based on java reflections._
+> _With this and meta info, which can be fetched from a mapping / pre-processor / constraint / extra-constraint with `[instance].meta()`, `form-binder-java` allows third party tools, like [binder-swagger-java](https://github.com/tminglei/binder-swagger-java), to deeply know its structure and details, just like they got through java reflections, then based on it to do more._
 
 
 _p.s. for more dev and usage details pls check the [source codes](https://github.com/tminglei/form-binder-java/tree/master/src/main/java/com/github/tminglei/bind) and [test cases](https://github.com/tminglei/form-binder-java/tree/master/src/test/java/com/github/tminglei/bind)._
