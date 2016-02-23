@@ -11,11 +11,11 @@ public class BindObject implements Iterable<Map.Entry<String, Object>> {
     private final Object errors;
     private final Map<String, Object> data;
 
-    BindObject(Object errors) {
+    public BindObject(Object errors) {
         this.errors = errors;
         this.data = new HashMap<>();
     }
-    BindObject(Map<String, Object> data) {
+    public BindObject(Map<String, Object> data) {
         this.errors = null;
         this.data = data;
     }

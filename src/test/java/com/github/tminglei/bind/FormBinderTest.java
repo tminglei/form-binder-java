@@ -84,8 +84,8 @@ public class FormBinderTest {
                 entry("touched", "[\"email\", \"price\"]")
         );
         Mapping<BindObject> mappingx = mapping
-                .options(o -> o.ignoreEmpty(true))
-                .options(o -> o.touched(prefixTouched("data", "touched")))
+                .options(o -> o.skipUntouched(true))
+                .options(o -> o.touchedChecker(prefixTouched("data", "touched")))
                 .processor(expandJsonKeys("touched"));
 
         BindObject bindObj = new FormBinder(messages).bind(mappingx, data);
@@ -103,9 +103,23 @@ public class FormBinderTest {
                 entry("id", "133"),
                 entry("data", "{\"email\":\"example@123.com\", \"price\":337.5, \"count\":5}")
         );
-        Mapping<BindObject> mappingx = mapping.options(o -> o.i18n(true));
+        Mapping<BindObject> mapping =
+                mapping(
+                        field("id", vLong()),
+                        field("data", attach(expandJson()).to(mapping(
+                                field("email", attach(required("%s is required")).to(text(maxLength(20, "%s: length > %s"), email("%s: invalid email")))),
+                                field("price", attach(omitLeft("$")).to(vFloat())),
+                                field("count", vInt().verifying(min(3), max(10)))
+                        )).label("@xx").verifying((label, vObj, messages1) -> {
+                            float price = vObj.get("price");
+                            int count = vObj.get("count");
+                            if (price * count > 1000) {
+                                return Arrays.asList(label + ": total cost too much!");
+                            } else return Collections.EMPTY_LIST;
+                        }))
+                );
 
-        BindObject bindObj = new FormBinder(messages).bind(mappingx, data);
+        BindObject bindObj = new FormBinder(messages).bind(mapping, data);
 
         assertEquals(bindObj.errors().isPresent(), true);
         assertEquals(bindObj.errors().get(), Arrays.asList(
@@ -121,8 +135,8 @@ public class FormBinderTest {
                 entry("body", "{\"data\": {\"email\":null, \"price\":337.5, \"count\":5}, \"touched\": [\"email\", \"price\"]}")
         );
         Mapping<BindObject> mappingx = mapping
-                .options(o -> o.ignoreEmpty(true))
-                .options(o -> o.touched(prefixTouched("body.data", "body.touched")))
+                .options(o -> o.skipUntouched(true))
+                .options(o -> o.touchedChecker(prefixTouched("body.data", "body.touched")))
                 .processor(expandJson("body"));
 
         BindObject bindObj = new FormBinder(messages).bind(mappingx, data, "body");
@@ -158,8 +172,8 @@ public class FormBinderTest {
                 entry("touched", "[\"email\", \"price\"]")
         );
         Mapping<BindObject> mappingx = mapping
-                .options(o -> o.ignoreEmpty(true))
-                .options(o -> o.touched(prefixTouched("data", "touched")))
+                .options(o -> o.skipUntouched(true))
+                .options(o -> o.touchedChecker(prefixTouched("data", "touched")))
                 .processor(expandJsonKeys("touched"));
 
         Optional<List<Map.Entry<String, String>>> errors = new FormBinder(messages)

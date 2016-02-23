@@ -11,6 +11,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import com.github.tminglei.bind.spi.*;
+
 /**
  * utilities for framework internal usages
  */
@@ -22,7 +24,7 @@ public class FrameworkUtils {
     public static final String  PATTERN_EMAIL = "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
 
     ////////////////////////////////////////////////////////////////////////////
-    public static final Framework.Constraint PassValidating
+    public static final Constraint PassValidating
             = (name, data, messages, options) -> Collections.EMPTY_LIST;
 
     public static <T> List<T> unmodifiableList(List<T> list) {
@@ -56,11 +58,10 @@ public class FrameworkUtils {
         return str == null || str.trim().equals("") || str.equalsIgnoreCase("null");
     }
 
-    public static boolean isEmptyInput(String name, Map<String, String> data,
-                                       Framework.InputMode inputMode) {
+    public static boolean isEmptyInput(String name, Map<String, String> data, InputMode inputMode) {
         logger.trace("checking empty input for {}", name);
 
-        if (inputMode == Framework.InputMode.SINGLE)
+        if (inputMode == InputMode.SINGLE)
             return isEmptyStr(data.get(name));
         else {
             String prefix1 = isEmptyStr(name) ? "" : name + ".";
@@ -68,7 +69,7 @@ public class FrameworkUtils {
             long subInputCount = data.keySet().stream()
                     .filter(k -> (k.startsWith(prefix1) || k.startsWith(prefix2)) && k.length() > name.length())
                     .count();
-            return inputMode == Framework.InputMode.MULTIPLE ? subInputCount == 0
+            return inputMode == InputMode.MULTIPLE ? subInputCount == 0
                     : isEmptyStr(data.get(name)) && subInputCount == 0;
         }
     }
@@ -108,12 +109,12 @@ public class FrameworkUtils {
 
     ///
 
-    public static Framework.ExtensionMeta mkExtensionMeta(String name, Object... params) {
+    public static ExtensionMeta mkExtensionMeta(String name, Object... params) {
         List<?> paramList = Arrays.asList(params);
         String paramStr = paramList.isEmpty() ? "" : paramList.stream()
                 .map(t -> t == null ? "" : t.toString()).reduce((l, r) -> l + ", " + r).get();
         String desc = name + "(" + paramStr + ")";
-        return new Framework.ExtensionMeta(name, desc, paramList);
+        return new ExtensionMeta(name, desc, paramList);
     }
 
     // make an internal converter from `(vString) => value`
@@ -123,12 +124,12 @@ public class FrameworkUtils {
     }
 
     // make a constraint from `(label, vString, messages) => [error]` (ps: vString may be NULL/EMPTY)
-    public static Framework.Constraint
-            mkSimpleConstraint(Framework.Function3<String, String, Framework.Messages, String> validate,
-                               Framework.ExtensionMeta meta) {
+    public static Constraint
+            mkSimpleConstraint(Function3<String, String, Messages, String> validate,
+                               ExtensionMeta meta) {
         return mkConstraintWithMeta(
             (name, data, messages, options) -> {
-                if (options._inputMode() != Framework.InputMode.SINGLE) {
+                if (options._inputMode() != InputMode.SINGLE) {
                     throw new IllegalArgumentException("The constraint should only be used to SINGLE INPUT mapping!");
                 } else {
                     String label = getLabel(name, messages, options);
@@ -139,42 +140,42 @@ public class FrameworkUtils {
             }, meta);
         }
 
-    public static Framework.Constraint
-            mkConstraintWithMeta(Framework.Function4<String, Map<String, String>, Framework.Messages, Options, List<Map.Entry<String, String>>> validate,
-                                 Framework.ExtensionMeta meta) {
-        return new Framework.Constraint() {
+    public static Constraint
+            mkConstraintWithMeta(Function4<String, Map<String, String>, Messages, Options, List<Map.Entry<String, String>>> validate,
+                                 ExtensionMeta meta) {
+        return new Constraint() {
             @Override
-            public Framework.ExtensionMeta meta() {
+            public ExtensionMeta meta() {
                 return meta;
             }
             @Override
-            public List<Map.Entry<String, String>> apply(String name, Map<String, String> data, Framework.Messages messages, Options options) {
+            public List<Map.Entry<String, String>> apply(String name, Map<String, String> data, Messages messages, Options options) {
                 return validate.apply(name, data, messages, options);
             }
         };
     }
 
-    public static <T> Framework.ExtraConstraint<T>
-            mkExtraConstraintWithMeta(Framework.Function3<String, T, Framework.Messages, List<String>> validate,
-                                      Framework.ExtensionMeta meta) {
-        return new Framework.ExtraConstraint<T>() {
+    public static <T> ExtraConstraint<T>
+            mkExtraConstraintWithMeta(Function3<String, T, Messages, List<String>> validate,
+                                      ExtensionMeta meta) {
+        return new ExtraConstraint<T>() {
             @Override
-            public Framework.ExtensionMeta meta() {
+            public ExtensionMeta meta() {
                 return meta;
             }
             @Override
-            public List<String> apply(String label, T vObj, Framework.Messages messages) {
+            public List<String> apply(String label, T vObj, Messages messages) {
                 return validate.apply(label, vObj, messages);
             }
         };
     }
 
-    public static Framework.PreProcessor
-            mkPreProcessorWithMeta(Framework.Function3<String, Map<String, String>, Options, Map<String, String>> process,
-                                   Framework.ExtensionMeta meta) {
-        return new Framework.PreProcessor() {
+    public static PreProcessor
+            mkPreProcessorWithMeta(Function3<String, Map<String, String>, Options, Map<String, String>> process,
+                                   ExtensionMeta meta) {
+        return new PreProcessor() {
             @Override
-            public Framework.ExtensionMeta meta() {
+            public ExtensionMeta meta() {
                 return meta;
             }
             @Override
@@ -188,25 +189,25 @@ public class FrameworkUtils {
 
     public static boolean isUntouchedEmpty(String name, Map<String, String> data, Options options) {
         return isEmptyInput(name, data, options._inputMode())
-                &&  options.ignoreEmpty().orElse(false)
-                && (options.touched() == null || ! options.touched().apply(name, data));
+                &&  options.skipUntouched().orElse(false)
+                && (options.touchedChecker() == null || ! options.touchedChecker().apply(name, data));
     }
 
     public static Map<String, String>
             processDataRec(String prefix, Map<String, String> data, Options options,
-                           List<Framework.PreProcessor> remainingProcessors) {
+                           List<PreProcessor> remainingProcessors) {
         if (remainingProcessors.isEmpty()) return data;
         else {
-            Framework.PreProcessor currProcessor = remainingProcessors.get(0);
-            List<Framework.PreProcessor> newRemainingProcessors = remainingProcessors.subList(1, remainingProcessors.size());
+            PreProcessor currProcessor = remainingProcessors.get(0);
+            List<PreProcessor> newRemainingProcessors = remainingProcessors.subList(1, remainingProcessors.size());
             Map<String, String> newData = currProcessor.apply(prefix, data, options);
             return processDataRec(prefix, newData, options, newRemainingProcessors);
         }
     }
 
     public static List<Map.Entry<String, String>>
-            validateRec(String name, Map<String, String> data, Framework.Messages messages, Options options,
-                        List<Framework.Constraint> constraints) {
+            validateRec(String name, Map<String, String> data, Messages messages, Options options,
+                        List<Constraint> constraints) {
         if (options.eagerCheck().orElse(false)) {
             return constraints.stream()
                     .flatMap(c -> c.apply(name, data, messages, options).stream())
@@ -223,8 +224,8 @@ public class FrameworkUtils {
     }
 
     public static <T> List<Map.Entry<String, String>>
-            extraValidateRec(String name, T vObj, Framework.Messages messages, Options options,
-                             List<Framework.ExtraConstraint<T>> constraints) {
+            extraValidateRec(String name, T vObj, Messages messages, Options options,
+                             List<ExtraConstraint<T>> constraints) {
         String label = getLabel(name, messages, options);
         if (options.eagerCheck().orElse(false)) {
             return constraints.stream()
@@ -245,9 +246,8 @@ public class FrameworkUtils {
 
     // i18n on: use i18n label, if exists; else use label; else use last field name from full name
     // i18n off: use label; else use last field name from full name
-    public static String getLabel(String fullName, Framework.Messages messages, Options options) {
-        logger.trace("getting label for '{}' with options (i18n: {}, _label: {})",
-                fullName, options.i18n(), options._label());
+    public static String getLabel(String fullName, Messages messages, Options options) {
+        logger.trace("getting label for '{}' with _label: {}", fullName, options._label());
 
         String[] parts = splitName(fullName);   // parts: (parent, name/index, isArray)
         boolean isArray = Boolean.parseBoolean(parts[2]);
@@ -255,11 +255,8 @@ public class FrameworkUtils {
                 ? splitName(parts[0])[1] + "[" + parts[1] + "]"
                 : parts[1];
 
-        String label = options.i18n().orElse(false)
-                ? options._label()
-                    .flatMap(l -> Optional.ofNullable(messages.get(l)))
-                    .orElse(options._label().orElse(defaultLabel))
-                : options._label().orElse(defaultLabel);
+        String label = options._label().map(l -> l.startsWith("@") ? messages.get(l.substring(1)) : l)
+                .orElse(defaultLabel);
 
         logger.trace("getting label - return {}", label);
 
@@ -267,7 +264,7 @@ public class FrameworkUtils {
     }
 
     // make a Constraint which will try to check and collect errors
-    public static <T> Framework.Constraint
+    public static <T> Constraint
             checking(Function<String, T> check, String messageOrKey, boolean isKey, String... extraMessageArgs) {
         return mkSimpleConstraint(((label, vString, messages) -> {
             logger.debug("checking for {}", vString);
@@ -287,12 +284,12 @@ public class FrameworkUtils {
     }
 
     // make a compound Constraint, which checks whether any inputting constraints passed
-    public static Framework.Constraint anyPassed(Framework.Constraint... constraints) {
+    public static Constraint anyPassed(Constraint... constraints) {
         return ((name, data, messages, options) -> {
             logger.debug("checking any passed for {}", name);
 
             List<Map.Entry<String, String>> errErrors = new ArrayList<>();
-            for(Framework.Constraint constraint : constraints) {
+            for(Constraint constraint : constraints) {
                 List<Map.Entry<String, String>> errors = constraint.apply(name, data, messages, options);
                 if (errors.isEmpty()) return Collections.EMPTY_LIST;
                 else {

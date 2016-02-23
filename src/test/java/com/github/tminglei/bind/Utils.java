@@ -1,6 +1,6 @@
 package com.github.tminglei.bind;
 
-import java.util.function.Function;
+import com.github.tminglei.bind.spi.Extensible;
 
 public class Utils {
 
@@ -30,11 +30,11 @@ public class Utils {
 
     ///////////////////////////////////////////////////////////////////
 
-    public static Ext ext(Framework.Extensible ext) {
+    public static Ext ext(Extensible ext) {
         return ext != null ? (Ext) ext : new Ext();
     }
 
-    public static class Ext implements Framework.Extensible {
+    public static class Ext implements Extensible {
         private String in = "";
         private String desc = "";
 
@@ -48,7 +48,7 @@ public class Utils {
         }
 
         @Override
-        public Framework.Extensible clone() {
+        public Extensible clone() {
             Ext clone = new Ext();
             clone.in = this.in;
             clone.desc = this.desc;

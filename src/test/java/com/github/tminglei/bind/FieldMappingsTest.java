@@ -76,7 +76,7 @@ public class FieldMappingsTest {
                 Arrays.asList(entry("text", "text is required")));
 
         Mapping<String> text2 = Mappings.text(required("%s is required"))
-                .options(o -> o.ignoreEmpty(true));
+                .options(o -> o.skipUntouched(true));
         assertEquals(text2.validate("text", data, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(text2.convert("text", data), null);
@@ -89,15 +89,15 @@ public class FieldMappingsTest {
         Map<String, String> data = newmap();
 
         Mapping<String> text1 = Mappings.text(required("%s is required"))
-                .options(o -> o.ignoreEmpty(true));
+                .options(o -> o.skipUntouched(true));
         assertEquals(text1.validate("text", data, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(text1.convert("text", data), null);
 
         Mapping<String> text2 = Mappings.text(required("%s is required"))
-                .options(o -> o.ignoreEmpty(true));
+                .options(o -> o.skipUntouched(true));
         assertEquals(text2.validate("text", data, messages, new Options()
-                        .touched(listTouched(Arrays.asList("text")))),
+                        .touchedChecker(listTouched(Arrays.asList("text")))),
                 Arrays.asList(entry("text", "text is required")));
     }
 

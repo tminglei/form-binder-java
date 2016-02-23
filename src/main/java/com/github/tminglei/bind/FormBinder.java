@@ -14,15 +14,15 @@ import static com.github.tminglei.bind.FrameworkUtils.*;
  * The Facade class
  */
 public class FormBinder {
-    private final Framework.Messages messages;
+    private final Messages messages;
     private final Function<List<Map.Entry<String, String>>, ?> errProcessor;
 
     private static final Logger logger = LoggerFactory.getLogger(FormBinder.class);
 
-    public FormBinder(Framework.Messages messages) {
+    public FormBinder(Messages messages) {
         this(messages, null);
     }
-    public FormBinder(Framework.Messages messages, Function<List<Map.Entry<String, String>>, ?> errProcessor) {
+    public FormBinder(Messages messages, Function<List<Map.Entry<String, String>>, ?> errProcessor) {
         this.messages = messages;
         this.errProcessor = errProcessor;
     }

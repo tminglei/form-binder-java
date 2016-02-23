@@ -3,6 +3,8 @@ package com.github.tminglei.bind;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.github.tminglei.bind.spi.*;
+
 import static com.github.tminglei.bind.FrameworkUtils.*;
 
 /**
@@ -11,51 +13,35 @@ import static com.github.tminglei.bind.FrameworkUtils.*;
 public class Options {
     public static final Options EMPTY = new Options();
 
-    private Boolean i18n;
     private Boolean eagerCheck;
-    private Boolean ignoreEmpty;
-    private Framework.TouchedChecker touched;
-    // internal options, only applied to current mapping
-    private Framework.InputMode _inputMode;
+    private Boolean skipUntouched;
+    private TouchedChecker touchedChecker;
+    // internal state, only applied to current mapping
+    private InputMode _inputMode;
     private String  _label = null;
     private boolean _ignoreConstraints = false;
-    private List<Framework.Constraint> _constraints = Collections.EMPTY_LIST;
-    private List<Framework.ExtraConstraint<?>> _extraConstraints = Collections.EMPTY_LIST;
-    private List<Framework.PreProcessor> _processors = Collections.EMPTY_LIST;
+    private List<Constraint> _constraints = Collections.EMPTY_LIST;
+    private List<ExtraConstraint<?>> _extraConstraints = Collections.EMPTY_LIST;
+    private List<PreProcessor> _processors = Collections.EMPTY_LIST;
     // extension object
-    private Framework.Extensible _ext;
+    private Extensible _extData;
 
     public Options() {}
-    public Options(Boolean i18n, Boolean eagerCheck, Boolean ignoreEmpty, Framework.TouchedChecker touched) {
-        this.i18n = i18n;
+    public Options(Boolean eagerCheck, Boolean skipUntouched, TouchedChecker touchedChecker) {
         this.eagerCheck = eagerCheck;
-        this.ignoreEmpty = ignoreEmpty;
-        this.touched = touched;
+        this.skipUntouched = skipUntouched;
+        this.touchedChecker = touchedChecker;
     }
 
     public Options merge(Options other) {
         Options clone = this.clone();
-        clone.i18n = i18n != null ? i18n : other.i18n;
         clone.eagerCheck = eagerCheck != null ? eagerCheck : other.eagerCheck;
-        clone.ignoreEmpty = ignoreEmpty != null ? ignoreEmpty : other.ignoreEmpty;
-        clone.touched = touched != null ? touched : other.touched;
+        clone.skipUntouched = skipUntouched != null ? skipUntouched : other.skipUntouched;
+        clone.touchedChecker = touchedChecker != null ? touchedChecker : other.touchedChecker;
         return clone;
     }
 
     ///
-
-    /**
-     * whether activate i18n support
-     * @return the value optional
-     */
-    public Optional<Boolean> i18n() {
-        return Optional.ofNullable(this.i18n);
-    }
-    public Options i18n(Boolean i18n) {
-        Options clone = this.clone();
-        clone.i18n = i18n;
-        return clone;
-    }
 
     /**
      * whether check errors as more as possible
@@ -71,132 +57,132 @@ public class Options {
     }
 
     /**
-     * whether skip to check empty even they are declared as required
+     * whether to skip checking untouched empty field/values
      * @return the value optional
      */
-    public Optional<Boolean> ignoreEmpty() {
-        return Optional.ofNullable(this.ignoreEmpty);
+    public Optional<Boolean> skipUntouched() {
+        return Optional.ofNullable(this.skipUntouched);
     }
-    public Options ignoreEmpty(Boolean ignoreEmpty) {
+    public Options skipUntouched(Boolean ignoreEmpty) {
         Options clone = this.clone();
-        clone.ignoreEmpty = ignoreEmpty;
+        clone.skipUntouched = ignoreEmpty;
         return clone;
     }
 
     /**
-     * for touched fields, an error will be filed if they are declared as required and they are empty
+     * used to check whether a field was touched by user
      * @return the touched checker
      */
-    public Framework.TouchedChecker touched() {
-        return this.touched;
+    public TouchedChecker touchedChecker() {
+        return this.touchedChecker;
     }
-    public Options touched(Framework.TouchedChecker touched) {
+    public Options touchedChecker(TouchedChecker touched) {
         Options clone = this.clone();
-        clone.touched = touched;
+        clone.touchedChecker = touched;
         return clone;
     }
 
     //-- internal options
-    public Framework.InputMode _inputMode() {
+    InputMode _inputMode() {
         return this._inputMode;
     }
-    public Options _inputMode(Framework.InputMode inputMode) {
+    Options _inputMode(InputMode inputMode) {
         Options clone = this.clone();
         clone._inputMode = inputMode;
         return clone;
     }
 
-    public Optional<String> _label() {
+    Optional<String> _label() {
         return Optional.ofNullable(this._label);
     }
-    public Options _label(String label) {
+    Options _label(String label) {
         Options clone = this.clone();
         clone._label = label;
         return clone;
     }
 
-    public boolean _ignoreConstraints() {
+    boolean _ignoreConstraints() {
         return this._ignoreConstraints;
     }
-    public Options _ignoreConstraints(boolean ignore) {
+    Options _ignoreConstraints(boolean ignore) {
         Options clone = this.clone();
         clone._ignoreConstraints = ignore;
         return clone;
     }
 
-    public List<Framework.Constraint> _constraints() {
+    List<Constraint> _constraints() {
         return this._constraints;
     }
-    public Options _constraints(List<Framework.Constraint> constraints) {
+    Options _constraints(List<Constraint> constraints) {
         Options clone = this.clone();
         clone._constraints = unmodifiableList(constraints);
         return clone;
     }
-    public Options append_constraints(List<Framework.Constraint> constraints) {
+    Options append_constraints(List<Constraint> constraints) {
         Options clone = this.clone();
         clone._constraints = unmodifiableList(mergeList(clone._constraints, constraints));
         return clone;
     }
-    public Options prepend_constraints(List<Framework.Constraint> constraints) {
+    Options prepend_constraints(List<Constraint> constraints) {
         Options clone = this.clone();
         clone._constraints = unmodifiableList(mergeList(constraints, clone._constraints));
         return clone;
     }
 
-    public List<Framework.PreProcessor> _processors() {
+    List<PreProcessor> _processors() {
         return this._processors;
     }
-    public Options _processors(List<Framework.PreProcessor> processors) {
+    Options _processors(List<PreProcessor> processors) {
         Options clone = this.clone();
         clone._processors = unmodifiableList(processors);
         return clone;
     }
-    public Options append_processors(List<Framework.PreProcessor> processors) {
+    Options append_processors(List<PreProcessor> processors) {
         Options clone = this.clone();
         clone._processors = unmodifiableList(mergeList(clone._processors, processors));
         return clone;
     }
-    public Options prepend_processors(List<Framework.PreProcessor> processors) {
+    Options prepend_processors(List<PreProcessor> processors) {
         Options clone = this.clone();
         clone._processors = unmodifiableList(mergeList(processors, clone._processors));
         return clone;
     }
 
-    public <T> List<Framework.ExtraConstraint<T>> _extraConstraints() {
-        return this._extraConstraints.stream().map(c -> (Framework.ExtraConstraint<T>) c).collect(Collectors.toList());
+    <T> List<ExtraConstraint<T>> _extraConstraints() {
+        return this._extraConstraints.stream().map(c -> (ExtraConstraint<T>) c).collect(Collectors.toList());
     }
-    public Options _extraConstraints(List<Framework.ExtraConstraint<?>> extraConstraints) {
+    Options _extraConstraints(List<ExtraConstraint<?>> extraConstraints) {
         Options clone = this.clone();
         clone._extraConstraints = unmodifiableList(extraConstraints);
         return clone;
     }
-    public Options append_extraConstraints(List<Framework.ExtraConstraint<?>> extraConstraints) {
+    Options append_extraConstraints(List<ExtraConstraint<?>> extraConstraints) {
         Options clone = this.clone();
         clone._extraConstraints = unmodifiableList(mergeList(clone._extraConstraints, extraConstraints));
         return clone;
     }
 
     ///
-    public Framework.Extensible _ext() {
-        return this._ext;
+    Extensible _extData() {
+        return this._extData;
     }
-    public Options _ext(Framework.Extensible ext) {
+    Options _extData(Extensible ext) {
         Options clone = this.clone();
-        clone._ext = ext;
+        clone._extData = ext;
         return clone;
     }
 
     /////////////////////////////////////////////////////////////////////////////////////
 
     protected Options clone() {
-        Options clone = new Options(this.i18n, this.eagerCheck, this.ignoreEmpty, this.touched);
+        Options clone = new Options(this.eagerCheck, this.skipUntouched, this.touchedChecker);
         clone._inputMode = this._inputMode;
         clone._label = this._label;
         clone._ignoreConstraints = this._ignoreConstraints;
         clone._constraints = this._constraints;
         clone._extraConstraints = this._extraConstraints;
         clone._processors = this._processors;
-        clone._ext = this._ext;
+        clone._extData = this._extData;
         return clone;
     }
 }

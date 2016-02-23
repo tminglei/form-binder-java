@@ -201,13 +201,13 @@ public class GroupMappingsTest {
 
         assertEquals(mappingx.validate("", nullData, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
-        assertEquals(mappingx.options(o -> o.ignoreEmpty(true))
+        assertEquals(mappingx.options(o -> o.skipUntouched(true))
                         .validate("", nullData, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
 
         assertEquals(mappingx.validate("", emptyData, messages, Options.EMPTY),
                 Arrays.asList(entry("email", "email is required")));
-        assertEquals(mappingx.options(o -> o.ignoreEmpty(true))
+        assertEquals(mappingx.options(o -> o.skipUntouched(true))
                         .validate("", emptyData, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
     }
@@ -216,13 +216,13 @@ public class GroupMappingsTest {
     public void testGroupMapping_WithIgnoreEmptyAndTouched() {
         System.out.println(green(">> group mapping - with ignore empty and touched"));
 
-        Mapping<BindObject> mapping = mappingx.options(o -> o.ignoreEmpty(true));
+        Mapping<BindObject> mapping = mappingx.options(o -> o.skipUntouched(true));
         Map<String, String> data = newmap(entry("count", ""));
 
         assertEquals(mapping.validate("", data, messages, Options.EMPTY),
                 Collections.EMPTY_LIST);
         assertEquals(mapping.validate("", data, messages, Options.EMPTY
-                        .touched(listTouched(Arrays.asList("email")))),
+                        .touchedChecker(listTouched(Arrays.asList("email")))),
                 Arrays.asList(entry("email", "email is required")));
     }
 
