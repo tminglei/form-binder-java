@@ -84,8 +84,8 @@ public class FormBinderTest {
                 entry("touched", "[\"email\", \"price\"]")
         );
         Mapping<BindObject> mappingx = mapping
-                .options(o -> o.ignoreEmpty(true))
-                .options(o -> o.touched(prefixTouched("data", "touched")))
+                .options(o -> o.skipUntouched(true))
+                .options(o -> o.touchedChecker(prefixTouched("data", "touched")))
                 .processor(expandJsonKeys("touched"));
 
         BindObject bindObj = new FormBinder(messages).bind(mappingx, data);
@@ -135,8 +135,8 @@ public class FormBinderTest {
                 entry("body", "{\"data\": {\"email\":null, \"price\":337.5, \"count\":5}, \"touched\": [\"email\", \"price\"]}")
         );
         Mapping<BindObject> mappingx = mapping
-                .options(o -> o.ignoreEmpty(true))
-                .options(o -> o.touched(prefixTouched("body.data", "body.touched")))
+                .options(o -> o.skipUntouched(true))
+                .options(o -> o.touchedChecker(prefixTouched("body.data", "body.touched")))
                 .processor(expandJson("body"));
 
         BindObject bindObj = new FormBinder(messages).bind(mappingx, data, "body");
@@ -172,8 +172,8 @@ public class FormBinderTest {
                 entry("touched", "[\"email\", \"price\"]")
         );
         Mapping<BindObject> mappingx = mapping
-                .options(o -> o.ignoreEmpty(true))
-                .options(o -> o.touched(prefixTouched("data", "touched")))
+                .options(o -> o.skipUntouched(true))
+                .options(o -> o.touchedChecker(prefixTouched("data", "touched")))
                 .processor(expandJsonKeys("touched"));
 
         Optional<List<Map.Entry<String, String>>> errors = new FormBinder(messages)

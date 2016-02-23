@@ -14,8 +14,8 @@ public class Options {
     public static final Options EMPTY = new Options();
 
     private Boolean eagerCheck;
-    private Boolean ignoreEmpty;
-    private TouchedChecker touched;
+    private Boolean skipUntouched;
+    private TouchedChecker touchedChecker;
     // internal state, only applied to current mapping
     private InputMode _inputMode;
     private String  _label = null;
@@ -27,17 +27,17 @@ public class Options {
     private Extensible _extData;
 
     public Options() {}
-    public Options(Boolean eagerCheck, Boolean ignoreEmpty, TouchedChecker touched) {
+    public Options(Boolean eagerCheck, Boolean skipUntouched, TouchedChecker touchedChecker) {
         this.eagerCheck = eagerCheck;
-        this.ignoreEmpty = ignoreEmpty;
-        this.touched = touched;
+        this.skipUntouched = skipUntouched;
+        this.touchedChecker = touchedChecker;
     }
 
     public Options merge(Options other) {
         Options clone = this.clone();
         clone.eagerCheck = eagerCheck != null ? eagerCheck : other.eagerCheck;
-        clone.ignoreEmpty = ignoreEmpty != null ? ignoreEmpty : other.ignoreEmpty;
-        clone.touched = touched != null ? touched : other.touched;
+        clone.skipUntouched = skipUntouched != null ? skipUntouched : other.skipUntouched;
+        clone.touchedChecker = touchedChecker != null ? touchedChecker : other.touchedChecker;
         return clone;
     }
 
@@ -60,12 +60,12 @@ public class Options {
      * whether skip to check empty even they are declared as required
      * @return the value optional
      */
-    public Optional<Boolean> ignoreEmpty() {
-        return Optional.ofNullable(this.ignoreEmpty);
+    public Optional<Boolean> skipUntouched() {
+        return Optional.ofNullable(this.skipUntouched);
     }
-    public Options ignoreEmpty(Boolean ignoreEmpty) {
+    public Options skipUntouched(Boolean ignoreEmpty) {
         Options clone = this.clone();
-        clone.ignoreEmpty = ignoreEmpty;
+        clone.skipUntouched = ignoreEmpty;
         return clone;
     }
 
@@ -73,12 +73,12 @@ public class Options {
      * for touched fields, an error will be filed if they are declared as required and they are empty
      * @return the touched checker
      */
-    public TouchedChecker touched() {
-        return this.touched;
+    public TouchedChecker touchedChecker() {
+        return this.touchedChecker;
     }
-    public Options touched(TouchedChecker touched) {
+    public Options touchedChecker(TouchedChecker touched) {
         Options clone = this.clone();
-        clone.touched = touched;
+        clone.touchedChecker = touched;
         return clone;
     }
 
@@ -175,7 +175,7 @@ public class Options {
     /////////////////////////////////////////////////////////////////////////////////////
 
     protected Options clone() {
-        Options clone = new Options(this.eagerCheck, this.ignoreEmpty, this.touched);
+        Options clone = new Options(this.eagerCheck, this.skipUntouched, this.touchedChecker);
         clone._inputMode = this._inputMode;
         clone._label = this._label;
         clone._ignoreConstraints = this._ignoreConstraints;

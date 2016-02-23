@@ -189,8 +189,8 @@ public class FrameworkUtils {
 
     public static boolean isUntouchedEmpty(String name, Map<String, String> data, Options options) {
         return isEmptyInput(name, data, options._inputMode())
-                &&  options.ignoreEmpty().orElse(false)
-                && (options.touched() == null || ! options.touched().apply(name, data));
+                &&  options.skipUntouched().orElse(false)
+                && (options.touchedChecker() == null || ! options.touchedChecker().apply(name, data));
     }
 
     public static Map<String, String>

@@ -86,14 +86,10 @@ public <Err> Optional<Err> validate(Framework.Mapping<?> mapping, Map<String, St
 #### Options/Features:  
 1) **label**: `feature`, readable name for current group/field  
 2) **mapTo**: `feature`, map converted value to another type  
-3) **i18n**: `option`, let label value can be used as a message key to fetch a i18n value from `messages`   
-4) **eagerCheck**: `option`, check errors as more as possible  
-5) **ignoreEmpty**: `option`, not check empty field/values, especially they're not touched by user  
-6) **touched**: `function`, check whether a field was touched by user; if yes, they can't be empty if they're required  
-
-> _* By default, `form-binder-java` would return right after encountered a validation error._  
-> _** ignoreEmpty + touched, will let form-binder re-check touched empty field/values._  
-> _*** if i18n is on, the label you input should be a message key instead of a value._
+3) **i18n**: `feature`, label starting with `@` will be used as a message key to fetch a i18n value from `messages`
+4) **eagerCheck**: `option`, check errors as more as possible; default `false`, return right after a validation error found
+5) **skipUntouched**: `option`, whether skip checking untouched empty field/values; default `false`, won't skip untouched
+6) **touchedChecker**: `function`, check whether a field was touched by user; if yes, required field can't be empty
 
 #### Extensible object and meta info:
 If you want to associate some extra data to a mapping, now you can do it like this:
