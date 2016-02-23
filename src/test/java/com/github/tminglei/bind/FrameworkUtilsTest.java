@@ -67,12 +67,12 @@ public class FrameworkUtilsTest {
                 "c");
         assertEquals(FrameworkUtils.getLabel("a.b.c", (key) -> "tt", Options.EMPTY._label("t1")),
                 "t1");
-        assertEquals(FrameworkUtils.getLabel("a.b.c", (key) -> "tt", Options.EMPTY.i18n(true)._label("t1")),
+        assertEquals(FrameworkUtils.getLabel("a.b.c", (key) -> "tt", Options.EMPTY._label("@t1")),
                 "tt");
-        assertEquals(FrameworkUtils.getLabel("a.b.c", (key) -> "tt", Options.EMPTY.i18n(true)),
+        assertEquals(FrameworkUtils.getLabel("a.b.c", (key) -> "tt", Options.EMPTY),
                 "c");
-        assertEquals(FrameworkUtils.getLabel("a.b.c", (key) -> null, Options.EMPTY.i18n(true)._label("t1")),
-                "t1");
+        assertEquals(FrameworkUtils.getLabel("a.b.c", (key) -> null, Options.EMPTY._label("@t1")),
+                "c");
 
         assertEquals(FrameworkUtils.getLabel("a.b.c[1]", (key) -> "tt", Options.EMPTY),
                 "c[1]");

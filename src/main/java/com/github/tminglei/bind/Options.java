@@ -13,11 +13,10 @@ import static com.github.tminglei.bind.FrameworkUtils.*;
 public class Options {
     public static final Options EMPTY = new Options();
 
-    private Boolean i18n;
     private Boolean eagerCheck;
     private Boolean ignoreEmpty;
     private TouchedChecker touched;
-    // internal options, only applied to current mapping
+    // internal state, only applied to current mapping
     private InputMode _inputMode;
     private String  _label = null;
     private boolean _ignoreConstraints = false;
@@ -28,8 +27,7 @@ public class Options {
     private Extensible _extData;
 
     public Options() {}
-    public Options(Boolean i18n, Boolean eagerCheck, Boolean ignoreEmpty, TouchedChecker touched) {
-        this.i18n = i18n;
+    public Options(Boolean eagerCheck, Boolean ignoreEmpty, TouchedChecker touched) {
         this.eagerCheck = eagerCheck;
         this.ignoreEmpty = ignoreEmpty;
         this.touched = touched;
@@ -37,7 +35,6 @@ public class Options {
 
     public Options merge(Options other) {
         Options clone = this.clone();
-        clone.i18n = i18n != null ? i18n : other.i18n;
         clone.eagerCheck = eagerCheck != null ? eagerCheck : other.eagerCheck;
         clone.ignoreEmpty = ignoreEmpty != null ? ignoreEmpty : other.ignoreEmpty;
         clone.touched = touched != null ? touched : other.touched;
@@ -45,19 +42,6 @@ public class Options {
     }
 
     ///
-
-    /**
-     * whether activate i18n support
-     * @return the value optional
-     */
-    public Optional<Boolean> i18n() {
-        return Optional.ofNullable(this.i18n);
-    }
-    public Options i18n(Boolean i18n) {
-        Options clone = this.clone();
-        clone.i18n = i18n;
-        return clone;
-    }
 
     /**
      * whether check errors as more as possible
@@ -191,7 +175,7 @@ public class Options {
     /////////////////////////////////////////////////////////////////////////////////////
 
     protected Options clone() {
-        Options clone = new Options(this.i18n, this.eagerCheck, this.ignoreEmpty, this.touched);
+        Options clone = new Options(this.eagerCheck, this.ignoreEmpty, this.touched);
         clone._inputMode = this._inputMode;
         clone._label = this._label;
         clone._ignoreConstraints = this._ignoreConstraints;

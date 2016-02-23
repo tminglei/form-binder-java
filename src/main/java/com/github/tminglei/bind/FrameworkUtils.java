@@ -247,8 +247,7 @@ public class FrameworkUtils {
     // i18n on: use i18n label, if exists; else use label; else use last field name from full name
     // i18n off: use label; else use last field name from full name
     public static String getLabel(String fullName, Messages messages, Options options) {
-        logger.trace("getting label for '{}' with options (i18n: {}, _label: {})",
-                fullName, options.i18n(), options._label());
+        logger.trace("getting label for '{}' with _label: {}", fullName, options._label());
 
         String[] parts = splitName(fullName);   // parts: (parent, name/index, isArray)
         boolean isArray = Boolean.parseBoolean(parts[2]);
@@ -256,11 +255,8 @@ public class FrameworkUtils {
                 ? splitName(parts[0])[1] + "[" + parts[1] + "]"
                 : parts[1];
 
-        String label = options.i18n().orElse(false)
-                ? options._label()
-                    .flatMap(l -> Optional.ofNullable(messages.get(l)))
-                    .orElse(options._label().orElse(defaultLabel))
-                : options._label().orElse(defaultLabel);
+        String label = options._label().map(l -> l.startsWith("@") ? messages.get(l.substring(1)) : l)
+                .orElse(defaultLabel);
 
         logger.trace("getting label - return {}", label);
 
