@@ -86,9 +86,9 @@ public <Err> Optional<Err> validate(Framework.Mapping<?> mapping, Map<String, St
 #### Options/Features:  
 1) **label**: `feature`, readable name for current group/field  
 2) **mapTo**: `feature`, map converted value to another type  
-3) **i18n**: `feature`, label starting with `@` will be used as a message key to fetch a i18n value from `messages`
-4) **eagerCheck**: `option`, check errors as more as possible; default `false`, return right after a validation error found
-5) **skipUntouched**: `option`, whether skip checking untouched empty field/values; default `false`, won't skip untouched
+3) **i18n**: `feature`, label starting with `@` will be used as a message key to fetch a i18n value from `messages`  
+4) **eagerCheck**: `option`, check errors as more as possible; default `false`, return right after a validation error found  
+5) **skipUntouched**: `option`, whether skip checking untouched empty field/values; default `false`, won't skip untouched  
 6) **touchedChecker**: `function`, check whether a field was touched by user; if yes, required field can't be empty
 
 #### Extensible object and meta info:
