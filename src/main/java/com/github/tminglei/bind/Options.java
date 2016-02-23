@@ -57,7 +57,7 @@ public class Options {
     }
 
     /**
-     * whether skip to check empty even they are declared as required
+     * whether to skip checking untouched empty field/values
      * @return the value optional
      */
     public Optional<Boolean> skipUntouched() {
@@ -70,7 +70,7 @@ public class Options {
     }
 
     /**
-     * for touched fields, an error will be filed if they are declared as required and they are empty
+     * used to check whether a field was touched by user
      * @return the touched checker
      */
     public TouchedChecker touchedChecker() {
