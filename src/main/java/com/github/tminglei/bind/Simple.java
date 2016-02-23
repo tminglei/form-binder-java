@@ -1,10 +1,8 @@
-package com.github.tminglei.bind.api;
+package com.github.tminglei.bind;
 
 import java.util.*;
 
 import com.github.tminglei.bind.spi.*;
-import com.github.tminglei.bind.Framework;
-import com.github.tminglei.bind.FrameworkUtils;
 
 /**
  * helper class to easy usage

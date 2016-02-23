@@ -8,7 +8,6 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import com.github.tminglei.bind.api.*;
 import com.github.tminglei.bind.spi.*;
 
 import static com.github.tminglei.bind.FrameworkUtils.*;
@@ -184,16 +183,16 @@ public class Framework {
 
         private final Logger logger = LoggerFactory.getLogger(FieldMapping.class);
 
-        public FieldMapping(InputMode inputMode, BiFunction<String, Map<String, String>, T> doConvert,
-                            MappingMeta meta) {
+        FieldMapping(InputMode inputMode, BiFunction<String, Map<String, String>, T> doConvert,
+                     MappingMeta meta) {
             this(inputMode, doConvert, FrameworkUtils.PassValidating, Options.EMPTY, meta);
         }
-        public FieldMapping(InputMode inputMode, BiFunction<String, Map<String, String>, T> doConvert,
-                            Constraint moreValidate, MappingMeta meta) {
+        FieldMapping(InputMode inputMode, BiFunction<String, Map<String, String>, T> doConvert,
+                     Constraint moreValidate, MappingMeta meta) {
             this(inputMode, doConvert, moreValidate, Options.EMPTY, meta);
         }
-        public FieldMapping(InputMode inputMode, BiFunction<String, Map<String, String>, T> doConvert,
-                            Constraint moreValidate, Options options, MappingMeta meta) {
+        FieldMapping(InputMode inputMode, BiFunction<String, Map<String, String>, T> doConvert,
+                     Constraint moreValidate, Options options, MappingMeta meta) {
             this.doConvert = doConvert;
             this.moreValidate = moreValidate;
             this.options = options._inputMode(inputMode);
@@ -259,10 +258,10 @@ public class Framework {
 
         private final Logger logger = LoggerFactory.getLogger(GroupMapping.class);
 
-        public GroupMapping(List<Map.Entry<String, Mapping<?>>> fields) {
+        GroupMapping(List<Map.Entry<String, Mapping<?>>> fields) {
             this(fields, Options.EMPTY);
         }
-        public GroupMapping(List<Map.Entry<String, Mapping<?>>> fields, Options options) {
+        GroupMapping(List<Map.Entry<String, Mapping<?>>> fields, Options options) {
             this.fields = unmodifiableList(fields);
             this.options = options._inputMode(InputMode.MULTIPLE);
         }

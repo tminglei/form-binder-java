@@ -8,7 +8,6 @@ import java.util.Collections;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
-import com.github.tminglei.bind.api.*;
 import com.github.tminglei.bind.spi.*;
 
 import static org.testng.Assert.*;

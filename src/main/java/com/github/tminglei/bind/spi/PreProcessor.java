@@ -2,6 +2,8 @@ package com.github.tminglei.bind.spi;
 
 import java.util.Map;
 
+import com.github.tminglei.bind.Options;
+
 /**
  * Created by tminglei on 2/23/16.
  */

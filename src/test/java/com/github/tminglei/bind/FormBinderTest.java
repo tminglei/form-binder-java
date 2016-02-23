@@ -5,10 +5,8 @@ import org.testng.annotations.Test;
 
 import java.util.*;
 
-import com.github.tminglei.bind.api.*;
-
 import static org.testng.Assert.*;
-import static com.github.tminglei.bind.api.Simple.*;
+import static com.github.tminglei.bind.Simple.*;
 import static com.github.tminglei.bind.Mappings.*;
 import static com.github.tminglei.bind.Constraints.*;
 import static com.github.tminglei.bind.Processors.*;

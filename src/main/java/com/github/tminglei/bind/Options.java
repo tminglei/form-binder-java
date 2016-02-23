@@ -1,7 +1,9 @@
-package com.github.tminglei.bind.spi;
+package com.github.tminglei.bind;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import com.github.tminglei.bind.spi.*;
 
 import static com.github.tminglei.bind.FrameworkUtils.*;
 
@@ -97,90 +99,90 @@ public class Options {
     }
 
     //-- internal options
-    public InputMode _inputMode() {
+    InputMode _inputMode() {
         return this._inputMode;
     }
-    public Options _inputMode(InputMode inputMode) {
+    Options _inputMode(InputMode inputMode) {
         Options clone = this.clone();
         clone._inputMode = inputMode;
         return clone;
     }
 
-    public Optional<String> _label() {
+    Optional<String> _label() {
         return Optional.ofNullable(this._label);
     }
-    public Options _label(String label) {
+    Options _label(String label) {
         Options clone = this.clone();
         clone._label = label;
         return clone;
     }
 
-    public boolean _ignoreConstraints() {
+    boolean _ignoreConstraints() {
         return this._ignoreConstraints;
     }
-    public Options _ignoreConstraints(boolean ignore) {
+    Options _ignoreConstraints(boolean ignore) {
         Options clone = this.clone();
         clone._ignoreConstraints = ignore;
         return clone;
     }
 
-    public List<Constraint> _constraints() {
+    List<Constraint> _constraints() {
         return this._constraints;
     }
-    public Options _constraints(List<Constraint> constraints) {
+    Options _constraints(List<Constraint> constraints) {
         Options clone = this.clone();
         clone._constraints = unmodifiableList(constraints);
         return clone;
     }
-    public Options append_constraints(List<Constraint> constraints) {
+    Options append_constraints(List<Constraint> constraints) {
         Options clone = this.clone();
         clone._constraints = unmodifiableList(mergeList(clone._constraints, constraints));
         return clone;
     }
-    public Options prepend_constraints(List<Constraint> constraints) {
+    Options prepend_constraints(List<Constraint> constraints) {
         Options clone = this.clone();
         clone._constraints = unmodifiableList(mergeList(constraints, clone._constraints));
         return clone;
     }
 
-    public List<PreProcessor> _processors() {
+    List<PreProcessor> _processors() {
         return this._processors;
     }
-    public Options _processors(List<PreProcessor> processors) {
+    Options _processors(List<PreProcessor> processors) {
         Options clone = this.clone();
         clone._processors = unmodifiableList(processors);
         return clone;
     }
-    public Options append_processors(List<PreProcessor> processors) {
+    Options append_processors(List<PreProcessor> processors) {
         Options clone = this.clone();
         clone._processors = unmodifiableList(mergeList(clone._processors, processors));
         return clone;
     }
-    public Options prepend_processors(List<PreProcessor> processors) {
+    Options prepend_processors(List<PreProcessor> processors) {
         Options clone = this.clone();
         clone._processors = unmodifiableList(mergeList(processors, clone._processors));
         return clone;
     }
 
-    public <T> List<ExtraConstraint<T>> _extraConstraints() {
+    <T> List<ExtraConstraint<T>> _extraConstraints() {
         return this._extraConstraints.stream().map(c -> (ExtraConstraint<T>) c).collect(Collectors.toList());
     }
-    public Options _extraConstraints(List<ExtraConstraint<?>> extraConstraints) {
+    Options _extraConstraints(List<ExtraConstraint<?>> extraConstraints) {
         Options clone = this.clone();
         clone._extraConstraints = unmodifiableList(extraConstraints);
         return clone;
     }
-    public Options append_extraConstraints(List<ExtraConstraint<?>> extraConstraints) {
+    Options append_extraConstraints(List<ExtraConstraint<?>> extraConstraints) {
         Options clone = this.clone();
         clone._extraConstraints = unmodifiableList(mergeList(clone._extraConstraints, extraConstraints));
         return clone;
     }
 
     ///
-    public Extensible _extData() {
+    Extensible _extData() {
         return this._extData;
     }
-    public Options _extData(Extensible ext) {
+    Options _extData(Extensible ext) {
         Options clone = this.clone();
         clone._extData = ext;
         return clone;

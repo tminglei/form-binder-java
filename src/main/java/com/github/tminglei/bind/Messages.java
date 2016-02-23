@@ -1,4 +1,4 @@
-package com.github.tminglei.bind.api;
+package com.github.tminglei.bind;
 
 @FunctionalInterface
 public interface Messages {

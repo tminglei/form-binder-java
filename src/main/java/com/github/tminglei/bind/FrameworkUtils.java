@@ -11,7 +11,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import com.github.tminglei.bind.api.Messages;
 import com.github.tminglei.bind.spi.*;
 
 /**

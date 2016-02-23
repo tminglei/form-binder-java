@@ -1,6 +1,5 @@
 package com.github.tminglei.bind;
 
-import com.github.tminglei.bind.spi.Options;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -10,10 +9,8 @@ import java.time.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import com.github.tminglei.bind.api.*;
-
 import static org.testng.Assert.*;
-import static com.github.tminglei.bind.api.Simple.*;
+import static com.github.tminglei.bind.Simple.*;
 import static com.github.tminglei.bind.Constraints.*;
 import static com.github.tminglei.bind.Processors.*;
 import static com.github.tminglei.bind.FrameworkUtils.*;
