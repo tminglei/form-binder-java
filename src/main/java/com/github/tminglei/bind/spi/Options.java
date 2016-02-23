@@ -1,4 +1,4 @@
-package com.github.tminglei.bind;
+package com.github.tminglei.bind.spi;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -14,19 +14,19 @@ public class Options {
     private Boolean i18n;
     private Boolean eagerCheck;
     private Boolean ignoreEmpty;
-    private Framework.TouchedChecker touched;
+    private TouchedChecker touched;
     // internal options, only applied to current mapping
-    private Framework.InputMode _inputMode;
+    private InputMode _inputMode;
     private String  _label = null;
     private boolean _ignoreConstraints = false;
-    private List<Framework.Constraint> _constraints = Collections.EMPTY_LIST;
-    private List<Framework.ExtraConstraint<?>> _extraConstraints = Collections.EMPTY_LIST;
-    private List<Framework.PreProcessor> _processors = Collections.EMPTY_LIST;
+    private List<Constraint> _constraints = Collections.EMPTY_LIST;
+    private List<ExtraConstraint<?>> _extraConstraints = Collections.EMPTY_LIST;
+    private List<PreProcessor> _processors = Collections.EMPTY_LIST;
     // extension object
-    private Framework.Extensible _ext;
+    private Extensible _extData;
 
     public Options() {}
-    public Options(Boolean i18n, Boolean eagerCheck, Boolean ignoreEmpty, Framework.TouchedChecker touched) {
+    public Options(Boolean i18n, Boolean eagerCheck, Boolean ignoreEmpty, TouchedChecker touched) {
         this.i18n = i18n;
         this.eagerCheck = eagerCheck;
         this.ignoreEmpty = ignoreEmpty;
@@ -87,20 +87,20 @@ public class Options {
      * for touched fields, an error will be filed if they are declared as required and they are empty
      * @return the touched checker
      */
-    public Framework.TouchedChecker touched() {
+    public TouchedChecker touched() {
         return this.touched;
     }
-    public Options touched(Framework.TouchedChecker touched) {
+    public Options touched(TouchedChecker touched) {
         Options clone = this.clone();
         clone.touched = touched;
         return clone;
     }
 
     //-- internal options
-    public Framework.InputMode _inputMode() {
+    public InputMode _inputMode() {
         return this._inputMode;
     }
-    public Options _inputMode(Framework.InputMode inputMode) {
+    public Options _inputMode(InputMode inputMode) {
         Options clone = this.clone();
         clone._inputMode = inputMode;
         return clone;
@@ -124,65 +124,65 @@ public class Options {
         return clone;
     }
 
-    public List<Framework.Constraint> _constraints() {
+    public List<Constraint> _constraints() {
         return this._constraints;
     }
-    public Options _constraints(List<Framework.Constraint> constraints) {
+    public Options _constraints(List<Constraint> constraints) {
         Options clone = this.clone();
         clone._constraints = unmodifiableList(constraints);
         return clone;
     }
-    public Options append_constraints(List<Framework.Constraint> constraints) {
+    public Options append_constraints(List<Constraint> constraints) {
         Options clone = this.clone();
         clone._constraints = unmodifiableList(mergeList(clone._constraints, constraints));
         return clone;
     }
-    public Options prepend_constraints(List<Framework.Constraint> constraints) {
+    public Options prepend_constraints(List<Constraint> constraints) {
         Options clone = this.clone();
         clone._constraints = unmodifiableList(mergeList(constraints, clone._constraints));
         return clone;
     }
 
-    public List<Framework.PreProcessor> _processors() {
+    public List<PreProcessor> _processors() {
         return this._processors;
     }
-    public Options _processors(List<Framework.PreProcessor> processors) {
+    public Options _processors(List<PreProcessor> processors) {
         Options clone = this.clone();
         clone._processors = unmodifiableList(processors);
         return clone;
     }
-    public Options append_processors(List<Framework.PreProcessor> processors) {
+    public Options append_processors(List<PreProcessor> processors) {
         Options clone = this.clone();
         clone._processors = unmodifiableList(mergeList(clone._processors, processors));
         return clone;
     }
-    public Options prepend_processors(List<Framework.PreProcessor> processors) {
+    public Options prepend_processors(List<PreProcessor> processors) {
         Options clone = this.clone();
         clone._processors = unmodifiableList(mergeList(processors, clone._processors));
         return clone;
     }
 
-    public <T> List<Framework.ExtraConstraint<T>> _extraConstraints() {
-        return this._extraConstraints.stream().map(c -> (Framework.ExtraConstraint<T>) c).collect(Collectors.toList());
+    public <T> List<ExtraConstraint<T>> _extraConstraints() {
+        return this._extraConstraints.stream().map(c -> (ExtraConstraint<T>) c).collect(Collectors.toList());
     }
-    public Options _extraConstraints(List<Framework.ExtraConstraint<?>> extraConstraints) {
+    public Options _extraConstraints(List<ExtraConstraint<?>> extraConstraints) {
         Options clone = this.clone();
         clone._extraConstraints = unmodifiableList(extraConstraints);
         return clone;
     }
-    public Options append_extraConstraints(List<Framework.ExtraConstraint<?>> extraConstraints) {
+    public Options append_extraConstraints(List<ExtraConstraint<?>> extraConstraints) {
         Options clone = this.clone();
         clone._extraConstraints = unmodifiableList(mergeList(clone._extraConstraints, extraConstraints));
         return clone;
     }
 
     ///
-    public Framework.Extensible _ext() {
-        return this._ext;
+    public Extensible _extData() {
+        return this._extData;
     }
-    public Options _ext(Framework.Extensible ext) {
+    public Options _extData(Extensible ext) {
         Options clone = this.clone();
-        clone._ext = ext;
+        clone._extData = ext;
         return clone;
     }
 
@@ -196,7 +196,7 @@ public class Options {
         clone._constraints = this._constraints;
         clone._extraConstraints = this._extraConstraints;
         clone._processors = this._processors;
-        clone._ext = this._ext;
+        clone._extData = this._extData;
         return clone;
     }
 }

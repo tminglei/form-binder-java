@@ -14,6 +14,8 @@ import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import com.github.tminglei.bind.spi.*;
+
 import static com.github.tminglei.bind.FrameworkUtils.*;
 
 /**
@@ -24,7 +26,7 @@ public class Processors {
 
     ///////////////////////////////////  pre-defined pre-processors  //////////////////////////
 
-    public static Framework.PreProcessor trim() {
+    public static PreProcessor trim() {
         return mkPreProcessorWithMeta((prefix, data, options) -> {
             logger.debug("trimming '{}'", prefix);
 
@@ -45,30 +47,30 @@ public class Processors {
             }, mkExtensionMeta("trim"));
         }
 
-    public static Framework.PreProcessor omit(String str) {
+    public static PreProcessor omit(String str) {
         return replaceMatched(Pattern.quote(str), "", mkExtensionMeta("omit", str));
     }
 
-    public static Framework.PreProcessor omitLeft(String str) {
+    public static PreProcessor omitLeft(String str) {
         return replaceMatched("^" + Pattern.quote(str), "", mkExtensionMeta("omitLeft", str));
     }
 
-    public static Framework.PreProcessor omitRight(String str) {
+    public static PreProcessor omitRight(String str) {
         return replaceMatched(Pattern.quote(str) + "$", "", mkExtensionMeta("omitRight", str));
     }
 
-    public static Framework.PreProcessor omitRedundant(String str) {
+    public static PreProcessor omitRedundant(String str) {
         return replaceMatched("["+Pattern.quote(str)+"]+", str, mkExtensionMeta("omitRedundant", str));
     }
 
-    public static Framework.PreProcessor omitMatched(String pattern) {
+    public static PreProcessor omitMatched(String pattern) {
         return replaceMatched(pattern, "", mkExtensionMeta("omitMatched", pattern));
     }
 
-    public static Framework.PreProcessor replaceMatched(String pattern, String replacement) {
+    public static PreProcessor replaceMatched(String pattern, String replacement) {
         return replaceMatched(pattern, replacement, null);
     }
-    static Framework.PreProcessor replaceMatched(String pattern, String replacement, Framework.ExtensionMeta meta) {
+    static PreProcessor replaceMatched(String pattern, String replacement, ExtensionMeta meta) {
         return mkPreProcessorWithMeta((prefix, data, options) -> {
             logger.debug("replacing '{}' with '{}'", pattern, replacement);
 
@@ -86,7 +88,7 @@ public class Processors {
                             Map.Entry::getKey,
                             Map.Entry::getValue
                     ));
-            }, meta != null ? meta : new Framework.ExtensionMeta(
+            }, meta != null ? meta : new ExtensionMeta(
                 "replaceMatched",
                 "replace(matched '" + pattern + "' with '" + replacement + "')",
                 Arrays.asList(pattern, replacement)));
@@ -96,10 +98,10 @@ public class Processors {
      * expand json string to map of data
      * @return new created pre-processor
      */
-    public static Framework.PreProcessor expandJson() {
+    public static PreProcessor expandJson() {
         return expandJson(null);
     }
-    public static Framework.PreProcessor expandJson(String prefix) {
+    public static PreProcessor expandJson(String prefix) {
         return mkPreProcessorWithMeta((prefix1, data, options) -> {
             logger.debug("expanding json at '{}'", (prefix == null ? prefix1 : prefix));
 
@@ -128,10 +130,10 @@ public class Processors {
      * expand json string to data keys
      * @return new created pre-processor
      */
-    public static Framework.PreProcessor expandJsonKeys() {
+    public static PreProcessor expandJsonKeys() {
         return expandJsonKeys(null);
     }
-    public static Framework.PreProcessor expandJsonKeys(String prefix) {
+    public static PreProcessor expandJsonKeys(String prefix) {
         return mkPreProcessorWithMeta((prefix1, data, options) -> {
             logger.debug("expanding json keys at '{}'", (prefix == null ? prefix1 : prefix));
 
@@ -145,10 +147,10 @@ public class Processors {
      * expand list of strings to data keys
      * @return new created pre-processor
      */
-    public static Framework.PreProcessor expandListKeys() {
+    public static PreProcessor expandListKeys() {
         return expandListKeys(null);
     }
-    public static Framework.PreProcessor expandListKeys(String prefix) {
+    public static PreProcessor expandListKeys(String prefix) {
         return mkPreProcessorWithMeta((prefix1, data, options) -> {
             logger.debug("expanding list keys at '{}'", (prefix == null ? prefix1 : prefix));
 
@@ -173,7 +175,7 @@ public class Processors {
      * @param to to prefix
      * @return new created pre-processor
      */
-    public static Framework.PreProcessor changePrefix(String from, String to) {
+    public static PreProcessor changePrefix(String from, String to) {
         return mkPreProcessorWithMeta((prefix, data, options) -> {
             logger.debug("changing prefix at '{}' from '{}' to '{}'", prefix, from, to);
 
@@ -195,7 +197,7 @@ public class Processors {
                             Map.Entry::getKey,
                             Map.Entry::getValue
                     ));
-            }, new Framework.ExtensionMeta("changePrefix",
+            }, new ExtensionMeta("changePrefix",
                     "changePrefix(from '" +from+ "' to '" +to+ "')",
                     Arrays.asList(from, to)));
         }
@@ -250,7 +252,7 @@ public class Processors {
      * @param touched the touched list
      * @return new created touched checker
      */
-    public static Framework.TouchedChecker listTouched(List<String> touched) {
+    public static TouchedChecker listTouched(List<String> touched) {
         return ((prefix, data) -> {
             logger.debug("checking touched in list for '{}'", prefix);
 
@@ -266,7 +268,7 @@ public class Processors {
      * @param touchedPrefix the touched keys prefix
      * @return new created touched checker
      */
-    public static Framework.TouchedChecker prefixTouched(String dataPrefix, String touchedPrefix) {
+    public static TouchedChecker prefixTouched(String dataPrefix, String touchedPrefix) {
         return ((prefix, data) -> {
             logger.debug("checking touched with data prefix '{}' and touched prefix '{}' for '{}'",
                     dataPrefix, touchedPrefix, prefix);

@@ -1,5 +1,6 @@
 package com.github.tminglei.bind;
 
+import com.github.tminglei.bind.spi.Options;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -8,8 +9,10 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+import com.github.tminglei.bind.api.*;
+
 import static org.testng.Assert.*;
-import static com.github.tminglei.bind.Simple.*;
+import static com.github.tminglei.bind.api.Simple.*;
 import static com.github.tminglei.bind.Mappings.*;
 import static com.github.tminglei.bind.Constraints.*;
 import static com.github.tminglei.bind.Processors.*;

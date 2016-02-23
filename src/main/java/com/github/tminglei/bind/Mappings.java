@@ -11,6 +11,9 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import com.github.tminglei.bind.spi.*;
+
+import static com.github.tminglei.bind.Framework.*;
 import static com.github.tminglei.bind.FrameworkUtils.*;
 
 /**
@@ -26,11 +29,11 @@ public class Mappings {
      * @param constraints constraints
      * @return new created mapping
      */
-    public static Framework.Mapping<String> text(Framework.Constraint... constraints) {
-        return new Framework.FieldMapping(
-                Framework.InputMode.SINGLE,
+    public static Mapping<String> text(Constraint... constraints) {
+        return new FieldMapping(
+                InputMode.SINGLE,
                 mkSimpleConverter(Function.identity()),
-                new Framework.MappingMeta(String.class)
+                new MappingMeta(String.class)
             ).constraint(constraints);
         }
 
@@ -39,12 +42,12 @@ public class Mappings {
      * @param constraints constraints
      * @return new created mapping
      */
-    public static Framework.Mapping<Boolean> vBoolean(Framework.Constraint... constraints) {
-        return new Framework.FieldMapping(
-                Framework.InputMode.SINGLE,
+    public static Mapping<Boolean> vBoolean(Constraint... constraints) {
+        return new FieldMapping(
+                InputMode.SINGLE,
                 mkSimpleConverter(s ->
                     isEmptyStr(s) ? false : Boolean.parseBoolean(s)
-                ), new Framework.MappingMeta(Boolean.class)
+                ), new MappingMeta(Boolean.class)
             ).constraint(checking(Boolean::parseBoolean, "error.boolean", true))
                 .constraint(constraints);
         }
@@ -54,12 +57,12 @@ public class Mappings {
      * @param constraints constraints
      * @return new created mapping
      */
-    public static Framework.Mapping<Integer> vInt(Framework.Constraint... constraints) {
-        return new Framework.FieldMapping(
-                Framework.InputMode.SINGLE,
+    public static Mapping<Integer> vInt(Constraint... constraints) {
+        return new FieldMapping(
+                InputMode.SINGLE,
                 mkSimpleConverter(s ->
                     isEmptyStr(s) ? 0 : Integer.parseInt(s)
-                ), new Framework.MappingMeta(Integer.class)
+                ), new MappingMeta(Integer.class)
             ).constraint(checking(Integer::parseInt, "error.number", true))
                 .constraint(constraints);
         }
@@ -69,12 +72,12 @@ public class Mappings {
      * @param constraints constraints
      * @return new created mapping
      */
-    public static Framework.Mapping<Double> vDouble(Framework.Constraint... constraints) {
-        return new Framework.FieldMapping(
-                Framework.InputMode.SINGLE,
+    public static Mapping<Double> vDouble(Constraint... constraints) {
+        return new FieldMapping(
+                InputMode.SINGLE,
                 mkSimpleConverter(s ->
                     isEmptyStr(s) ? 0.0d : Double.parseDouble(s)
-                ), new Framework.MappingMeta(Double.class)
+                ), new MappingMeta(Double.class)
             ).constraint(checking(Double::parseDouble, "error.double", true))
                 .constraint(constraints);
         }
@@ -84,12 +87,12 @@ public class Mappings {
      * @param constraints constraints
      * @return new created mapping
      */
-    public static Framework.Mapping<Float> vFloat(Framework.Constraint... constraints) {
-        return new Framework.FieldMapping(
-                Framework.InputMode.SINGLE,
+    public static Mapping<Float> vFloat(Constraint... constraints) {
+        return new FieldMapping(
+                InputMode.SINGLE,
                 mkSimpleConverter(s ->
                     isEmptyStr(s) ? 0.0f : Float.parseFloat(s)
-                ), new Framework.MappingMeta(Float.class)
+                ), new MappingMeta(Float.class)
             ).constraint(checking(Float::parseFloat, "error.float", true))
                 .constraint(constraints);
         }
@@ -99,12 +102,12 @@ public class Mappings {
      * @param constraints constraints
      * @return new created mapping
      */
-    public static Framework.Mapping<Long> vLong(Framework.Constraint... constraints) {
-        return new Framework.FieldMapping(
-                Framework.InputMode.SINGLE,
+    public static Mapping<Long> vLong(Constraint... constraints) {
+        return new FieldMapping(
+                InputMode.SINGLE,
                 mkSimpleConverter(s ->
                     isEmptyStr(s) ? 0l : Long.parseLong(s)
-                ), new Framework.MappingMeta(Long.class)
+                ), new MappingMeta(Long.class)
             ).constraint(checking(Long::parseLong, "error.long", true))
                 .constraint(constraints);
         }
@@ -114,12 +117,12 @@ public class Mappings {
      * @param constraints constraints
      * @return new created mapping
      */
-    public static Framework.Mapping<BigDecimal> bigDecimal(Framework.Constraint... constraints) {
-        return new Framework.FieldMapping(
-                Framework.InputMode.SINGLE,
+    public static Mapping<BigDecimal> bigDecimal(Constraint... constraints) {
+        return new FieldMapping(
+                InputMode.SINGLE,
                 mkSimpleConverter(s ->
                     isEmptyStr(s) ? BigDecimal.ZERO : new BigDecimal(s)
-                ), new Framework.MappingMeta(BigDecimal.class)
+                ), new MappingMeta(BigDecimal.class)
             ).constraint(checking(BigDecimal::new, "error.bigdecimal", true))
                 .constraint(constraints);
         }
@@ -129,12 +132,12 @@ public class Mappings {
      * @param constraints constraints
      * @return new created mapping
      */
-    public static Framework.Mapping<BigInteger> bigInt(Framework.Constraint... constraints) {
-        return new Framework.FieldMapping(
-                Framework.InputMode.SINGLE,
+    public static Mapping<BigInteger> bigInt(Constraint... constraints) {
+        return new FieldMapping(
+                InputMode.SINGLE,
                 mkSimpleConverter(s ->
                     isEmptyStr(s) ? BigInteger.ZERO : new BigInteger(s)
-                ), new Framework.MappingMeta(BigInteger.class)
+                ), new MappingMeta(BigInteger.class)
             ).constraint(checking(BigInteger::new, "error.bigint", true))
                 .constraint(constraints);
         }
@@ -144,12 +147,12 @@ public class Mappings {
      * @param constraints constraints
      * @return new created mapping
      */
-    public static Framework.Mapping<UUID> uuid(Framework.Constraint... constraints) {
-        return new Framework.FieldMapping(
-                Framework.InputMode.SINGLE,
+    public static Mapping<UUID> uuid(Constraint... constraints) {
+        return new FieldMapping(
+                InputMode.SINGLE,
                 mkSimpleConverter(s ->
                     isEmptyStr(s) ? null : UUID.fromString(s)
-                ), new Framework.MappingMeta(UUID.class)
+                ), new MappingMeta(UUID.class)
             ).constraint(checking(UUID::fromString, "error.uuid", true))
                 .constraint(constraints);
         }
@@ -159,13 +162,13 @@ public class Mappings {
      * @param constraints constraints
      * @return new created mapping
      */
-    public static Framework.Mapping<LocalDate> date(Framework.Constraint... constraints) {
+    public static Mapping<LocalDate> date(Constraint... constraints) {
         return date("yyyy-MM-dd", constraints);
     }
-    public static Framework.Mapping<LocalDate> date(String pattern, Framework.Constraint... constraints) {
+    public static Mapping<LocalDate> date(String pattern, Constraint... constraints) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
-        return new Framework.FieldMapping(
-                Framework.InputMode.SINGLE,
+        return new FieldMapping(
+                InputMode.SINGLE,
                 mkSimpleConverter(s -> {
                     if (isEmptyStr(s)) return null;
                     else if (s.matches("^[\\d]+$")) {
@@ -174,7 +177,7 @@ public class Mappings {
                     } else {
                         return LocalDate.parse(s, formatter);
                     }
-                }), new Framework.MappingMeta(LocalDate.class)
+                }), new MappingMeta(LocalDate.class)
             ).constraint(anyPassed(
                     checking(s -> new Date(Long.parseLong(s)), "'%s' not a date long", false),
                     checking(formatter::parse, "error.pattern", true, pattern)
@@ -186,13 +189,13 @@ public class Mappings {
      * @param constraints constraints
      * @return new created mapping
      */
-    public static Framework.Mapping<LocalDateTime> datetime(Framework.Constraint... constraints) {
+    public static Mapping<LocalDateTime> datetime(Constraint... constraints) {
         return datetime("yyyy-MM-dd'T'HH:mm:ss.SSS", constraints);
     }
-    public static Framework.Mapping<LocalDateTime> datetime(String pattern, Framework.Constraint... constraints) {
+    public static Mapping<LocalDateTime> datetime(String pattern, Constraint... constraints) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
-        return new Framework.FieldMapping(
-                Framework.InputMode.SINGLE,
+        return new FieldMapping(
+                InputMode.SINGLE,
                 mkSimpleConverter(s -> {
                     if (isEmptyStr(s)) return null;
                     else if (s.matches("^[\\d]+$")) {
@@ -201,7 +204,7 @@ public class Mappings {
                     } else {
                         return LocalDateTime.parse(s, formatter);
                     }
-                }), new Framework.MappingMeta(LocalDateTime.class)
+                }), new MappingMeta(LocalDateTime.class)
             ).constraint(anyPassed(
                     checking(s -> new Date(Long.parseLong(s)), "'%s' not a date long", false),
                     checking(formatter::parse, "error.pattern", true, pattern)
@@ -213,13 +216,13 @@ public class Mappings {
      * @param constraints constraints
      * @return new created mapping
      */
-    public static Framework.Mapping<LocalTime> time(Framework.Constraint... constraints) {
+    public static Mapping<LocalTime> time(Constraint... constraints) {
         return time("HH:mm:ss.SSS", constraints);
     }
-    public static Framework.Mapping<LocalTime> time(String pattern, Framework.Constraint... constraints) {
+    public static Mapping<LocalTime> time(String pattern, Constraint... constraints) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
-        return new Framework.FieldMapping(
-                Framework.InputMode.SINGLE,
+        return new FieldMapping(
+                InputMode.SINGLE,
                 mkSimpleConverter(s -> {
                     if (isEmptyStr(s)) return null;
                     else if (s.matches("^[\\d]+$")) {
@@ -228,7 +231,7 @@ public class Mappings {
                     } else {
                         return LocalTime.parse(s, formatter);
                     }
-                }), new Framework.MappingMeta(LocalTime.class)
+                }), new MappingMeta(LocalTime.class)
             ).constraint(anyPassed(
                     checking(s -> new Date(Long.parseLong(s)), "'%s' not a date long", false),
                     checking(formatter::parse, "error.pattern", true, pattern)
@@ -244,11 +247,11 @@ public class Mappings {
      * @param <T> base type
      * @return new created mapping
      */
-    public static <T> Framework.Mapping<T> ignored(T instead) {
-        return new Framework.FieldMapping<T>(
-                Framework.InputMode.POLYMORPHIC,
+    public static <T> Mapping<T> ignored(T instead) {
+        return new FieldMapping<T>(
+                InputMode.POLYMORPHIC,
                 ((name, data) -> instead),
-                new Framework.MappingMeta(instead.getClass())
+                new MappingMeta(instead.getClass())
             ).options(o -> o._ignoreConstraints(true));
         }
 
@@ -261,7 +264,7 @@ public class Mappings {
      * @param <T> base type
      * @return new created mapping
      */
-    public static <T> Framework.Mapping<T> defaultVal(Framework.Mapping<T> base, T defaultVal, Framework.Constraint... constraints) {
+    public static <T> Mapping<T> defaultVal(Mapping<T> base, T defaultVal, Constraint... constraints) {
         return optional(base, constraints).mapTo(o -> o.orElse(defaultVal));
     }
 
@@ -272,8 +275,8 @@ public class Mappings {
      * @param <T> base type
      * @return new created mapping
      */
-    public static <T> Framework.Mapping<Optional<T>> optional(Framework.Mapping<T> base, Framework.Constraint... constraints) {
-        return new Framework.FieldMapping<Optional<T>>(
+    public static <T> Mapping<Optional<T>> optional(Mapping<T> base, Constraint... constraints) {
+        return new FieldMapping<Optional<T>>(
                 base.options()._inputMode(),
                 ((name, data) -> {
                     logger.debug("optional - converting {}", name);
@@ -292,7 +295,7 @@ public class Mappings {
                                 .options(o -> o._label(o._label().orElse(options._label().orElse(null))))
                                 .validate(name, data, messages, options);
                     }
-                }), new Framework.MappingMeta(Optional.class, base)
+                }), new MappingMeta(Optional.class, base)
             ).options(o -> o._ignoreConstraints(true))
                 .constraint(constraints);
         }
@@ -304,9 +307,9 @@ public class Mappings {
      * @param <T> base type
      * @return new created mapping
      */
-    public static <T> Framework.Mapping<List<T>> list(Framework.Mapping<T> base, Framework.Constraint... constraints) {
-        return new Framework.FieldMapping<List<T>>(
-                Framework.InputMode.MULTIPLE,
+    public static <T> Mapping<List<T>> list(Mapping<T> base, Constraint... constraints) {
+        return new FieldMapping<List<T>>(
+                InputMode.MULTIPLE,
                 ((name, data) -> {
                     logger.debug("list - converting {}", name);
 
@@ -320,7 +323,7 @@ public class Mappings {
                     return indexes(name, data).stream()
                             .flatMap(i -> base.validate(name + "[" + i + "]", data, messages, options).stream())
                             .collect(Collectors.toList());
-                }), new Framework.MappingMeta(List.class, base)
+                }), new MappingMeta(List.class, base)
             ).constraint(constraints);
         }
 
@@ -331,14 +334,14 @@ public class Mappings {
      * @param <V> base value type
      * @return new created mapping
      */
-    public static <V> Framework.Mapping<Map<String, V>> map(Framework.Mapping<V> vBase,
-                                                      Framework.Constraint... constraints) {
+    public static <V> Mapping<Map<String, V>> map(Mapping<V> vBase,
+                                                      Constraint... constraints) {
         return map(text(), vBase, constraints);
     }
-    public static <K, V> Framework.Mapping<Map<K, V>> map(Framework.Mapping<K> kBase, Framework.Mapping<V> vBase,
-                                                    Framework.Constraint... constraints) {
-        return new Framework.FieldMapping<Map<K, V>>(
-                Framework.InputMode.MULTIPLE,
+    public static <K, V> Mapping<Map<K, V>> map(Mapping<K> kBase, Mapping<V> vBase,
+                                                    Constraint... constraints) {
+        return new FieldMapping<Map<K, V>>(
+                InputMode.MULTIPLE,
                 ((name, data) -> {
                     logger.debug("map - converting {}", name);
 
@@ -369,7 +372,7 @@ public class Mappings {
                             ).stream();
                         })
                         .collect(Collectors.toList());
-                }), new Framework.MappingMeta(Map.class, kBase, vBase)
+                }), new MappingMeta(Map.class, kBase, vBase)
             ).constraint(constraints);
         }
 

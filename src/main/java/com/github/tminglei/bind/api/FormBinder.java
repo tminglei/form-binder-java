@@ -1,4 +1,4 @@
-package com.github.tminglei.bind;
+package com.github.tminglei.bind.api;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,21 +8,24 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
+import com.github.tminglei.bind.Framework;
+import com.github.tminglei.bind.spi.Options;
+
 import static com.github.tminglei.bind.FrameworkUtils.*;
 
 /**
  * The Facade class
  */
 public class FormBinder {
-    private final Framework.Messages messages;
+    private final Messages messages;
     private final Function<List<Map.Entry<String, String>>, ?> errProcessor;
 
     private static final Logger logger = LoggerFactory.getLogger(FormBinder.class);
 
-    public FormBinder(Framework.Messages messages) {
+    public FormBinder(Messages messages) {
         this(messages, null);
     }
-    public FormBinder(Framework.Messages messages, Function<List<Map.Entry<String, String>>, ?> errProcessor) {
+    public FormBinder(Messages messages, Function<List<Map.Entry<String, String>>, ?> errProcessor) {
         this.messages = messages;
         this.errProcessor = errProcessor;
     }

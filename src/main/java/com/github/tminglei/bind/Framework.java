@@ -8,73 +8,16 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import com.github.tminglei.bind.api.*;
+import com.github.tminglei.bind.spi.*;
+
 import static com.github.tminglei.bind.FrameworkUtils.*;
 
 /**
  * framework's core interfaces/implementations
  */
 public class Framework {
-    @FunctionalInterface
-    public interface Messages {
-        String get(String key);
-    }
-    @FunctionalInterface
-    public interface PreProcessor extends Metable<ExtensionMeta> {
-        Map<String, String> apply(String prefix, Map<String, String> data, Options options);
-    }
-    @FunctionalInterface
-    public interface Constraint extends Metable<ExtensionMeta> {
-        List<Map.Entry<String, String>> apply(String name, Map<String, String> data, Messages messages, Options options);
-    }
-    @FunctionalInterface
-    public interface ExtraConstraint<T> extends Metable<ExtensionMeta> {
-        List<String> apply(String label, T vObj, Messages messages);
-    }
-    @FunctionalInterface
-    public interface TouchedChecker {
-        boolean apply(String prefix, Map<String, String> data);
-    }
-    @FunctionalInterface
-    public interface Function3<T1,T2,T3,R> {
-        R apply(T1 p1, T2 p2, T3 p3);
-    }
-    @FunctionalInterface
-    public interface Function4<T1,T2,T3,T4,R> {
-        R apply(T1 p1, T2 p2, T3 p3, T4 p4);
-    }
 
-    public interface Extensible extends java.lang.Cloneable {
-        Extensible clone();
-    }
-    public interface Metable<M> {
-        default M meta() { return null; }
-    }
-    ///
-    public enum InputMode {
-        SINGLE, MULTIPLE, POLYMORPHIC
-    }
-    public static class MappingMeta {
-        public final Class<?> targetType;
-        public final Mapping<?>[] baseMappings;
-
-        public MappingMeta(Class<?> targetType, Mapping<?>... baseMappings) {
-            this.targetType = targetType;
-            this.baseMappings = baseMappings;
-        }
-    }
-    public static class ExtensionMeta {
-        public final String name;
-        public final String desc;
-        public final List<?> params;
-
-        public ExtensionMeta(String name, String desc, List<?> params) {
-            this.name = name;
-            this.desc = desc;
-            this.params = unmodifiableList(params);
-        }
-    }
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////
     /**
      * A mapping, w/ constraints/processors/options, was used to validate/convert input data
      */
@@ -108,8 +51,8 @@ public class Framework {
          */
         default <E extends Extensible> Mapping<T> $ext(Function<E, E> setting) {
             return options(o -> {
-                E ext = (E) (o._ext() != null ? o._ext().clone() : null);
-                return o._ext(setting.apply(ext));
+                E ext = (E) (o._extData() != null ? o._extData().clone() : null);
+                return o._extData(setting.apply(ext));
             });
         }
 
@@ -241,14 +184,16 @@ public class Framework {
 
         private final Logger logger = LoggerFactory.getLogger(FieldMapping.class);
 
-        FieldMapping(InputMode inputMode, BiFunction<String, Map<String, String>, T> doConvert, MappingMeta meta) {
+        public FieldMapping(InputMode inputMode, BiFunction<String, Map<String, String>, T> doConvert,
+                            MappingMeta meta) {
             this(inputMode, doConvert, FrameworkUtils.PassValidating, Options.EMPTY, meta);
         }
-        FieldMapping(InputMode inputMode, BiFunction<String, Map<String, String>, T> doConvert, Constraint moreValidate, MappingMeta meta) {
+        public FieldMapping(InputMode inputMode, BiFunction<String, Map<String, String>, T> doConvert,
+                            Constraint moreValidate, MappingMeta meta) {
             this(inputMode, doConvert, moreValidate, Options.EMPTY, meta);
         }
-        FieldMapping(InputMode inputMode, BiFunction<String, Map<String, String>, T> doConvert,
-                     Constraint moreValidate, Options options, MappingMeta meta) {
+        public FieldMapping(InputMode inputMode, BiFunction<String, Map<String, String>, T> doConvert,
+                            Constraint moreValidate, Options options, MappingMeta meta) {
             this.doConvert = doConvert;
             this.moreValidate = moreValidate;
             this.options = options._inputMode(inputMode);
@@ -314,10 +259,10 @@ public class Framework {
 
         private final Logger logger = LoggerFactory.getLogger(GroupMapping.class);
 
-        GroupMapping(List<Map.Entry<String, Mapping<?>>> fields) {
+        public GroupMapping(List<Map.Entry<String, Mapping<?>>> fields) {
             this(fields, Options.EMPTY);
         }
-        GroupMapping(List<Map.Entry<String, Mapping<?>>> fields, Options options) {
+        public GroupMapping(List<Map.Entry<String, Mapping<?>>> fields, Options options) {
             this.fields = unmodifiableList(fields);
             this.options = options._inputMode(InputMode.MULTIPLE);
         }

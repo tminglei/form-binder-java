@@ -6,8 +6,9 @@ import org.testng.annotations.Test;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.github.tminglei.bind.spi.*;
+
 import static org.testng.Assert.*;
-import static com.github.tminglei.bind.Simple.*;
 import static com.github.tminglei.bind.FrameworkUtils.*;
 import static com.github.tminglei.bind.Utils.*;
 

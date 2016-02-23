@@ -6,8 +6,10 @@ import org.testng.annotations.Test;
 import java.util.Arrays;
 import java.util.Collections;
 
+import com.github.tminglei.bind.spi.*;
+
+
 import static org.testng.Assert.*;
-import static com.github.tminglei.bind.Simple.*;
 import static com.github.tminglei.bind.Utils.*;
 
 public class ExtensionMetaTest {

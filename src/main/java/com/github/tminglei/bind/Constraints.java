@@ -9,6 +9,8 @@ import java.util.Collections;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
+import com.github.tminglei.bind.spi.*;
+
 import static com.github.tminglei.bind.FrameworkUtils.*;
 
 /**
@@ -19,10 +21,10 @@ public class Constraints {
 
     /////////////////////////////////////  pre-defined constraints  /////////////////////////
 
-    public static Framework.Constraint required() {
+    public static Constraint required() {
         return required(null);
     }
-    public static Framework.Constraint required(String message) {
+    public static Constraint required(String message) {
         return mkConstraintWithMeta(
             (name, data, messages, options) -> {
                 logger.debug("checking required for {}", name);
@@ -30,12 +32,12 @@ public class Constraints {
                 if (isEmptyInput(name, data, options._inputMode())) {
                     String errMessage;
                     // wrong input, e.g. required single but found multiple, required multiple but found single
-                    if (!isEmptyInput(name, data, Framework.InputMode.POLYMORPHIC)) {
+                    if (!isEmptyInput(name, data, InputMode.POLYMORPHIC)) {
                         String msgTemplate = messages.get("error.wronginput");
                         String simple = getLabel("simple", messages, options);
                         String compound = getLabel("compound", messages, options);
 
-                        if (options._inputMode() == Framework.InputMode.SINGLE) {
+                        if (options._inputMode() == InputMode.SINGLE) {
                             errMessage = String.format(msgTemplate, simple, compound);
                         } else {
                             errMessage = String.format(msgTemplate, compound, simple);
@@ -52,16 +54,16 @@ public class Constraints {
             }, mkExtensionMeta("required"));
         }
 
-    public static Framework.Constraint maxLength(int length) {
+    public static Constraint maxLength(int length) {
         return maxLength(length, true);
     }
-    public static Framework.Constraint maxLength(int length, boolean withIt) {
+    public static Constraint maxLength(int length, boolean withIt) {
         return maxLength(length, null, withIt);
     }
-    public static Framework.Constraint maxLength(int length, String message) {
+    public static Constraint maxLength(int length, String message) {
         return maxLength(length, message, true);
     }
-    public static Framework.Constraint maxLength(int length, String message, boolean withIt) {
+    public static Constraint maxLength(int length, String message, boolean withIt) {
         return mkSimpleConstraint(
                 (label, vString, messages) -> {
                     logger.debug("checking max-length ({}) for '{}'", length, vString);
@@ -74,16 +76,16 @@ public class Constraints {
                 }, mkExtensionMeta("maxLength", length));
         }
 
-    public static Framework.Constraint minLength(int length) {
+    public static Constraint minLength(int length) {
         return minLength(length, true);
     }
-    public static Framework.Constraint minLength(int length, boolean withIt) {
+    public static Constraint minLength(int length, boolean withIt) {
         return minLength(length, null, withIt);
     }
-    public static Framework.Constraint minLength(int length, String message) {
+    public static Constraint minLength(int length, String message) {
         return minLength(length, message, true);
     }
-    public static Framework.Constraint minLength(int length, String message, boolean withIt) {
+    public static Constraint minLength(int length, String message, boolean withIt) {
         return mkSimpleConstraint(
             (label, vString, messages) -> {
                 logger.debug("checking min-length ({}) for '{}'", length, vString);
@@ -96,10 +98,10 @@ public class Constraints {
             }, mkExtensionMeta("minLength", length));
         }
 
-    public static Framework.Constraint length(int length) {
+    public static Constraint length(int length) {
         return length(length, null);
     }
-    public static Framework.Constraint length(int length, String message) {
+    public static Constraint length(int length, String message) {
         return mkSimpleConstraint(
             (label, vString, messages) -> {
                 logger.debug("checking length ({}) for '{}'", length, vString);
@@ -111,10 +113,10 @@ public class Constraints {
             }, mkExtensionMeta("length", length));
         }
 
-    public static Framework.Constraint oneOf(Collection<String> values) {
+    public static Constraint oneOf(Collection<String> values) {
         return oneOf(values, null);
     }
-    public static Framework.Constraint oneOf(Collection<String> values, String message) {
+    public static Constraint oneOf(Collection<String> values, String message) {
         return mkSimpleConstraint(
             (label, vString, messages) -> {
                 logger.debug("checking one of {} for '{}'", values, vString);
@@ -126,10 +128,10 @@ public class Constraints {
             }, mkExtensionMeta("oneOf", values));
         }
 
-    public static Framework.Constraint email() {
+    public static Constraint email() {
         return email(null);
     }
-    public static Framework.Constraint email(String message) {
+    public static Constraint email(String message) {
         return mkSimpleConstraint(
             (label, vString, messages) -> {
                 logger.debug("checking email for '{}'", vString);
@@ -141,10 +143,10 @@ public class Constraints {
             }, mkExtensionMeta("email"));
         }
 
-    public static Framework.Constraint pattern(String pattern) {
+    public static Constraint pattern(String pattern) {
         return pattern(pattern, null);
     }
-    public static Framework.Constraint pattern(String pattern, String message) {
+    public static Constraint pattern(String pattern, String message) {
         return mkSimpleConstraint(
             (label, vString, messages) -> {
                 logger.debug("checking pattern '{}' for '{}'", pattern, vString);
@@ -156,10 +158,10 @@ public class Constraints {
             }, mkExtensionMeta("pattern", pattern));
         }
 
-    public static Framework.Constraint patternNot(String pattern) {
+    public static Constraint patternNot(String pattern) {
         return patternNot(pattern, null);
     }
-    public static Framework.Constraint patternNot(String pattern, String message) {
+    public static Constraint patternNot(String pattern, String message) {
         return mkSimpleConstraint(
             (label, vString, messages) -> {
                 logger.debug("checking pattern-not '{}' for '{}'", pattern, vString);
@@ -171,10 +173,10 @@ public class Constraints {
             }, mkExtensionMeta("patternNot", pattern));
         }
 
-    public static Framework.Constraint indexInKeys() {
+    public static Constraint indexInKeys() {
         return indexInKeys(null);
     }
-    public static Framework.Constraint indexInKeys(String message) {
+    public static Constraint indexInKeys(String message) {
         return mkConstraintWithMeta(
             (name, data, messages, options) -> {
                 logger.debug("checking index in keys for '{}'", name);
@@ -195,19 +197,19 @@ public class Constraints {
 
     ///////////////////////////////////  pre-defined extra constraints  //////////////////////
 
-    public static <T extends Comparable<T>> Framework.ExtraConstraint<T>
+    public static <T extends Comparable<T>> ExtraConstraint<T>
                 min(T minVal) {
         return min(minVal, true);
     }
-    public static <T extends Comparable<T>> Framework.ExtraConstraint<T>
+    public static <T extends Comparable<T>> ExtraConstraint<T>
                 min(T minVal, boolean withIt) {
         return min(minVal, null, withIt);
     }
-    public static <T extends Comparable<T>> Framework.ExtraConstraint<T>
+    public static <T extends Comparable<T>> ExtraConstraint<T>
                 min(T minVal, String message) {
         return min(minVal, message, true);
     }
-    public static <T extends Comparable<T>> Framework.ExtraConstraint<T>
+    public static <T extends Comparable<T>> ExtraConstraint<T>
                 min(T minVal, String message, boolean withIt) {
         return mkExtraConstraintWithMeta(
             (label, value, messages) -> {
@@ -218,25 +220,25 @@ public class Constraints {
                     String msgTemplate = message != null ? message : messages.get("error.min");
                     return Arrays.asList(String.format(msgTemplate, value, minVal, withIt));
                 } else return Collections.EMPTY_LIST;
-            }, new Framework.ExtensionMeta(
+            }, new ExtensionMeta(
                     "min",
                     "min(" + minVal + " " + (withIt ? "w/" : "w/o") + " boundary)",
                     Arrays.asList(minVal, withIt)));
         }
 
-    public static <T extends Comparable<T>> Framework.ExtraConstraint<T>
+    public static <T extends Comparable<T>> ExtraConstraint<T>
                 max(T maxVal) {
         return max(maxVal, true);
     }
-    public static <T extends Comparable<T>> Framework.ExtraConstraint<T>
+    public static <T extends Comparable<T>> ExtraConstraint<T>
                 max(T maxVal, boolean withIt) {
         return max(maxVal, null, withIt);
     }
-    public static <T extends Comparable<T>> Framework.ExtraConstraint<T>
+    public static <T extends Comparable<T>> ExtraConstraint<T>
                 max(T maxVal, String message) {
         return max(maxVal, message, true);
     }
-    public static <T extends Comparable<T>> Framework.ExtraConstraint<T>
+    public static <T extends Comparable<T>> ExtraConstraint<T>
                 max(T maxVal, String message, boolean withIt) {
         return mkExtraConstraintWithMeta(
             (label, value, messages) -> {
@@ -247,7 +249,7 @@ public class Constraints {
                     String msgTemplate = message != null ? message : messages.get("error.max");
                     return Arrays.asList(String.format(msgTemplate, value, maxVal, withIt));
                 } else return Collections.EMPTY_LIST;
-            }, new Framework.ExtensionMeta(
+            }, new ExtensionMeta(
                 "max",
                 "max(" + maxVal + " " + (withIt ? "w/" : "w/o") + " boundary)",
                 Arrays.asList(maxVal, withIt)));
