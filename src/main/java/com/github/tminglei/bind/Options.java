@@ -23,8 +23,8 @@ public class Options {
     private List<Constraint> _constraints = Collections.EMPTY_LIST;
     private List<ExtraConstraint<?>> _extraConstraints = Collections.EMPTY_LIST;
     private List<PreProcessor> _processors = Collections.EMPTY_LIST;
-    // extension object
-    private Extensible _extData;
+    // used to associate/hold application specific object
+    private Object _attachment;
 
     public Options() {}
     public Options(Boolean eagerCheck, Boolean skipUntouched, TouchedChecker touchedChecker) {
@@ -163,12 +163,12 @@ public class Options {
     }
 
     ///
-    Extensible _extData() {
-        return this._extData;
+    Object _attachment() {
+        return this._attachment;
     }
-    Options _extData(Extensible ext) {
+    Options _attachment(Object attachment) {
         Options clone = this.clone();
-        clone._extData = ext;
+        clone._attachment = attachment;
         return clone;
     }
 
@@ -182,7 +182,7 @@ public class Options {
         clone._constraints = this._constraints;
         clone._extraConstraints = this._extraConstraints;
         clone._processors = this._processors;
-        clone._extData = this._extData;
+        clone._attachment = this._attachment;
         return clone;
     }
 }

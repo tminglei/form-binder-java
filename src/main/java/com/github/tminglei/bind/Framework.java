@@ -44,18 +44,6 @@ public class Framework {
         }
 
         /**
-         * change extensions associated with the mapping
-         * @param setting function used to change the extensions
-         * @return the mapping
-         */
-        default <E extends Extensible> Mapping<T> $ext(Function<E, E> setting) {
-            return options(o -> {
-                E ext = (E) (o._extData() != null ? o._extData().clone() : null);
-                return o._extData(setting.apply(ext));
-            });
-        }
-
-        /**
          * attach some pre-processors to the mapping
          * @param newProcessors pre-processors
          * @return the mapping
