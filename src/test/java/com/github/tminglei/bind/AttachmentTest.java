@@ -8,7 +8,7 @@ import static com.github.tminglei.bind.Simple.*;
 import static com.github.tminglei.bind.Mappings.*;
 import static com.github.tminglei.bind.Utils.*;
 
-public class MappingExtTest {
+public class AttachmentTest {
 
     @BeforeClass
     public void start() {
@@ -16,7 +16,7 @@ public class MappingExtTest {
     }
 
     @Test
-    public void testExt() {
+    public void testAttachment() {
         System.out.println(green(">> ext setting/checking"));
 
         GroupMapping mapping = mapping(

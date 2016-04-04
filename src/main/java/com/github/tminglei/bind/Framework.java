@@ -94,11 +94,11 @@ public class Framework {
 
         /**
          * transform this result value to another type
-         * @param transform
-         * @param <R>
-         * @return
+         * @param transform transform function
+         * @param <R> target type
+         * @return a TransformMapping
          */
-        default <R> Mapping<R> mapTo(Function<T, R> transform) {
+        default <R> Mapping<R> map(Function<T, R> transform) {
             return new TransformMapping<>(this, transform);
         }
     }
@@ -173,7 +173,7 @@ public class Framework {
 
         FieldMapping(InputMode inputMode, BiFunction<String, Map<String, String>, T> doConvert,
                      MappingMeta meta) {
-            this(inputMode, doConvert, FrameworkUtils.PassValidating, Options.EMPTY, meta);
+            this(inputMode, doConvert, FrameworkUtils.PASS_VALIDATE, Options.EMPTY, meta);
         }
         FieldMapping(InputMode inputMode, BiFunction<String, Map<String, String>, T> doConvert,
                      Constraint moreValidate, MappingMeta meta) {

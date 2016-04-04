@@ -24,7 +24,8 @@ public class FrameworkUtils {
     public static final String  PATTERN_EMAIL = "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
 
     ////////////////////////////////////////////////////////////////////////////
-    public static final Constraint PassValidating
+    public static final Function<?, ?> PASS_THROUGH = (v) -> v;
+    public static final Constraint PASS_VALIDATE
             = (name, data, messages, options) -> Collections.EMPTY_LIST;
 
     public static <T> List<T> unmodifiableList(List<T> list) {

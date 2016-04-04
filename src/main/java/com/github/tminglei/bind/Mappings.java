@@ -265,7 +265,7 @@ public class Mappings {
      * @return new created mapping
      */
     public static <T> Mapping<T> defaultVal(Mapping<T> base, T defaultVal, Constraint... constraints) {
-        return optional(base, constraints).mapTo(o -> o.orElse(defaultVal));
+        return optional(base, constraints).map(o -> o.orElse(defaultVal));
     }
 
     /**
@@ -334,12 +334,10 @@ public class Mappings {
      * @param <V> base value type
      * @return new created mapping
      */
-    public static <V> Mapping<Map<String, V>> map(Mapping<V> vBase,
-                                                      Constraint... constraints) {
+    public static <V> Mapping<Map<String, V>> map(Mapping<V> vBase, Constraint... constraints) {
         return map(text(), vBase, constraints);
     }
-    public static <K, V> Mapping<Map<K, V>> map(Mapping<K> kBase, Mapping<V> vBase,
-                                                    Constraint... constraints) {
+    public static <K, V> Mapping<Map<K, V>> map(Mapping<K> kBase, Mapping<V> vBase, Constraint... constraints) {
         return new FieldMapping<Map<K, V>>(
                 InputMode.MULTIPLE,
                 ((name, data) -> {

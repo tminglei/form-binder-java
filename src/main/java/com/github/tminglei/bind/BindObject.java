@@ -6,7 +6,7 @@ import java.util.*;
  * object used to hold bind result or errors
  */
 public class BindObject implements Iterable<Map.Entry<String, Object>> {
-    static final String DEFAULT_KEY = "_default$";
+    static final String DEFAULT_KEY = "__default_key";
 
     private final Object errors;
     private final Map<String, Object> data;
@@ -21,11 +21,11 @@ public class BindObject implements Iterable<Map.Entry<String, Object>> {
     }
 
     /**
-     * @param <T> expected type
+     * @param <Err> expected type
      * @return the errors optional
      */
-    public <T> Optional<T> errors() {
-        return Optional.ofNullable((T) errors);
+    public <Err> Optional<Err> errors() {
+        return Optional.ofNullable((Err) errors);
     }
 
     /**
@@ -46,9 +46,17 @@ public class BindObject implements Iterable<Map.Entry<String, Object>> {
 
     /**
      * @param name field name
+     * @return true if exists; false if not
+     */
+    public boolean has(String name) {
+        return data.get(name) != null;
+    }
+
+    /**
+     * @param name field name
      * @return field bind object
      */
-    public BindObject node(String name) {
+    public BindObject obj(String name) {
         return (BindObject) data.get(name);
     }
 
@@ -67,14 +75,6 @@ public class BindObject implements Iterable<Map.Entry<String, Object>> {
      */
     public <T> T get(String name) {
         return (T) data.get(name);
-    }
-
-    /**
-     * @param name field name
-     * @return true if exists; false if not
-     */
-    public boolean has(String name) {
-        return data.get(name) != null;
     }
 
     ///--

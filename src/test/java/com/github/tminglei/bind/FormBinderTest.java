@@ -53,9 +53,9 @@ public class FormBinderTest {
 
         assertEquals(bindObj.errors().isPresent(), false);
         assertEquals(bindObj.get("id"), Long.valueOf(133));
-        assertEquals(bindObj.node("data").get("email"), "etttt@example.com");
-        assertEquals(bindObj.node("data").get("price"), Float.valueOf(137.5f));
-        assertEquals(bindObj.node("data").get("count"), Integer.valueOf(5));
+        assertEquals(bindObj.obj("data").get("email"), "etttt@example.com");
+        assertEquals(bindObj.obj("data").get("price"), Float.valueOf(137.5f));
+        assertEquals(bindObj.obj("data").get("count"), Integer.valueOf(5));
 
         /// for each usage
         for(Map.Entry<String, Object> e1 : bindObj) {
