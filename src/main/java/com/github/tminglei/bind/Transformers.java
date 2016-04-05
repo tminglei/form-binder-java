@@ -130,7 +130,7 @@ public class Transformers {
                             : PropertyUtils.getGenericParamTypes(toClazz)[0];
 
                     values = values.stream().map(v -> transform(v, elemType, registry))
-                            .collect(Collectors.toList());
+                            .collect(Collectors.<Object>toList());
 
                     return doTransform(values, toClazz, registry);
                 }
