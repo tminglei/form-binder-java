@@ -93,7 +93,7 @@ public class Transformers {
                 return bean;
             }
             else if (value instanceof Optional) {
-                Optional<Object> optional = (Optional) value;
+                Optional<?> optional = (Optional) value;
 
                 if (toClazz == Optional.class) {
                     Class<?> targetType = PropertyUtils.getGenericParamTypes(toClazz)[0];
@@ -103,7 +103,7 @@ public class Transformers {
                 }
             }
             else if (value instanceof Map) {
-                Map<Object, Object> values = (Map) value;
+                Map<?, ?> values = (Map) value;
 
                 if (Map.class.isAssignableFrom(toClazz)) {
                     Class<?> keyType = PropertyUtils.getGenericParamTypes(toClazz)[0];
@@ -123,7 +123,7 @@ public class Transformers {
                         "INCOMPATIBLE transform: " + value.getClass().getName() + " -> " + toClazz.getName());
             }
             else if (value instanceof Collection) {
-                Collection<Object> values = (Collection) value;
+                Collection<?> values = (Collection) value;
 
                 if (Collection.class.isAssignableFrom(toClazz) || toClazz.isArray()) {
                     Class<?> elemType = toClazz.isArray() ? toClazz.getComponentType()
