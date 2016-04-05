@@ -29,7 +29,7 @@ public class Transformers {
     }
 
     /**
-     * register a transform function for from type -> to type
+     * register a transform function for from type -* to type
      *
      * @param from class of from type
      * @param to   class of to type
@@ -42,7 +42,7 @@ public class Transformers {
     }
 
     /**
-     * fetch a transform function for from type -> to type
+     * fetch a transform function for from type -* to type
      *
      * @param from class of from type
      * @param to   class of to type
@@ -58,7 +58,7 @@ public class Transformers {
     ///---
 
     /**
-     * create a transform function for BindObject -> [bean] type
+     * create a transform function for BindObject -* [bean] type
      *
      * @param beanClazz bean class
      * @param <R>       bean type
