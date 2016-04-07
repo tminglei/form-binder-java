@@ -92,7 +92,7 @@ public <Err> Optional<Err> validate(Framework.Mapping<?> mapping, Map<String, St
 6) **skipUntouched**: `option`, whether skip checking untouched empty field/values; default `false`, won't skip untouched  
 7) **touchedChecker**: `function`, check whether a field was touched by user; if yes, required field can't be empty
 
-#### Extensible object and meta info:
+#### Attachment object and meta info:
 If you want to associate some extra data to a mapping, now, after some [preparing](https://github.com/tminglei/form-binder-java/blob/master/src/test/java/com/github/tminglei/bind/AttachmentTest.java#L34), you can do it like this:
 ```java
 Mapping<BindObject> pet = $(mapping(
