@@ -24,7 +24,7 @@ To use `form-binder-java`, pls add the dependency to your `maven` project file:
 <dependency>
   <groupId>com.github.tminglei</groupId>
   <artifactId>form-binder-java</artifactId>
-  <version>0.12.0</version>
+  <version>0.13.0</version>
 </dependency>
 ```
 
@@ -85,26 +85,27 @@ public <Err> Optional<Err> validate(Framework.Mapping<?> mapping, Map<String, St
 
 #### Options/Features:  
 1) **label**: `feature`, readable name for current group/field  
-2) **mapTo**: `feature`, map converted value to another type  
-3) **i18n**: `feature`, label starting with `@` will be used as a message key to fetch a i18n value from `messages`  
-4) **eagerCheck**: `option`, check errors as more as possible; default `false`, return right after a validation error found  
-5) **skipUntouched**: `option`, whether skip checking untouched empty field/values; default `false`, won't skip untouched  
-6) **touchedChecker**: `function`, check whether a field was touched by user; if yes, required field can't be empty
+2) **map**: `feature`, map converted value to another type
+3) **i18n**: `feature`, label starting with `@` will be used as a message key to fetch a i18n value from `messages`
+4) **bean**: `feature`, transform converted values to a specified java bean
+5) **eagerCheck**: `option`, check errors as more as possible; default `false`, return right after a validation error found
+6) **skipUntouched**: `option`, whether skip checking untouched empty field/values; default `false`, won't skip untouched
+7) **touchedChecker**: `function`, check whether a field was touched by user; if yes, required field can't be empty
 
 #### Extensible object and meta info:
-If you want to associate some extra data to a mapping, now you can do it like this:
+If you want to associate some extra data to a mapping, now, after some [preparing](https://github.com/tminglei/form-binder-java/blob/master/src/test/java/com/github/tminglei/bind/AttachmentTest.java#L34), you can do it like this:
 ```java
-Mapping<BindObject> pet = mapping(
-    field("id", vLong().$ext(o -> ext(o).desc("pet id"))),
-    field("name", text(required()).$ext(o -> ext(o).desc("pet name"))),
-    field("category", attach(required()).to(mapping(
+Mapping<BindObject> pet = $(mapping(
+    field("id", $(vLong()).desc("pet id").$$),
+    field("name", $(text(required())).desc("pet name").$$),
+    field("category", $(attach(required()).to(mapping(
         field("id", vLong(required())),
         field("name", text(required()))
-    )).$ext(o -> ext(o).desc("category belonged to"))),
-    field("photoUrls", list(text()).$ext(o -> ext(o).desc("pet's photo urls"))),
-    field("tags", list(text()).$ext(o -> ext(o).desc("tags for the pet"))),
+    ))).desc("category belonged to").$$),
+    field("photoUrls", $(list(text())).desc("pet's photo urls").$$),
+    field("tags", $(list(text())).desc("tags for the pet").$$),
     field("status", petStatus)
-).$ext(o -> ext(o).desc("pet info"));
+)).desc("pet info").$$;
 ```
 > _With this and meta info, which can be fetched from a mapping / pre-processor / constraint / extra-constraint with `[instance].meta()`, `form-binder-java` allows third party tools, like [binder-swagger-java](https://github.com/tminglei/binder-swagger-java), to deeply know its structure and details, just like they got through java reflections, then based on it to do more._
 
