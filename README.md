@@ -114,12 +114,6 @@ _p.s. for more dev and usage details pls check the [source codes](https://github
 
 
 
-How to
---------------------
-[TODO]
-
-
-
 Build & Test
 -------------------
 To hack it and make your contribution, you can setup it like this:
