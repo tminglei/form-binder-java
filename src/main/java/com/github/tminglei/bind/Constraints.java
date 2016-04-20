@@ -19,6 +19,8 @@ import static com.github.tminglei.bind.FrameworkUtils.*;
 public class Constraints {
     private static final Logger logger = LoggerFactory.getLogger(Constraints.class);
 
+    private Constraints() {}
+
     /////////////////////////////////////  pre-defined constraints  /////////////////////////
 
     public static Constraint required() {

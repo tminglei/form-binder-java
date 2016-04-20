@@ -13,6 +13,8 @@ import java.util.*;
  */
 public class PropertyUtils {
 
+    private PropertyUtils() {}
+
     public static Object readProperty( Object bean, String propName ) {
         Objects.requireNonNull(bean, "Bean object is NULL!");
         Objects.requireNonNull(propName, "Property name is NULL!");

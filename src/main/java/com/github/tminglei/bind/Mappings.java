@@ -22,6 +22,8 @@ import static com.github.tminglei.bind.FrameworkUtils.*;
 public class Mappings {
     private static final Logger logger = LoggerFactory.getLogger(Mappings.class);
 
+    private Mappings() {}
+
     ///////////////////////////////////  pre-defined field mappings  ////////////////////////
 
     /**

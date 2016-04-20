@@ -17,6 +17,9 @@ public class Transformers {
     static final Logger logger = LoggerFactory.getLogger(Transformers.class);
 
     static final Registry REGISTRY = new Registry();
+
+    private Transformers() {}
+
     static {
         register(Byte.class, Byte.TYPE, (Function<Byte, Byte>) FrameworkUtils.PASS_THROUGH);
         register(Short.class, Short.TYPE, (Function<Short, Short>) FrameworkUtils.PASS_THROUGH);

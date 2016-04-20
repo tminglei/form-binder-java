@@ -21,6 +21,8 @@ import static com.github.tminglei.bind.FrameworkUtils.*;
 public class Processors {
     private static final Logger logger = LoggerFactory.getLogger(Processors.class);
 
+    private Processors() {}
+
     ///////////////////////////////////  pre-defined pre-processors  //////////////////////////
 
     public static PreProcessor trim() {
