@@ -14,7 +14,7 @@ import java.util.*;
 public class PropertyUtils {
 
     public static final String PROPERTY_NAME_IS_NULL = "Property name is NULL!";
-    public static final String CAN_T_FIND_PROPERTY_1$S_IN_CLASS_2$S = "Can't find property '%1$s' in class %2$s";
+    public static final String CANNOT_FIND_PROPERTY_IN_CLASS = "Can't find property '%1$s' in class %2$s";
     private static Map<String,Map<String,PropertyDescriptor>> pdCache =
             Collections.synchronizedMap( new WeakHashMap<>() );
 
@@ -25,7 +25,7 @@ public class PropertyUtils {
         PropertyDescriptor pd = findPropertyDescriptor( bean.getClass(), propName );
 
         if( pd == null)
-            throw new IllegalArgumentException( String.format(CAN_T_FIND_PROPERTY_1$S_IN_CLASS_2$S,
+            throw new IllegalArgumentException( String.format(CANNOT_FIND_PROPERTY_IN_CLASS,
                     propName, bean.getClass().getName()));
 
         try {
@@ -49,7 +49,7 @@ public class PropertyUtils {
         PropertyDescriptor pd = findPropertyDescriptor( bean.getClass(), propName );
 
         if( pd == null)
-            throw new IllegalArgumentException( String.format(CAN_T_FIND_PROPERTY_1$S_IN_CLASS_2$S,
+            throw new IllegalArgumentException( String.format(CANNOT_FIND_PROPERTY_IN_CLASS,
                     propName, bean.getClass().getName()));
 
         try {
@@ -73,7 +73,7 @@ public class PropertyUtils {
         PropertyDescriptor pd = findPropertyDescriptor( beanclazz, propName );
 
         if( pd == null)
-            throw new IllegalArgumentException( String.format(CAN_T_FIND_PROPERTY_1$S_IN_CLASS_2$S,
+            throw new IllegalArgumentException( String.format(CANNOT_FIND_PROPERTY_IN_CLASS,
                     propName, beanclazz.getName()));
 
         return pd.getPropertyType();

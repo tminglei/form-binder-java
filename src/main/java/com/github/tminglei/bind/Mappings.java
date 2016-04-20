@@ -21,7 +21,7 @@ import static com.github.tminglei.bind.FrameworkUtils.*;
  */
 public class Mappings {
     private static final Logger logger = LoggerFactory.getLogger(Mappings.class);
-    public static final String D_$ = "^[\\d]+$";
+    public static final String PATTERN = "^[\\d]+$";
     public static final String S_NOT_A_DATE_LONG = "'%s' not a date long";
     public static final String ERROR_PATTERN = "error.pattern";
 
@@ -174,7 +174,7 @@ public class Mappings {
                 InputMode.SINGLE,
                 mkSimpleConverter(s -> {
                     if (isEmptyStr(s)) return null;
-                    else if (s.matches(D_$)) {
+                    else if (s.matches(PATTERN)) {
                         Instant instant = new Date(Long.parseLong(s)).toInstant();
                         return LocalDateTime.ofInstant(instant, ZoneId.of("UTC")).toLocalDate();
                     } else {
@@ -201,7 +201,7 @@ public class Mappings {
                 InputMode.SINGLE,
                 mkSimpleConverter(s -> {
                     if (isEmptyStr(s)) return null;
-                    else if (s.matches(D_$)) {
+                    else if (s.matches(PATTERN)) {
                         Instant instant = new Date(Long.parseLong(s)).toInstant();
                         return LocalDateTime.ofInstant(instant, ZoneId.of("UTC"));
                     } else {
@@ -228,7 +228,7 @@ public class Mappings {
                 InputMode.SINGLE,
                 mkSimpleConverter(s -> {
                     if (isEmptyStr(s)) return null;
-                    else if (s.matches(D_$)) {
+                    else if (s.matches(PATTERN)) {
                         Instant instant = new Date(Long.parseLong(s)).toInstant();
                         return LocalDateTime.ofInstant(instant, ZoneId.of("UTC")).toLocalTime();
                     } else {
