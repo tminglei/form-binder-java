@@ -28,6 +28,10 @@ public class FrameworkUtils {
     public static final Constraint PASS_VALIDATE
             = (name, data, messages, options) -> Collections.EMPTY_LIST;
 
+
+    private static final Pattern OBJ_ELEMENT_NAME = Pattern.compile("^(.*)\\.([^\\.]+)$");
+    private static final Pattern ARR_ELEMENT_NAME = Pattern.compile("^(.*)\\[([\\d]+)\\]$");
+
     public static <T> List<T> unmodifiableList(List<T> list) {
         return list == null ? Collections.EMPTY_LIST : Collections.unmodifiableList(list);
     }
@@ -75,8 +79,6 @@ public class FrameworkUtils {
         }
     }
 
-    static final Pattern OBJ_ELEMENT_NAME = Pattern.compile("^(.*)\\.([^\\.]+)$");
-    static final Pattern ARR_ELEMENT_NAME = Pattern.compile("^(.*)\\[([\\d]+)\\]$");
     // return (parent, name, isArray:false) or (name, index, isArray:true)
     static String[] splitName(String name) {
         logger.trace("splitting name for {}", name);
@@ -267,7 +269,7 @@ public class FrameworkUtils {
     // make a Constraint which will try to check and collect errors
     public static <T> Constraint
             checking(Function<String, T> check, String messageOrKey, boolean isKey, String... extraMessageArgs) {
-        return mkSimpleConstraint(((label, vString, messages) -> {
+        return mkSimpleConstraint((label, vString, messages) -> {
             logger.debug("checking for {}", vString);
 
             if (isEmptyStr(vString)) return null;
@@ -281,12 +283,12 @@ public class FrameworkUtils {
                     return String.format(msgTemplate, messageArgs.toArray());
                 }
             }
-        }), null);
+        }, null);
     }
 
     // make a compound Constraint, which checks whether any inputting constraints passed
     public static Constraint anyPassed(Constraint... constraints) {
-        return ((name, data, messages, options) -> {
+        return (name, data, messages, options) -> {
             logger.debug("checking any passed for {}", name);
 
             List<Map.Entry<String, String>> errErrors = new ArrayList<>();
@@ -303,7 +305,7 @@ public class FrameworkUtils {
                     .collect(Collectors.joining(", ", "[", "]"));
             return Arrays.asList(entry(name,
                     String.format(messages.get("error.anypassed"), label, errStr)));
-        });
+        };
     }
 
     // Computes the available indexes for the given key in this set of data.
