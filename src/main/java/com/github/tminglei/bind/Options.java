@@ -17,14 +17,14 @@ public class Options {
     private Boolean skipUntouched;
     private TouchedChecker touchedChecker;
     // internal state, only applied to current mapping
-    private InputMode _inputMode;
-    private String  _label = null;
-    private boolean _ignoreConstraints = false;
-    private List<Constraint> _constraints = Collections.EMPTY_LIST;
-    private List<ExtraConstraint<?>> _extraConstraints = Collections.EMPTY_LIST;
-    private List<PreProcessor> _processors = Collections.EMPTY_LIST;
+    private InputMode inputMode;
+    private String label = null;
+    private boolean ignoreConstraints = false;
+    private List<Constraint> constraints = Collections.emptyList();
+    private List<ExtraConstraint<?>> extraConstraints = Collections.emptyList();
+    private List<PreProcessor> processors = Collections.emptyList();
     // used to associate/hold application specific object
-    private Object _attachment;
+    private Object attachment;
 
     public Options() {}
     public Options(Boolean eagerCheck, Boolean skipUntouched, TouchedChecker touchedChecker) {
@@ -84,91 +84,91 @@ public class Options {
 
     //-- internal options
     InputMode _inputMode() {
-        return this._inputMode;
+        return this.inputMode;
     }
     Options _inputMode(InputMode inputMode) {
         Options clone = this.clone();
-        clone._inputMode = inputMode;
+        clone.inputMode = inputMode;
         return clone;
     }
 
     Optional<String> _label() {
-        return Optional.ofNullable(this._label);
+        return Optional.ofNullable(this.label);
     }
     Options _label(String label) {
         Options clone = this.clone();
-        clone._label = label;
+        clone.label = label;
         return clone;
     }
 
     boolean _ignoreConstraints() {
-        return this._ignoreConstraints;
+        return this.ignoreConstraints;
     }
     Options _ignoreConstraints(boolean ignore) {
         Options clone = this.clone();
-        clone._ignoreConstraints = ignore;
+        clone.ignoreConstraints = ignore;
         return clone;
     }
 
     List<Constraint> _constraints() {
-        return this._constraints;
+        return this.constraints;
     }
     Options _constraints(List<Constraint> constraints) {
         Options clone = this.clone();
-        clone._constraints = unmodifiableList(constraints);
+        clone.constraints = unmodifiableList(constraints);
         return clone;
     }
     Options append_constraints(List<Constraint> constraints) {
         Options clone = this.clone();
-        clone._constraints = unmodifiableList(mergeList(clone._constraints, constraints));
+        clone.constraints = unmodifiableList(mergeList(clone.constraints, constraints));
         return clone;
     }
     Options prepend_constraints(List<Constraint> constraints) {
         Options clone = this.clone();
-        clone._constraints = unmodifiableList(mergeList(constraints, clone._constraints));
+        clone.constraints = unmodifiableList(mergeList(constraints, clone.constraints));
         return clone;
     }
 
     List<PreProcessor> _processors() {
-        return this._processors;
+        return this.processors;
     }
     Options _processors(List<PreProcessor> processors) {
         Options clone = this.clone();
-        clone._processors = unmodifiableList(processors);
+        clone.processors = unmodifiableList(processors);
         return clone;
     }
     Options append_processors(List<PreProcessor> processors) {
         Options clone = this.clone();
-        clone._processors = unmodifiableList(mergeList(clone._processors, processors));
+        clone.processors = unmodifiableList(mergeList(clone.processors, processors));
         return clone;
     }
     Options prepend_processors(List<PreProcessor> processors) {
         Options clone = this.clone();
-        clone._processors = unmodifiableList(mergeList(processors, clone._processors));
+        clone.processors = unmodifiableList(mergeList(processors, clone.processors));
         return clone;
     }
 
     <T> List<ExtraConstraint<T>> _extraConstraints() {
-        return this._extraConstraints.stream().map(c -> (ExtraConstraint<T>) c).collect(Collectors.toList());
+        return this.extraConstraints.stream().map(c -> (ExtraConstraint<T>) c).collect(Collectors.toList());
     }
     Options _extraConstraints(List<ExtraConstraint<?>> extraConstraints) {
         Options clone = this.clone();
-        clone._extraConstraints = unmodifiableList(extraConstraints);
+        clone.extraConstraints = unmodifiableList(extraConstraints);
         return clone;
     }
     Options append_extraConstraints(List<ExtraConstraint<?>> extraConstraints) {
         Options clone = this.clone();
-        clone._extraConstraints = unmodifiableList(mergeList(clone._extraConstraints, extraConstraints));
+        clone.extraConstraints = unmodifiableList(mergeList(clone.extraConstraints, extraConstraints));
         return clone;
     }
 
     ///
     Object _attachment() {
-        return this._attachment;
+        return this.attachment;
     }
     Options _attachment(Object attachment) {
         Options clone = this.clone();
-        clone._attachment = attachment;
+        clone.attachment = attachment;
         return clone;
     }
 
@@ -176,13 +176,13 @@ public class Options {
 
     protected Options clone() {
         Options clone = new Options(this.eagerCheck, this.skipUntouched, this.touchedChecker);
-        clone._inputMode = this._inputMode;
-        clone._label = this._label;
-        clone._ignoreConstraints = this._ignoreConstraints;
-        clone._constraints = this._constraints;
-        clone._extraConstraints = this._extraConstraints;
-        clone._processors = this._processors;
-        clone._attachment = this._attachment;
+        clone.inputMode = this.inputMode;
+        clone.label = this.label;
+        clone.ignoreConstraints = this.ignoreConstraints;
+        clone.constraints = this.constraints;
+        clone.extraConstraints = this.extraConstraints;
+        clone.processors = this.processors;
+        clone.attachment = this.attachment;
         return clone;
     }
 }
