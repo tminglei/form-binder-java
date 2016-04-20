@@ -100,7 +100,7 @@ public class Processors {
     }
     public static PreProcessor expandJson(String prefix) {
         return mkPreProcessorWithMeta((prefix1, data, options) -> {
-            logger.debug("expanding json at '{}'", (prefix == null ? prefix1 : prefix));
+            logger.debug("expanding json at '{}'", prefix == null ? prefix1 : prefix);
 
             String thePrefix = prefix == null ? prefix1 : prefix;
             String jsonStr = data.get(thePrefix);
@@ -132,7 +132,7 @@ public class Processors {
     }
     public static PreProcessor expandJsonKeys(String prefix) {
         return mkPreProcessorWithMeta((prefix1, data, options) -> {
-            logger.debug("expanding json keys at '{}'", (prefix == null ? prefix1 : prefix));
+            logger.debug("expanding json keys at '{}'", prefix == null ? prefix1 : prefix);
 
             Map<String, String> data1 = expandJson(prefix).apply(prefix1, data, options);
             Map<String, String> data2 = expandListKeys(prefix).apply(prefix1, data1, options);
@@ -149,7 +149,7 @@ public class Processors {
     }
     public static PreProcessor expandListKeys(String prefix) {
         return mkPreProcessorWithMeta((prefix1, data, options) -> {
-            logger.debug("expanding list keys at '{}'", (prefix == null ? prefix1 : prefix));
+            logger.debug("expanding list keys at '{}'", prefix == null ? prefix1 : prefix);
 
             String thePrefix = prefix == null ? prefix1 : prefix;
             Pattern p = Pattern.compile("^" + Pattern.quote(thePrefix) + "\\[[\\d]+\\].*");
@@ -228,7 +228,7 @@ public class Processors {
      */
     public static Function<List<Map.Entry<String, String>>, Map<String, Object>>
                 errsTree() {
-        return ((errors) -> {
+        return (errors) -> {
             logger.debug("converting errors list to errors tree");
 
             Map<String, Object> root = new HashMap<>();
@@ -239,7 +239,7 @@ public class Processors {
                 workObj.add(error.getValue());
             }
             return root;
-        });
+        };
     }
 
     /////////////////////////////////  pre-defined touched checkers  /////////////////////
@@ -250,13 +250,13 @@ public class Processors {
      * @return new created touched checker
      */
     public static TouchedChecker listTouched(List<String> touched) {
-        return ((prefix, data) -> {
+        return (prefix, data) -> {
             logger.debug("checking touched in list for '{}'", prefix);
 
             return touched.stream()
                     .filter(key -> key.startsWith(prefix))
                     .count() > 0;
-        });
+        };
     }
 
     /**
@@ -266,7 +266,7 @@ public class Processors {
      * @return new created touched checker
      */
     public static TouchedChecker prefixTouched(String dataPrefix, String touchedPrefix) {
-        return ((prefix, data) -> {
+        return (prefix, data) -> {
             logger.debug("checking touched with data prefix '{}' and touched prefix '{}' for '{}'",
                     dataPrefix, touchedPrefix, prefix);
 
@@ -274,6 +274,6 @@ public class Processors {
             return data.keySet().stream()
                     .filter(key -> key.startsWith(prefixToBeChecked))
                     .count() > 0;
-        });
+        };
     }
 }

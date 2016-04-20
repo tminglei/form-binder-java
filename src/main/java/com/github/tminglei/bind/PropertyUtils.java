@@ -13,14 +13,19 @@ import java.util.*;
  */
 public class PropertyUtils {
 
+    public static final String PROPERTY_NAME_IS_NULL = "Property name is NULL!";
+    public static final String CANNOT_FIND_PROPERTY_IN_CLASS = "Can't find property '%1$s' in class %2$s";
+    private static Map<String,Map<String,PropertyDescriptor>> pdCache =
+            Collections.synchronizedMap( new WeakHashMap<>() );
+
     public static Object readProperty( Object bean, String propName ) {
         Objects.requireNonNull(bean, "Bean object is NULL!");
-        Objects.requireNonNull(propName, "Property name is NULL!");
+        Objects.requireNonNull(propName, PROPERTY_NAME_IS_NULL);
 
         PropertyDescriptor pd = findPropertyDescriptor( bean.getClass(), propName );
 
         if( pd == null)
-            throw new IllegalArgumentException( String.format("Can't find property '%1$s' in class %2$s",
+            throw new IllegalArgumentException( String.format(CANNOT_FIND_PROPERTY_IN_CLASS,
                     propName, bean.getClass().getName()));
 
         try {
@@ -29,7 +34,7 @@ public class PropertyUtils {
             if (method == null)
                 throw new UnsupportedOperationException("Property '" + pd.getName() + "' is not readable");
 
-            return (method.invoke(bean, new Object[0]));
+            return method.invoke(bean, new Object[0]);
         }
         catch (Exception e) {
             throw new RuntimeException( String.format("Exception occurred when reading property '%1$s': %2$s",
@@ -39,12 +44,12 @@ public class PropertyUtils {
 
     public static void writeProperty( Object bean, String propName, Object propValue ) {
         Objects.requireNonNull(bean, "Bean object is NULL!");
-        Objects.requireNonNull(propName, "Property name is NULL!");
+        Objects.requireNonNull(propName, PROPERTY_NAME_IS_NULL);
 
         PropertyDescriptor pd = findPropertyDescriptor( bean.getClass(), propName );
 
         if( pd == null)
-            throw new IllegalArgumentException( String.format("Can't find property '%1$s' in class %2$s",
+            throw new IllegalArgumentException( String.format(CANNOT_FIND_PROPERTY_IN_CLASS,
                     propName, bean.getClass().getName()));
 
         try {
@@ -63,12 +68,12 @@ public class PropertyUtils {
 
     public static Class<?> getPropertyType( Class<?> beanclazz, String propName ) {
         Objects.requireNonNull(beanclazz, "Bean class is NULL!");
-        Objects.requireNonNull(propName, "Property name is NULL!");
+        Objects.requireNonNull(propName, PROPERTY_NAME_IS_NULL);
 
         PropertyDescriptor pd = findPropertyDescriptor( beanclazz, propName );
 
         if( pd == null)
-            throw new IllegalArgumentException( String.format("Can't find property '%1$s' in class %2$s",
+            throw new IllegalArgumentException( String.format(CANNOT_FIND_PROPERTY_IN_CLASS,
                     propName, beanclazz.getName()));
 
         return pd.getPropertyType();
@@ -136,8 +141,6 @@ public class PropertyUtils {
 
     //---------------------------------------------------- inner support methods ---
 
-    static Map<String,Map<String,PropertyDescriptor>> pdCache =
-            Collections.synchronizedMap( new WeakHashMap<>() );
 
     static Map<String,PropertyDescriptor> introspect( Class<?> beanclazz ) {
         Map<String,PropertyDescriptor> pdmap = pdCache.get( beanclazz.getName() );

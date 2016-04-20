@@ -21,6 +21,9 @@ import static com.github.tminglei.bind.FrameworkUtils.*;
  */
 public class Mappings {
     private static final Logger logger = LoggerFactory.getLogger(Mappings.class);
+    public static final String PATTERN = "^[\\d]+$";
+    public static final String S_NOT_A_DATE_LONG = "'%s' not a date long";
+    public static final String ERROR_PATTERN = "error.pattern";
 
     ///////////////////////////////////  pre-defined field mappings  ////////////////////////
 
@@ -171,7 +174,7 @@ public class Mappings {
                 InputMode.SINGLE,
                 mkSimpleConverter(s -> {
                     if (isEmptyStr(s)) return null;
-                    else if (s.matches("^[\\d]+$")) {
+                    else if (s.matches(PATTERN)) {
                         Instant instant = new Date(Long.parseLong(s)).toInstant();
                         return LocalDateTime.ofInstant(instant, ZoneId.of("UTC")).toLocalDate();
                     } else {
@@ -179,8 +182,8 @@ public class Mappings {
                     }
                 }), new MappingMeta(LocalDate.class)
             ).constraint(anyPassed(
-                    checking(s -> new Date(Long.parseLong(s)), "'%s' not a date long", false),
-                    checking(formatter::parse, "error.pattern", true, pattern)
+                    checking(s -> new Date(Long.parseLong(s)), S_NOT_A_DATE_LONG, false),
+                    checking(formatter::parse, ERROR_PATTERN, true, pattern)
                 )).constraint(constraints);
         }
 
@@ -198,7 +201,7 @@ public class Mappings {
                 InputMode.SINGLE,
                 mkSimpleConverter(s -> {
                     if (isEmptyStr(s)) return null;
-                    else if (s.matches("^[\\d]+$")) {
+                    else if (s.matches(PATTERN)) {
                         Instant instant = new Date(Long.parseLong(s)).toInstant();
                         return LocalDateTime.ofInstant(instant, ZoneId.of("UTC"));
                     } else {
@@ -206,8 +209,8 @@ public class Mappings {
                     }
                 }), new MappingMeta(LocalDateTime.class)
             ).constraint(anyPassed(
-                    checking(s -> new Date(Long.parseLong(s)), "'%s' not a date long", false),
-                    checking(formatter::parse, "error.pattern", true, pattern)
+                    checking(s -> new Date(Long.parseLong(s)), S_NOT_A_DATE_LONG, false),
+                    checking(formatter::parse, ERROR_PATTERN, true, pattern)
                 )).constraint(constraints);
         }
 
@@ -225,7 +228,7 @@ public class Mappings {
                 InputMode.SINGLE,
                 mkSimpleConverter(s -> {
                     if (isEmptyStr(s)) return null;
-                    else if (s.matches("^[\\d]+$")) {
+                    else if (s.matches(PATTERN)) {
                         Instant instant = new Date(Long.parseLong(s)).toInstant();
                         return LocalDateTime.ofInstant(instant, ZoneId.of("UTC")).toLocalTime();
                     } else {
@@ -233,8 +236,8 @@ public class Mappings {
                     }
                 }), new MappingMeta(LocalTime.class)
             ).constraint(anyPassed(
-                    checking(s -> new Date(Long.parseLong(s)), "'%s' not a date long", false),
-                    checking(formatter::parse, "error.pattern", true, pattern)
+                    checking(s -> new Date(Long.parseLong(s)), S_NOT_A_DATE_LONG, false),
+                    checking(formatter::parse, ERROR_PATTERN, true, pattern)
                 )).constraint(constraints);
         }
 
@@ -250,7 +253,7 @@ public class Mappings {
     public static <T> Mapping<T> ignored(T instead) {
         return new FieldMapping<T>(
                 InputMode.POLYMORPHIC,
-                ((name, data) -> instead),
+                (name, data) -> instead,
                 new MappingMeta(instead.getClass())
             ).options(o -> o._ignoreConstraints(true));
         }
@@ -278,14 +281,14 @@ public class Mappings {
     public static <T> Mapping<Optional<T>> optional(Mapping<T> base, Constraint... constraints) {
         return new FieldMapping<Optional<T>>(
                 base.options()._inputMode(),
-                ((name, data) -> {
+                (name, data) -> {
                     logger.debug("optional - converting {}", name);
 
                     if (isEmptyInput(name, data, base.options()._inputMode())) {
                         return Optional.empty();
                     } else return Optional.of(base.convert(name, data));
-                }),
-                ((name, data, messages, options) -> {
+                },
+                (name, data, messages, options) -> {
                     logger.debug("optional - validating {}", name);
 
                     if (isEmptyInput(name, data, base.options()._inputMode())) {
@@ -295,7 +298,7 @@ public class Mappings {
                                 .options(o -> o._label(o._label().orElse(options._label().orElse(null))))
                                 .validate(name, data, messages, options);
                     }
-                }), new MappingMeta(Optional.class, base)
+                }, new MappingMeta(Optional.class, base)
             ).options(o -> o._ignoreConstraints(true))
                 .constraint(constraints);
         }
@@ -310,20 +313,20 @@ public class Mappings {
     public static <T> Mapping<List<T>> list(Mapping<T> base, Constraint... constraints) {
         return new FieldMapping<List<T>>(
                 InputMode.MULTIPLE,
-                ((name, data) -> {
+                (name, data) -> {
                     logger.debug("list - converting {}", name);
 
                     return indexes(name, data).stream()
                             .map(i -> base.convert(name + "[" + i + "]", data))
                             .collect(Collectors.toList());
-                }),
-                ((name, data, messages, options) -> {
+                },
+                (name, data, messages, options) -> {
                     logger.debug("list - validating {}", name);
 
                     return indexes(name, data).stream()
                             .flatMap(i -> base.validate(name + "[" + i + "]", data, messages, options).stream())
                             .collect(Collectors.toList());
-                }), new MappingMeta(List.class, base)
+                }, new MappingMeta(List.class, base)
             ).constraint(constraints);
         }
 
@@ -340,7 +343,7 @@ public class Mappings {
     public static <K, V> Mapping<Map<K, V>> map(Mapping<K> kBase, Mapping<V> vBase, Constraint... constraints) {
         return new FieldMapping<Map<K, V>>(
                 InputMode.MULTIPLE,
-                ((name, data) -> {
+                (name, data) -> {
                     logger.debug("map - converting {}", name);
 
                     return keys(name, data).stream()
@@ -356,8 +359,8 @@ public class Mappings {
                                 Map.Entry::getKey,
                                 Map.Entry::getValue
                         ));
-                }),
-                ((name, data, messages, options) -> {
+                },
+                (name, data, messages, options) -> {
                     logger.debug("map - validating {}", name);
 
                     return keys(name, data).stream()
@@ -370,7 +373,7 @@ public class Mappings {
                             ).stream();
                         })
                         .collect(Collectors.toList());
-                }), new MappingMeta(Map.class, kBase, vBase)
+                }, new MappingMeta(Map.class, kBase, vBase)
             ).constraint(constraints);
         }
 
