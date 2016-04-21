@@ -26,12 +26,12 @@ public class FrameworkUtils {
     ////////////////////////////////////////////////////////////////////////////
     public static final Function<?, ?> PASS_THROUGH = (v) -> v;
     public static final Constraint PASS_VALIDATE
-            = (name, data, messages, options) -> Collections.EMPTY_LIST;
+            = (name, data, messages, options) -> Collections.emptyList();
 
     private FrameworkUtils() {}
 
     public static <T> List<T> unmodifiableList(List<T> list) {
-        return list == null ? Collections.EMPTY_LIST : Collections.unmodifiableList(list);
+        return list == null ? Collections.emptyList() : Collections.unmodifiableList(list);
     }
 
     public static <T> List<T> appendList(List<T> list, T... others) {
@@ -137,7 +137,7 @@ public class FrameworkUtils {
                 } else {
                     String label = getLabel(name, messages, options);
                     String error = validate.apply(label, data.get(name), messages);
-                    return isEmptyStr(error) ? Collections.EMPTY_LIST
+                    return isEmptyStr(error) ? Collections.emptyList()
                             : Arrays.asList(entry(name, error));
                 }
             }, meta);
@@ -216,7 +216,7 @@ public class FrameworkUtils {
                     .flatMap(c -> c.apply(name, data, messages, options).stream())
                     .collect(Collectors.toList());
         } else {
-            if (constraints.isEmpty()) return Collections.EMPTY_LIST;
+            if (constraints.isEmpty()) return Collections.emptyList();
             else {
                 List<Map.Entry<String, String>> errors = constraints.get(0).apply(name, data, messages, options);
                 return errors.isEmpty()
@@ -294,7 +294,7 @@ public class FrameworkUtils {
             List<Map.Entry<String, String>> errErrors = new ArrayList<>();
             for(Constraint constraint : constraints) {
                 List<Map.Entry<String, String>> errors = constraint.apply(name, data, messages, options);
-                if (errors.isEmpty()) return Collections.EMPTY_LIST;
+                if (errors.isEmpty()) return Collections.emptyList();
                 else {
                     errErrors.addAll(errors);
                 }

@@ -52,7 +52,7 @@ public class Constraints {
                     }
 
                     return Arrays.asList(entry(name, errMessage));
-                } else return Collections.EMPTY_LIST;
+                } else return Collections.emptyList();
             }, mkExtensionMeta("required"));
         }
 
@@ -221,7 +221,7 @@ public class Constraints {
                         || (!withIt && value.compareTo(minVal) <= 0)) {
                     String msgTemplate = message != null ? message : messages.get("error.min");
                     return Arrays.asList(String.format(msgTemplate, value, minVal, withIt));
-                } else return Collections.EMPTY_LIST;
+                } else return Collections.emptyList();
             }, new ExtensionMeta(
                     "min",
                     "min(" + minVal + " " + (withIt ? "w/" : "w/o") + " boundary)",
@@ -250,7 +250,7 @@ public class Constraints {
                         || (!withIt && value.compareTo(maxVal) >= 0)) {
                     String msgTemplate = message != null ? message : messages.get("error.max");
                     return Arrays.asList(String.format(msgTemplate, value, maxVal, withIt));
-                } else return Collections.EMPTY_LIST;
+                } else return Collections.emptyList();
             }, new ExtensionMeta(
                 "max",
                 "max(" + maxVal + " " + (withIt ? "w/" : "w/o") + " boundary)",

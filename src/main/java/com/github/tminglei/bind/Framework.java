@@ -114,7 +114,7 @@ public class Framework {
         private final Logger logger = LoggerFactory.getLogger(TransformMapping.class);
 
         TransformMapping(Mapping<T> base, Function<T, R> transform) {
-            this(base, transform, Collections.EMPTY_LIST);
+            this(base, transform, Collections.emptyList());
         }
         TransformMapping(Mapping<T> base, Function<T, R> transform, List<ExtraConstraint<R>> extraConstraints) {
             this.base = base;
@@ -155,7 +155,7 @@ public class Framework {
             if (errors.isEmpty()) {
                 return Optional.ofNullable(convert(name, data))
                         .map(v -> extraValidateRec(name, v, messages, parentOptions, extraConstraints))
-                        .orElse(Collections.EMPTY_LIST);
+                        .orElse(Collections.emptyList());
             } else return errors;
         }
     }
@@ -223,14 +223,14 @@ public class Framework {
             Options theOptions = options().merge(parentOptions);
             Map<String, String> newData = processDataRec(name, data, theOptions, theOptions._processors());
 
-            if (isUntouchedEmpty(name, newData, theOptions)) return Collections.EMPTY_LIST;
+            if (isUntouchedEmpty(name, newData, theOptions)) return Collections.emptyList();
             else {
                 List<Constraint> validators = appendList(theOptions._ignoreConstraints() ? null : theOptions._constraints(), moreValidate);
                 List<Map.Entry<String, String>> errors = validateRec(name, newData, messages, theOptions, validators);
                 if (errors.isEmpty()) {
                     return Optional.ofNullable(doConvert.apply(name, newData))
                             .map(v -> extraValidateRec(name, v, messages, theOptions, theOptions._extraConstraints()))
-                            .orElse(Collections.EMPTY_LIST);
+                            .orElse(Collections.emptyList());
                 } else return errors;
             }
         }
@@ -305,11 +305,11 @@ public class Framework {
             Options theOptions = options().merge(parentOptions);
             Map<String, String> newData = processDataRec(name, data, theOptions, theOptions._processors());
 
-            if (isUntouchedEmpty(name, newData, theOptions)) return Collections.EMPTY_LIST;
+            if (isUntouchedEmpty(name, newData, theOptions)) return Collections.emptyList();
             else {
                 List<Constraint> validators = appendList(theOptions._constraints(),
                         (name1, data1, messages1, options1) -> {
-                            if (isEmptyInput(name1, data1, options1._inputMode())) return Collections.EMPTY_LIST;
+                            if (isEmptyInput(name1, data1, options1._inputMode())) return Collections.emptyList();
                             else {
                                 return fields.stream().flatMap(field -> {
                                     String fullName = isEmptyStr(name1) ? field.getKey() : name1 + "." + field.getKey();
@@ -321,7 +321,7 @@ public class Framework {
 
                 List<Map.Entry<String, String>> errors = validateRec(name, newData, messages, theOptions, validators);
                 if (errors.isEmpty()) {
-                    if (isEmptyInput(name, newData, theOptions._inputMode())) return Collections.EMPTY_LIST;
+                    if (isEmptyInput(name, newData, theOptions._inputMode())) return Collections.emptyList();
                     else {
                         BindObject vObj = doConvert(name, newData);
                         return extraValidateRec(name, vObj, messages, theOptions, theOptions._extraConstraints());

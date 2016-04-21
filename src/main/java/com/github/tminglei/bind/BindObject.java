@@ -81,18 +81,18 @@ public class BindObject implements Iterable<Map.Entry<String, Object>> {
 
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder builder = new StringBuilder();
         if (errors != null) {
-            buf.append("errors: ");
-            buf.append(errors);
+            builder.append("errors: ");
+            builder.append(errors);
         } else {
-            buf.append("{ ");
+            builder.append("{ ");
             data.entrySet().stream().forEach(e -> {
-                buf.append(e.getKey()).append(": ").append(e.getValue()).append(", ");
+                builder.append(e.getKey()).append(": ").append(e.getValue()).append(", ");
             });
-            buf.append(" }");
+            builder.append(" }");
         }
-        return buf.toString();
+        return builder.toString();
     }
 
 }

@@ -291,7 +291,7 @@ public class Mappings {
                     logger.debug("optional - validating {}", name);
 
                     if (isEmptyInput(name, data, base.options()._inputMode())) {
-                        return Collections.EMPTY_LIST;
+                        return Collections.emptyList();
                     } else { // merge the optional's constraints/label to base mapping then do validating
                         return base.options(o -> o.append_constraints(options._constraints()))
                                 .options(o -> o._label(o._label().orElse(options._label().orElse(null))))
