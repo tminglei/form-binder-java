@@ -28,6 +28,8 @@ public class FrameworkUtils {
     public static final Constraint PASS_VALIDATE
             = (name, data, messages, options) -> Collections.EMPTY_LIST;
 
+    private FrameworkUtils() {}
+
     public static <T> List<T> unmodifiableList(List<T> list) {
         return list == null ? Collections.EMPTY_LIST : Collections.unmodifiableList(list);
     }
