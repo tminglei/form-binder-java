@@ -105,6 +105,19 @@ public class TransformTest {
                         (email == null ? other.email == null : email.equals(other.email));
             } else return false;
         }
+
+        @Override
+        public String toString() {
+            StringBuilder bf = new StringBuilder();
+            bf.append("{");
+            bf.append("email=").append(email);
+            bf.append(", ");
+            bf.append("price=").append(price);
+            bf.append(", ");
+            bf.append("count=").append(count);
+            bf.append("}");
+            return bf.toString();
+        }
     }
 
     static class Bean2 {
@@ -144,6 +157,17 @@ public class TransformTest {
                 return id == other.id &&
                         (data == null ? other.data == null : data.equals(other.data));
             } else return false;
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder bf = new StringBuilder();
+            bf.append("{");
+            bf.append("id=").append(id);
+            bf.append(", ");
+            bf.append("data=").append(data);
+            bf.append("}");
+            return bf.toString();
         }
     }
 }
