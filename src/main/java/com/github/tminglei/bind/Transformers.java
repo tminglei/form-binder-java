@@ -81,7 +81,10 @@ public class Transformers {
 
     static <T> T transform(Object value, Class<T> toClazz, Registry registry) {
         try {
-            if (value instanceof BindObject) {
+            if (toClazz.isInstance(value)) {
+                return (T) value;
+            }
+            else if (value instanceof BindObject) {
                 T bean = newInstance(toClazz);
 
                 for(Map.Entry<String, Object> entry : (BindObject) value) {

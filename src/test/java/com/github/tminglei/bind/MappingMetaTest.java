@@ -45,7 +45,7 @@ public class MappingMetaTest {
     public void testDefaultValMapping() {
         System.out.println(green(">>> ignored mapping - string"));
 
-        Framework.Mapping<?> defaultVal = defaultVal(text(), "test");
+        Framework.Mapping<?> defaultVal = defaultv(text(), "test");
         assertEquals(defaultVal.meta().targetType,
                 Optional.class);
         assertEquals(defaultVal.meta().baseMappings[0].meta().targetType,
@@ -68,7 +68,7 @@ public class MappingMetaTest {
         System.out.println(green(">>> list mapping - compound"));
 
         Framework.Mapping<?> list = list(mapping(
-                field("id", vLong()),
+                field("id", longv()),
                 field("name", text())
             ));
         assertEquals(list.meta().targetType,
@@ -87,7 +87,7 @@ public class MappingMetaTest {
     public void testMapMapping() {
         System.out.println(green(">>> map mapping - <string, list<long>>"));
 
-        Framework.Mapping<?> map = map(list(vLong()));
+        Framework.Mapping<?> map = map(list(longv()));
         assertEquals(map.meta().targetType,
                 Map.class);
         assertEquals(map.meta().baseMappings[0].meta().targetType,
@@ -105,7 +105,7 @@ public class MappingMetaTest {
         System.out.println(green(">>> group mapping - { long, string }"));
 
         GroupMapping group = mapping(
-                field("id", vLong()),
+                field("id", longv()),
                 field("name", text())
             );
         assertEquals(group.meta().targetType,

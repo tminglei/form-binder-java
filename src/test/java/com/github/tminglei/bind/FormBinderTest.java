@@ -19,11 +19,11 @@ public class FormBinderTest {
 
     private Mapping<BindObject> mapping =
         mapping(
-            field("id", vLong()),
+            field("id", longv()),
             field("data", attach(expandJson()).to(mapping(
                 field("email", attach(required("%s is required")).to(text(maxLength(20, "%s: length > %s"), email("%s: invalid email")))),
-                field("price", attach(omitLeft("$")).to(vFloat())),
-                field("count", vInt().verifying(min(3), max(10)))
+                field("price", attach(omitLeft("$")).to(floatv())),
+                field("count", intv().verifying(min(3), max(10)))
             )).label("xx").verifying((label, vObj, messages1) -> {
                 float price = vObj.get("price");
                 int count = vObj.get("count");
@@ -105,11 +105,11 @@ public class FormBinderTest {
         );
         Mapping<BindObject> mapping =
                 mapping(
-                        field("id", vLong()),
+                        field("id", longv()),
                         field("data", attach(expandJson()).to(mapping(
                                 field("email", attach(required("%s is required")).to(text(maxLength(20, "%s: length > %s"), email("%s: invalid email")))),
-                                field("price", attach(omitLeft("$")).to(vFloat())),
-                                field("count", vInt().verifying(min(3), max(10)))
+                                field("price", attach(omitLeft("$")).to(floatv())),
+                                field("count", intv().verifying(min(3), max(10)))
                         )).label("@xx").verifying((label, vObj, messages1) -> {
                             float price = vObj.get("price");
                             int count = vObj.get("count");

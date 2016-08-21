@@ -69,7 +69,7 @@ public class GeneralMappingsTest {
     public void testDefaultVal_Simple() {
         System.out.println(green(">> default value - simple"));
 
-        Mapping<Integer> defaultVal = Mappings.defaultVal(Mappings.vInt(), 101);
+        Mapping<Integer> defaultVal = Mappings.defaultv(Mappings.intv(), 101);
 
         Map<String, String> data1 = newmap(
                 entry("number", "t122345")
@@ -92,8 +92,8 @@ public class GeneralMappingsTest {
     public void testDefaultVal_Compound() {
         System.out.println(green(">> default value - compound"));
 
-        Mapping<BindObject> defaultVal = Mappings.defaultVal(mapping(
-                field("id", Mappings.vInt()),
+        Mapping<BindObject> defaultVal = Mappings.defaultv(mapping(
+                field("id", Mappings.intv()),
                 field("name", Mappings.text())
         ), new BindObject(newmap(entry("id", 101), entry("name", "haha"))));
 
@@ -119,7 +119,7 @@ public class GeneralMappingsTest {
     public void testOptional_Simple() {
         System.out.println(green(">> optional - simple"));
 
-        Mapping<Optional<Integer>> optional = Mappings.optional(Mappings.vInt());
+        Mapping<Optional<Integer>> optional = Mappings.optional(Mappings.intv());
 
         Map<String, String> data1 = newmap();
         assertEquals(optional.validate("number", data1, messages, Options.EMPTY),
@@ -137,7 +137,7 @@ public class GeneralMappingsTest {
         System.out.println(green(">> optional - compound"));
 
         Mapping<Optional<BindObject>> optional = Mappings.optional(mapping(
-                field("id", Mappings.vInt()),
+                field("id", Mappings.intv()),
                 field("name", Mappings.text())
             ));
 
@@ -159,7 +159,7 @@ public class GeneralMappingsTest {
     public void testList_Simple() {
         System.out.println(green(">> list - simple"));
 
-        Mapping<List<Integer>> list = Mappings.list(Mappings.vInt());
+        Mapping<List<Integer>> list = Mappings.list(Mappings.intv());
 
         Map<String, String> data1 = newmap(
                 entry("list[1]", "101"),
@@ -180,7 +180,7 @@ public class GeneralMappingsTest {
         System.out.println(green(">> list - compound"));
 
         Mapping<List<BindObject>> list = Mappings.list(mapping(
-                field("id", Mappings.vInt()),
+                field("id", Mappings.intv()),
                 field("name", Mappings.text())
             ));
 
@@ -205,7 +205,7 @@ public class GeneralMappingsTest {
     public void testMap_Simple() {
         System.out.println(green(">> map - simple"));
 
-        Mapping<Map<String, Integer>> map = Mappings.map(Mappings.vInt());
+        Mapping<Map<String, Integer>> map = Mappings.map(Mappings.intv());
 
         Map<String, String> data1 = newmap(
                 entry("map.t1", "101"),
@@ -226,7 +226,7 @@ public class GeneralMappingsTest {
         System.out.println(green(">> map - compound"));
 
         Mapping<Map<String, BindObject>> map = Mappings.map(mapping(
-                field("id", Mappings.vInt()),
+                field("id", Mappings.intv()),
                 field("name", Mappings.text())
             ));
 
@@ -253,7 +253,7 @@ public class GeneralMappingsTest {
     public void testMap_LongKey() {
         System.out.println(green(">> map - long key"));
 
-        Mapping<Map<Long, String>> map = Mappings.map(Mappings.vLong(), Mappings.text());
+        Mapping<Map<Long, String>> map = Mappings.map(Mappings.longv(), Mappings.text());
 
         Map<String, String> data1 = newmap(
                 entry("map.101", "ttt"),

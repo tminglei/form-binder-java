@@ -21,7 +21,7 @@ public class GroupMappingsTest {
     private Messages messages = (key) -> bundle.getString(key);
 
     private Mapping<BindObject> mapping1 = mapping(
-            field("count", vInt())
+            field("count", intv())
         ).label("xx")
             .verifying((label, vObj, messages1) -> {
                 int count = vObj.get("count");
@@ -30,8 +30,8 @@ public class GroupMappingsTest {
                 else return Collections.EMPTY_LIST;
             });
     private Mapping<BindObject> mapping2 = mapping(
-            field("price", vFloat()),
-            field("count", vInt().verifying(min(3), max(10)))
+            field("price", floatv()),
+            field("count", intv().verifying(min(3), max(10)))
         ).label("xx")
             .verifying((label, vObj, messages1) -> {
                 float price = vObj.get("price");
@@ -41,7 +41,7 @@ public class GroupMappingsTest {
             });
     private Mapping<BindObject> mappingx = mapping(
             field("email", text(maxLength(20, "%s: length > %s"), email("%s: invalid email"), required("%s is required"))),
-            field("count", vInt().verifying(max(10, "%s > %s"), max(15, "%s > %s")))
+            field("count", intv().verifying(max(10, "%s > %s"), max(15, "%s > %s")))
         );
 
     @BeforeClass

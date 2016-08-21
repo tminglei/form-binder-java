@@ -22,15 +22,13 @@ public class TransformTest {
 
     private Mapping<?> mapping =
             mapping(
-                field("id", vLong()),
+                field("id", longv()),
                 field("data", attach(expandJson()).to(mapping(
                     field("email", attach(required("%s is required")).to(text(maxLength(20, "%s: length > %s"), email("%s: invalid email")))),
-                    field("price", attach(omitLeft("$")).to(vFloat())),
-                    field("count", vInt().verifying(min(3), max(10)))
-                )).label("xx").verifying((label, vObj, messages1) -> {
-                    float price = vObj.get("price");
-                    int count = vObj.get("count");
-                    if (price * count > 1000) {
+                    field("price", attach(omitLeft("$")).to(floatv())),
+                    field("count", intv().verifying(min(3), max(10)))
+                )).map(transTo(Bean1.class)).label("xx").verifying((label, bean1, messages1) -> {
+                    if (bean1.getPrice() * bean1.getCount() > 1000) {
                         return Arrays.asList(label + ": total cost too much!");
                     } else return Collections.EMPTY_LIST;
                 }))

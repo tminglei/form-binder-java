@@ -20,7 +20,7 @@ public class AttachmentTest {
         System.out.println(green(">> ext setting/checking"));
 
         GroupMapping mapping = mapping(
-                field("id", $(vLong()).in("path").desc("pet id").$$),
+                field("id", $(longv()).in("path").desc("pet id").$$),
                 field("name", $(text()).in("query").desc("pet name").$$)
             );
 

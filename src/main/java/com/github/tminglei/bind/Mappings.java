@@ -44,7 +44,7 @@ public class Mappings {
      * @param constraints constraints
      * @return new created mapping
      */
-    public static Mapping<Boolean> vBoolean(Constraint... constraints) {
+    public static Mapping<Boolean> bool(Constraint... constraints) {
         return new FieldMapping(
                 InputMode.SINGLE,
                 mkSimpleConverter(s ->
@@ -59,7 +59,7 @@ public class Mappings {
      * @param constraints constraints
      * @return new created mapping
      */
-    public static Mapping<Integer> vInt(Constraint... constraints) {
+    public static Mapping<Integer> intv(Constraint... constraints) {
         return new FieldMapping(
                 InputMode.SINGLE,
                 mkSimpleConverter(s ->
@@ -74,7 +74,7 @@ public class Mappings {
      * @param constraints constraints
      * @return new created mapping
      */
-    public static Mapping<Double> vDouble(Constraint... constraints) {
+    public static Mapping<Double> doublev(Constraint... constraints) {
         return new FieldMapping(
                 InputMode.SINGLE,
                 mkSimpleConverter(s ->
@@ -89,7 +89,7 @@ public class Mappings {
      * @param constraints constraints
      * @return new created mapping
      */
-    public static Mapping<Float> vFloat(Constraint... constraints) {
+    public static Mapping<Float> floatv(Constraint... constraints) {
         return new FieldMapping(
                 InputMode.SINGLE,
                 mkSimpleConverter(s ->
@@ -104,7 +104,7 @@ public class Mappings {
      * @param constraints constraints
      * @return new created mapping
      */
-    public static Mapping<Long> vLong(Constraint... constraints) {
+    public static Mapping<Long> longv(Constraint... constraints) {
         return new FieldMapping(
                 InputMode.SINGLE,
                 mkSimpleConverter(s ->
@@ -266,7 +266,7 @@ public class Mappings {
      * @param <T> base type
      * @return new created mapping
      */
-    public static <T> Mapping<T> defaultVal(Mapping<T> base, T defaultVal, Constraint... constraints) {
+    public static <T> Mapping<T> defaultv(Mapping<T> base, T defaultVal, Constraint... constraints) {
         return optional(base, constraints).map(o -> o.orElse(defaultVal));
     }
 
