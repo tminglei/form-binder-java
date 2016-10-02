@@ -155,6 +155,10 @@ public class FrameworkUtils {
             public List<Map.Entry<String, String>> apply(String name, Map<String, String> data, Messages messages, Options options) {
                 return validate.apply(name, data, messages, options);
             }
+            @Override
+            public String toString() {
+                return meta.desc;
+            }
         };
     }
 
@@ -170,6 +174,10 @@ public class FrameworkUtils {
             public List<String> apply(String label, T vObj, Messages messages) {
                 return validate.apply(label, vObj, messages);
             }
+            @Override
+            public String toString() {
+                return meta.desc;
+            }
         };
     }
 
@@ -184,6 +192,10 @@ public class FrameworkUtils {
             @Override
             public Map<String, String> apply(String prefix, Map<String, String> data, Options options) {
                 return process.apply(prefix, data, options);
+            }
+            @Override
+            public String toString() {
+                return meta.desc;
             }
         };
     }

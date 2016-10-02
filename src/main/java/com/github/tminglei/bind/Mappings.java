@@ -35,7 +35,7 @@ public class Mappings {
         return new FieldMapping(
                 InputMode.SINGLE,
                 mkSimpleConverter(Function.identity()),
-                new MappingMeta(String.class)
+                new MappingMeta("string", String.class)
             ).constraint(constraints);
         }
 
@@ -49,7 +49,7 @@ public class Mappings {
                 InputMode.SINGLE,
                 mkSimpleConverter(s ->
                     isEmptyStr(s) ? false : Boolean.parseBoolean(s)
-                ), new MappingMeta(Boolean.class)
+                ), new MappingMeta("boolean", Boolean.class)
             ).constraint(checking(Boolean::parseBoolean, "error.boolean", true))
                 .constraint(constraints);
         }
@@ -64,7 +64,7 @@ public class Mappings {
                 InputMode.SINGLE,
                 mkSimpleConverter(s ->
                     isEmptyStr(s) ? 0 : Integer.parseInt(s)
-                ), new MappingMeta(Integer.class)
+                ), new MappingMeta("int", Integer.class)
             ).constraint(checking(Integer::parseInt, "error.number", true))
                 .constraint(constraints);
         }
@@ -79,7 +79,7 @@ public class Mappings {
                 InputMode.SINGLE,
                 mkSimpleConverter(s ->
                     isEmptyStr(s) ? 0.0d : Double.parseDouble(s)
-                ), new MappingMeta(Double.class)
+                ), new MappingMeta("double", Double.class)
             ).constraint(checking(Double::parseDouble, "error.double", true))
                 .constraint(constraints);
         }
@@ -94,7 +94,7 @@ public class Mappings {
                 InputMode.SINGLE,
                 mkSimpleConverter(s ->
                     isEmptyStr(s) ? 0.0f : Float.parseFloat(s)
-                ), new MappingMeta(Float.class)
+                ), new MappingMeta("float", Float.class)
             ).constraint(checking(Float::parseFloat, "error.float", true))
                 .constraint(constraints);
         }
@@ -109,7 +109,7 @@ public class Mappings {
                 InputMode.SINGLE,
                 mkSimpleConverter(s ->
                     isEmptyStr(s) ? 0l : Long.parseLong(s)
-                ), new MappingMeta(Long.class)
+                ), new MappingMeta("long", Long.class)
             ).constraint(checking(Long::parseLong, "error.long", true))
                 .constraint(constraints);
         }
@@ -124,7 +124,7 @@ public class Mappings {
                 InputMode.SINGLE,
                 mkSimpleConverter(s ->
                     isEmptyStr(s) ? BigDecimal.ZERO : new BigDecimal(s)
-                ), new MappingMeta(BigDecimal.class)
+                ), new MappingMeta("bigDecimal", BigDecimal.class)
             ).constraint(checking(BigDecimal::new, "error.bigdecimal", true))
                 .constraint(constraints);
         }
@@ -139,7 +139,7 @@ public class Mappings {
                 InputMode.SINGLE,
                 mkSimpleConverter(s ->
                     isEmptyStr(s) ? BigInteger.ZERO : new BigInteger(s)
-                ), new MappingMeta(BigInteger.class)
+                ), new MappingMeta("bitInteger", BigInteger.class)
             ).constraint(checking(BigInteger::new, "error.bigint", true))
                 .constraint(constraints);
         }
@@ -154,7 +154,7 @@ public class Mappings {
                 InputMode.SINGLE,
                 mkSimpleConverter(s ->
                     isEmptyStr(s) ? null : UUID.fromString(s)
-                ), new MappingMeta(UUID.class)
+                ), new MappingMeta("uuid", UUID.class)
             ).constraint(checking(UUID::fromString, "error.uuid", true))
                 .constraint(constraints);
         }
@@ -179,7 +179,7 @@ public class Mappings {
                     } else {
                         return LocalDate.parse(s, formatter);
                     }
-                }), new MappingMeta(LocalDate.class)
+                }), new MappingMeta("date", LocalDate.class)
             ).constraint(anyPassed(
                     checking(s -> new Date(Long.parseLong(s)), "'%s' not a date long", false),
                     checking(formatter::parse, "error.pattern", true, pattern)
@@ -206,7 +206,7 @@ public class Mappings {
                     } else {
                         return LocalDateTime.parse(s, formatter);
                     }
-                }), new MappingMeta(LocalDateTime.class)
+                }), new MappingMeta("datetime", LocalDateTime.class)
             ).constraint(anyPassed(
                     checking(s -> new Date(Long.parseLong(s)), "'%s' not a date long", false),
                     checking(formatter::parse, "error.pattern", true, pattern)
@@ -233,7 +233,7 @@ public class Mappings {
                     } else {
                         return LocalTime.parse(s, formatter);
                     }
-                }), new MappingMeta(LocalTime.class)
+                }), new MappingMeta("time", LocalTime.class)
             ).constraint(anyPassed(
                     checking(s -> new Date(Long.parseLong(s)), "'%s' not a date long", false),
                     checking(formatter::parse, "error.pattern", true, pattern)
@@ -250,10 +250,11 @@ public class Mappings {
      * @return new created mapping
      */
     public static <T> Mapping<T> ignored(T instead) {
-        return new FieldMapping<T>(
+        String mname = "ignored to " + instead;
+        return new FieldMapping<>(
                 InputMode.POLYMORPHIC,
                 ((name, data) -> instead),
-                new MappingMeta(instead.getClass())
+                new MappingMeta(mname, instead.getClass())
             ).options(o -> o._ignoreConstraints(true));
         }
 
@@ -278,6 +279,7 @@ public class Mappings {
      * @return new created mapping
      */
     public static <T> Mapping<Optional<T>> optional(Mapping<T> base, Constraint... constraints) {
+        String mname = "optional " + base.meta().name;
         return new FieldMapping<Optional<T>>(
                 base.options()._inputMode(),
                 ((name, data) -> {
@@ -297,7 +299,7 @@ public class Mappings {
                                 .options(o -> o._label(o._label().orElse(options._label().orElse(null))))
                                 .validate(name, data, messages, options);
                     }
-                }), new MappingMeta(Optional.class, base)
+                }), new MappingMeta(mname, Optional.class, base)
             ).options(o -> o._ignoreConstraints(true))
                 .constraint(constraints);
         }
@@ -310,7 +312,8 @@ public class Mappings {
      * @return new created mapping
      */
     public static <T> Mapping<List<T>> list(Mapping<T> base, Constraint... constraints) {
-        return new FieldMapping<List<T>>(
+        String mname = "list of " + base.meta().name;
+        return new FieldMapping<>(
                 InputMode.MULTIPLE,
                 ((name, data) -> {
                     logger.debug("list - converting {}", name);
@@ -325,7 +328,7 @@ public class Mappings {
                     return indexes(name, data).stream()
                             .flatMap(i -> base.validate(name + "[" + i + "]", data, messages, options).stream())
                             .collect(Collectors.toList());
-                }), new MappingMeta(List.class, base)
+                }), new MappingMeta(mname, List.class, base)
             ).constraint(constraints);
         }
 
@@ -340,7 +343,8 @@ public class Mappings {
         return map(text(), vBase, constraints);
     }
     public static <K, V> Mapping<Map<K, V>> map(Mapping<K> kBase, Mapping<V> vBase, Constraint... constraints) {
-        return new FieldMapping<Map<K, V>>(
+        String mname = "map of " + kBase.meta().name + " -> " + vBase.meta().name;
+        return new FieldMapping<>(
                 InputMode.MULTIPLE,
                 ((name, data) -> {
                     logger.debug("map - converting {}", name);
@@ -372,7 +376,7 @@ public class Mappings {
                             ).stream();
                         })
                         .collect(Collectors.toList());
-                }), new MappingMeta(Map.class, kBase, vBase)
+                }), new MappingMeta(mname, Map.class, kBase, vBase)
             ).constraint(constraints);
         }
 

@@ -234,6 +234,11 @@ public class Framework {
                 } else return errors;
             }
         }
+
+        @Override
+        public String toString() {
+            return meta.name;
+        }
     }
 
     /**
@@ -242,7 +247,7 @@ public class Framework {
     public static class GroupMapping implements Mapping<BindObject> {
         private final Options options;
         private final List<Map.Entry<String, Mapping<?>>> fields;
-        private final MappingMeta meta = new MappingMeta(BindObject.class);
+        private final MappingMeta meta = new MappingMeta("object", BindObject.class);
 
         private final Logger logger = LoggerFactory.getLogger(GroupMapping.class);
 
@@ -329,6 +334,11 @@ public class Framework {
                 }
                 return errors;
             }
+        }
+
+        @Override
+        public String toString() {
+            return meta.name;
         }
     }
 
