@@ -158,6 +158,11 @@ public class Framework {
                         .orElse(Collections.emptyList());
             } else return errors;
         }
+
+        @Override
+        public String toString() {
+            return meta().name;
+        }
     }
 
     /**
