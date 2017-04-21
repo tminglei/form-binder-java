@@ -16,7 +16,7 @@ import static com.github.tminglei.bind.FrameworkUtils.*;
 /**
  * pre-defined constraints/extra-constraints
  */
-public class Constraints {
+public class Constraints implements Const {
     private static final Logger logger = LoggerFactory.getLogger(Constraints.class);
 
     private Constraints() {}
@@ -53,7 +53,7 @@ public class Constraints {
 
                     return Arrays.asList(entry(name, errMessage));
                 } else return Collections.emptyList();
-            }, mkExtensionMeta("required"));
+            }, mkExtensionMeta(CONSTRAINT_REQUIRED));
         }
 
     public static Constraint maxLength(int length) {
@@ -75,7 +75,7 @@ public class Constraints {
                         String msgTemplate = message != null ? message : messages.get("error.maxlength");
                         return String.format(msgTemplate, vString, length, withIt);
                     } else return null;
-                }, mkExtensionMeta("maxLength", length));
+                }, mkExtensionMeta(CONSTRAINT_MAX_LENGTH, length));
         }
 
     public static Constraint minLength(int length) {
@@ -97,7 +97,7 @@ public class Constraints {
                     String msgTemplate = message != null ? message : messages.get("error.minlength");
                     return String.format(msgTemplate, vString, length, withIt);
                 } else return null;
-            }, mkExtensionMeta("minLength", length));
+            }, mkExtensionMeta(CONSTRAINT_MIN_LENGTH, length));
         }
 
     public static Constraint length(int length) {
@@ -112,7 +112,7 @@ public class Constraints {
                     String msgTemplate = message != null ? message : messages.get("error.length");
                     return String.format(msgTemplate, vString, length);
                 } else return null;
-            }, mkExtensionMeta("length", length));
+            }, mkExtensionMeta(CONSTRAINT_LENGTH, length));
         }
 
     public static Constraint oneOf(Collection<String> values) {
@@ -127,7 +127,7 @@ public class Constraints {
                     String msgTemplate = message != null ? message : messages.get("error.oneof");
                     return String.format(msgTemplate, vString, values);
                 } else return null;
-            }, mkExtensionMeta("oneOf", values));
+            }, mkExtensionMeta(CONSTRAINT_ONE_OF, values));
         }
 
     public static Constraint email() {
@@ -142,7 +142,7 @@ public class Constraints {
                     String msgTemplate = message != null ? message : messages.get("error.email");
                     return String.format(msgTemplate, vString, PATTERN_EMAIL);
                 } else return null;
-            }, mkExtensionMeta("email"));
+            }, mkExtensionMeta(CONSTRAINT_EMAIL));
         }
 
     public static Constraint pattern(String pattern) {
@@ -157,7 +157,7 @@ public class Constraints {
                     String msgTemplate = message != null ? message : messages.get("error.pattern");
                     return String.format(msgTemplate, vString, pattern);
                 } else return null;
-            }, mkExtensionMeta("pattern", pattern));
+            }, mkExtensionMeta(CONSTRAINT_PATTERN, pattern));
         }
 
     public static Constraint patternNot(String pattern) {
@@ -172,7 +172,7 @@ public class Constraints {
                     String msgTemplate = message != null ? message : messages.get("error.patternnot");
                     return String.format(msgTemplate, vString, pattern);
                 } else return null;
-            }, mkExtensionMeta("patternNot", pattern));
+            }, mkExtensionMeta(CONSTRAINT_PATTERN_NOT, pattern));
         }
 
     public static Constraint indexInKeys() {
@@ -194,7 +194,7 @@ public class Constraints {
                         })
                         .filter(err -> err != null)
                         .collect(Collectors.toList());
-            }, mkExtensionMeta("indexInKeys"));
+            }, mkExtensionMeta(CONSTRAINT_INDEX_IN_KEYS));
         }
 
     ///////////////////////////////////  pre-defined extra constraints  //////////////////////
@@ -223,7 +223,7 @@ public class Constraints {
                     return Arrays.asList(String.format(msgTemplate, value, minVal, withIt));
                 } else return Collections.emptyList();
             }, new ExtensionMeta(
-                    "min",
+                    EX_CONSTRAINT_MIN,
                     "min(" + minVal + " " + (withIt ? "w/" : "w/o") + " boundary)",
                     Arrays.asList(minVal, withIt)));
         }
@@ -252,7 +252,7 @@ public class Constraints {
                     return Arrays.asList(String.format(msgTemplate, value, maxVal, withIt));
                 } else return Collections.emptyList();
             }, new ExtensionMeta(
-                "max",
+                EX_CONSTRAINT_MAX,
                 "max(" + maxVal + " " + (withIt ? "w/" : "w/o") + " boundary)",
                 Arrays.asList(maxVal, withIt)));
         }

@@ -19,7 +19,7 @@ import static com.github.tminglei.bind.FrameworkUtils.*;
 /**
  * pre-defined mappings
  */
-public class Mappings {
+public class Mappings implements Const {
     private static final Logger logger = LoggerFactory.getLogger(Mappings.class);
 
     private Mappings() {}
@@ -35,7 +35,7 @@ public class Mappings {
         return new FieldMapping(
                 InputMode.SINGLE,
                 mkSimpleConverter(Function.identity()),
-                new MappingMeta("string", String.class)
+                new MappingMeta(MAPPING_STRING, String.class)
             ).constraint(constraints);
         }
 
@@ -49,7 +49,7 @@ public class Mappings {
                 InputMode.SINGLE,
                 mkSimpleConverter(s ->
                     isEmptyStr(s) ? false : Boolean.parseBoolean(s)
-                ), new MappingMeta("boolean", Boolean.class)
+                ), new MappingMeta(MAPPING_BOOLEAN, Boolean.class)
             ).constraint(checking(Boolean::parseBoolean, "error.boolean", true))
                 .constraint(constraints);
         }
@@ -64,7 +64,7 @@ public class Mappings {
                 InputMode.SINGLE,
                 mkSimpleConverter(s ->
                     isEmptyStr(s) ? 0 : Integer.parseInt(s)
-                ), new MappingMeta("int", Integer.class)
+                ), new MappingMeta(MAPPING_INT, Integer.class)
             ).constraint(checking(Integer::parseInt, "error.number", true))
                 .constraint(constraints);
         }
@@ -79,7 +79,7 @@ public class Mappings {
                 InputMode.SINGLE,
                 mkSimpleConverter(s ->
                     isEmptyStr(s) ? 0.0d : Double.parseDouble(s)
-                ), new MappingMeta("double", Double.class)
+                ), new MappingMeta(MAPPING_DOUBLE, Double.class)
             ).constraint(checking(Double::parseDouble, "error.double", true))
                 .constraint(constraints);
         }
@@ -94,7 +94,7 @@ public class Mappings {
                 InputMode.SINGLE,
                 mkSimpleConverter(s ->
                     isEmptyStr(s) ? 0.0f : Float.parseFloat(s)
-                ), new MappingMeta("float", Float.class)
+                ), new MappingMeta(MAPPING_FLOAT, Float.class)
             ).constraint(checking(Float::parseFloat, "error.float", true))
                 .constraint(constraints);
         }
@@ -109,7 +109,7 @@ public class Mappings {
                 InputMode.SINGLE,
                 mkSimpleConverter(s ->
                     isEmptyStr(s) ? 0l : Long.parseLong(s)
-                ), new MappingMeta("long", Long.class)
+                ), new MappingMeta(MAPPING_LONG, Long.class)
             ).constraint(checking(Long::parseLong, "error.long", true))
                 .constraint(constraints);
         }
@@ -124,7 +124,7 @@ public class Mappings {
                 InputMode.SINGLE,
                 mkSimpleConverter(s ->
                     isEmptyStr(s) ? BigDecimal.ZERO : new BigDecimal(s)
-                ), new MappingMeta("bigDecimal", BigDecimal.class)
+                ), new MappingMeta(MAPPING_BIG_DECIMAL, BigDecimal.class)
             ).constraint(checking(BigDecimal::new, "error.bigdecimal", true))
                 .constraint(constraints);
         }
@@ -139,7 +139,7 @@ public class Mappings {
                 InputMode.SINGLE,
                 mkSimpleConverter(s ->
                     isEmptyStr(s) ? BigInteger.ZERO : new BigInteger(s)
-                ), new MappingMeta("bitInteger", BigInteger.class)
+                ), new MappingMeta(MAPPING_BIG_INTEGER, BigInteger.class)
             ).constraint(checking(BigInteger::new, "error.bigint", true))
                 .constraint(constraints);
         }
@@ -154,7 +154,7 @@ public class Mappings {
                 InputMode.SINGLE,
                 mkSimpleConverter(s ->
                     isEmptyStr(s) ? null : UUID.fromString(s)
-                ), new MappingMeta("uuid", UUID.class)
+                ), new MappingMeta(MAPPING_UUID, UUID.class)
             ).constraint(checking(UUID::fromString, "error.uuid", true))
                 .constraint(constraints);
         }
@@ -179,7 +179,7 @@ public class Mappings {
                     } else {
                         return LocalDate.parse(s, formatter);
                     }
-                }), new MappingMeta("date", LocalDate.class)
+                }), new MappingMeta(MAPPING_DATE, LocalDate.class)
             ).constraint(anyPassed(
                     checking(s -> new Date(Long.parseLong(s)), "'%s' not a date long", false),
                     checking(formatter::parse, "error.pattern", true, pattern)
@@ -206,7 +206,7 @@ public class Mappings {
                     } else {
                         return LocalDateTime.parse(s, formatter);
                     }
-                }), new MappingMeta("datetime", LocalDateTime.class)
+                }), new MappingMeta(MAPPING_DATE_TIME, LocalDateTime.class)
             ).constraint(anyPassed(
                     checking(s -> new Date(Long.parseLong(s)), "'%s' not a date long", false),
                     checking(formatter::parse, "error.pattern", true, pattern)
@@ -233,7 +233,7 @@ public class Mappings {
                     } else {
                         return LocalTime.parse(s, formatter);
                     }
-                }), new MappingMeta("time", LocalTime.class)
+                }), new MappingMeta(MAPPING_TIME, LocalTime.class)
             ).constraint(anyPassed(
                     checking(s -> new Date(Long.parseLong(s)), "'%s' not a date long", false),
                     checking(formatter::parse, "error.pattern", true, pattern)

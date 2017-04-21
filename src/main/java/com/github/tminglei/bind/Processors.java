@@ -18,7 +18,7 @@ import static com.github.tminglei.bind.FrameworkUtils.*;
 /**
  * pre-defined pre-processors/err-processors
  */
-public class Processors {
+public class Processors implements Const {
     private static final Logger logger = LoggerFactory.getLogger(Processors.class);
 
     private Processors() {}
@@ -43,27 +43,27 @@ public class Processors {
                             Map.Entry::getKey,
                             Map.Entry::getValue
                     ));
-            }, mkExtensionMeta("trim"));
+            }, mkExtensionMeta(PRE_PROCESSOR_TRIM));
         }
 
     public static PreProcessor omit(String str) {
-        return replaceMatched(Pattern.quote(str), "", mkExtensionMeta("omit", str));
+        return replaceMatched(Pattern.quote(str), "", mkExtensionMeta(PRE_PROCESSOR_OMIT, str));
     }
 
     public static PreProcessor omitLeft(String str) {
-        return replaceMatched("^" + Pattern.quote(str), "", mkExtensionMeta("omitLeft", str));
+        return replaceMatched("^" + Pattern.quote(str), "", mkExtensionMeta(PRE_PROCESSOR_OMIT_LEFT, str));
     }
 
     public static PreProcessor omitRight(String str) {
-        return replaceMatched(Pattern.quote(str) + "$", "", mkExtensionMeta("omitRight", str));
+        return replaceMatched(Pattern.quote(str) + "$", "", mkExtensionMeta(PRE_PROCESSOR_OMIT_RIGHT, str));
     }
 
     public static PreProcessor omitRedundant(String str) {
-        return replaceMatched("["+Pattern.quote(str)+"]+", str, mkExtensionMeta("omitRedundant", str));
+        return replaceMatched("["+Pattern.quote(str)+"]+", str, mkExtensionMeta(PRE_PROCESSOR_OMIT_REDUNDANT, str));
     }
 
     public static PreProcessor omitMatched(String pattern) {
-        return replaceMatched(pattern, "", mkExtensionMeta("omitMatched", pattern));
+        return replaceMatched(pattern, "", mkExtensionMeta(PRE_PROCESSOR_OMIT_MATCHED, pattern));
     }
 
     public static PreProcessor replaceMatched(String pattern, String replacement) {
@@ -88,7 +88,7 @@ public class Processors {
                             Map.Entry::getValue
                     ));
             }, meta != null ? meta : new ExtensionMeta(
-                "replaceMatched",
+                PRE_PROCESSOR_REPLACE_MATCHED,
                 "replace(matched '" + pattern + "' with '" + replacement + "')",
                 Arrays.asList(pattern, replacement)));
         }
@@ -122,7 +122,7 @@ public class Processors {
             } catch (IOException e) {
                 throw new IllegalArgumentException("Illegal json string at: " + thePrefix + " - \n" + jsonStr, e);
             }
-        }, mkExtensionMeta("expandJson", prefix));
+        }, mkExtensionMeta(PRE_PROCESSOR_EXPAND_JSON, prefix));
     }
 
     /**
@@ -139,7 +139,7 @@ public class Processors {
             Map<String, String> data1 = expandJson(prefix).apply(prefix1, data, options);
             Map<String, String> data2 = expandListKeys(prefix).apply(prefix1, data1, options);
             return data2;
-        }, mkExtensionMeta("expandJsonKeys", prefix));
+        }, mkExtensionMeta(PRE_PROCESSOR_EXPAND_JSON_KEYS, prefix));
     }
 
     /**
@@ -165,7 +165,7 @@ public class Processors {
                             Map.Entry::getKey,
                             Map.Entry::getValue
                     ));
-            }, mkExtensionMeta("expandListKeys", prefix));
+            }, mkExtensionMeta(PRE_PROCESSOR_EXPAND_LIST_KEYS, prefix));
         }
 
     /**
@@ -196,7 +196,7 @@ public class Processors {
                             Map.Entry::getKey,
                             Map.Entry::getValue
                     ));
-            }, new ExtensionMeta("changePrefix",
+            }, new ExtensionMeta(PRE_PROCESSOR_CHANGE_PREFIX,
                     "changePrefix(from '" +from+ "' to '" +to+ "')",
                     Arrays.asList(from, to)));
         }
