@@ -5,7 +5,7 @@
 
     <groupId>com.github.tminglei</groupId>
     <artifactId>form-binder-java</artifactId>
-    <version>0.13.3</version>
+    <version>0.13.4</version>
     <packaging>jar</packaging>
 
     <name>form-binder-java</name>
@@ -42,7 +42,7 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.5.4</version>
+            <version>2.9.9</version>
             <optional>true</optional>
         </dependency>
         <dependency>
@@ -86,7 +86,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.10.3</version>
+                <version>3.0.1</version>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
