@@ -118,14 +118,14 @@ Build & Test
 -------------------
 To hack it and make your contribution, you can setup it like this:
 ```bash
- $ git clone https://github.com/tminglei/form-binder.git
- $ cd form-binder
- $ sbt
+ $ git clone https://github.com/tminglei/form-binder-java.git
+ $ cd form-binder-java
+ $ mvn compile
 ...
 ```
 To run the tests, pls execute:
 ```bash
- $ sbt test
+ $ mvn test
 ```
 
 
