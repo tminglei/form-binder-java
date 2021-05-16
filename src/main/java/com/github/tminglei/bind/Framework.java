@@ -3,6 +3,8 @@ package com.github.tminglei.bind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -70,6 +72,11 @@ public class Framework {
         default Mapping<T> verifying(ExtraConstraint<T>... newConstraints) {
             return options(o -> o.append_extraConstraints(Arrays.asList(newConstraints)));
         }
+        // helper method
+        default Mapping<T> verifying(Function3<String, T, Messages, List<String>> validate, String desc) {
+            return verifying(mkExtraConstraintWithMeta(validate,
+                    new ExtensionMeta("anon", desc, null)));
+        }
 
         ///
 
@@ -101,6 +108,13 @@ public class Framework {
         default <R> Mapping<R> map(Function<T, R> transform) {
             return new TransformMapping<>(this, transform);
         }
+
+        /**
+         * print helper method
+         * @param writer  writer used to print
+         * @param level  used to pretty print
+         */
+        void print(PrintWriter writer, int level);
     }
 
     /**
@@ -139,7 +153,7 @@ public class Framework {
 
         @Override
         public Mapping<R> verifying(ExtraConstraint<R>... newConstraints) {
-            return new TransformMapping(base, transform, (List<ExtraConstraint<R>>) appendList(this.extraConstraints, newConstraints));
+            return new TransformMapping(base, transform, appendList(this.extraConstraints, newConstraints));
         }
 
         @Override
@@ -160,8 +174,22 @@ public class Framework {
         }
 
         @Override
+        public void print(PrintWriter writer, int level) {
+            writer.println("transform: [");
+            indent(writer, level+1);
+            base.print(writer, level+1);
+            for (ExtraConstraint constraint : extraConstraints) {
+                indent(writer, level+1).print("~ ");
+                writer.println(constraint);
+            }
+            indent(writer, level).println("]");
+        }
+
+        @Override
         public String toString() {
-            return meta().name;
+            StringWriter writer = new StringWriter();
+            print(new PrintWriter(writer), 0);
+            return writer.toString();
         }
     }
 
@@ -241,8 +269,46 @@ public class Framework {
         }
 
         @Override
+        public void print(PrintWriter writer, int level) {
+            if (meta.targetType == Map.class) {
+                writer.println("map {");
+                indent(writer, level+1).print("key: ");
+                meta.baseMappings[0].print(writer, level+2);
+                indent(writer, level+1).print("value: ");
+                meta.baseMappings[1].print(writer, level+2);
+                indent(writer, level).println("}");
+            } else if (meta.targetType == List.class) {
+                writer.println("list [");
+                indent(writer, level+1).print("base: ");
+                meta.baseMappings[0].print(writer, level+2);
+                indent(writer, level).println("]");
+            } else {
+                writer.print(meta.name);
+                // print related processors/constraints
+                writer.print(" |");
+                for (PreProcessor processor : options._processors()) {
+                    writer.print(" >> ");
+                    writer.print(processor);
+                }
+                List<Constraint> constraints = moreValidate == PASS_VALIDATE ? options._constraints()
+                        : appendList(options._constraints(), moreValidate);
+                for (Constraint constraint : constraints) {
+                    writer.print(" :: ");
+                    writer.print(constraint.meta() == null ? "anon" : constraint);
+                }
+                for (ExtraConstraint constraint : options._extraConstraints()) {
+                    writer.print(" ~ ");
+                    writer.print(constraint);
+                }
+                writer.println("");
+            }
+        }
+
+        @Override
         public String toString() {
-            return meta.name;
+            StringWriter writer = new StringWriter();
+            print(new PrintWriter(writer), 0);
+            return writer.toString();
         }
     }
 
@@ -342,8 +408,45 @@ public class Framework {
         }
 
         @Override
+        public void print(PrintWriter writer, int level) {
+            writer.println("{");
+            // print processors/constraints
+            if (!options._processors().isEmpty()) {
+                indent(writer, level+1);
+                for (PreProcessor processor : options._processors()) {
+                    writer.print(">> ");
+                    writer.print(processor);
+                }
+                writer.println("");
+            }
+            if (!options._constraints().isEmpty()) {
+                indent(writer, level+1);
+                for (Constraint constraint : options._constraints()) {
+                    writer.print(":: ");
+                    writer.print(constraint);
+                }
+                writer.println("");
+            }
+
+            // print field mappings
+            for (Map.Entry<String, Mapping<?>> field : fields) {
+                indent(writer, level+1).print(field.getKey() + ": ");
+                field.getValue().print(writer, level+1);
+            }
+
+            // print extra constraints
+            for (ExtraConstraint constraint : options._extraConstraints()) {
+                indent(writer, level+1).print("~ ");
+                writer.println(constraint);
+            }
+            indent(writer, level).println("}");
+        }
+
+        @Override
         public String toString() {
-            return meta.name;
+            StringWriter writer = new StringWriter();
+            print(new PrintWriter(writer), 0);
+            return writer.toString();
         }
     }
 

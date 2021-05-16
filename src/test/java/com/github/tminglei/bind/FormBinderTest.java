@@ -22,16 +22,22 @@ public class FormBinderTest {
             field("id", longv()),
             field("data", attach(expandJson()).to(mapping(
                 field("email", attach(required("%s is required")).to(text(maxLength(20, "%s: length > %s"), email("%s: invalid email")))),
-                field("price", attach(omitLeft("$")).to(floatv())),
-                field("count", intv().verifying(min(3), max(10)))
+                field("price", attach(omitLeft("$")).to(floatv()).map((f) -> f)
+                        .verifying(((label, vObj, messages1) -> Collections.EMPTY_LIST), "test")),
+                field("count", intv().verifying(min(3), max(10))),
+                field("props", map(text(required()), text(required())))
             )).label("xx").verifying((label, vObj, messages1) -> {
                 float price = vObj.get("price");
                 int count = vObj.get("count");
                 if (price * count > 1000) {
                     return Arrays.asList(label + ": total cost too much!");
                 } else return Collections.EMPTY_LIST;
-            }))
+            }, "price * count > 1000"))
         );
+
+    {   // print mapping
+        System.out.println(mapping);
+    }
 
     @BeforeClass
     public void start() {
