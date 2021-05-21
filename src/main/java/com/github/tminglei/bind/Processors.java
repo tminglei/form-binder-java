@@ -117,9 +117,9 @@ public class Processors implements Const {
                     JsonNode json = new ObjectMapper().readTree(jsonStr);
                     newData.putAll(json2map(thePrefix, json));
                 }
-
                 return newData;
-            } catch (IOException e) {
+
+            } catch (Exception e) {
                 throw new IllegalArgumentException("Illegal json string at: " + thePrefix + " - \n" + jsonStr, e);
             }
         }, mkExtensionMeta(PRE_PROCESSOR_EXPAND_JSON, prefix));
