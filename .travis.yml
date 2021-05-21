@@ -3,4 +3,4 @@ install: true
 script:
 - mvn install
 jdk:
-  - oraclejdk11
+  - oraclejdk8
