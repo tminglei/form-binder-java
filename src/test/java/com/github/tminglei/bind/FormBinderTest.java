@@ -35,10 +35,6 @@ public class FormBinderTest {
             }, "price * count > 1000"))
         );
 
-    {   // print mapping
-        System.out.println(mapping);
-    }
-
     @BeforeClass
     public void start() {
         System.out.println(cyan("test form binder facade"));
