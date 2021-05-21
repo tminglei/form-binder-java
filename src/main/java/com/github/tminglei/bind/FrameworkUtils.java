@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.PrintWriter;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -75,6 +76,13 @@ public class FrameworkUtils {
             return inputMode == InputMode.MULTIPLE ? subInputCount == 0
                     : isEmptyStr(data.get(name)) && subInputCount == 0;
         }
+    }
+
+    static PrintWriter indent(PrintWriter writer, int level) {
+        for (int i=0; i<level; i++) {
+            writer.write("  ");
+        }
+        return writer;
     }
 
     static final Pattern OBJ_ELEMENT_NAME = Pattern.compile("^(.*)\\.([^\\.]+)$");
@@ -157,7 +165,7 @@ public class FrameworkUtils {
             }
             @Override
             public String toString() {
-                return meta.desc;
+                return meta == null ? "anon" : meta.desc;
             }
         };
     }
@@ -176,7 +184,7 @@ public class FrameworkUtils {
             }
             @Override
             public String toString() {
-                return meta.desc;
+                return meta == null ? "anon" : meta.desc;
             }
         };
     }
@@ -195,7 +203,7 @@ public class FrameworkUtils {
             }
             @Override
             public String toString() {
-                return meta.desc;
+                return meta == null ? "anon" : meta.desc;
             }
         };
     }
@@ -278,16 +286,16 @@ public class FrameworkUtils {
         return label;
     }
 
-    // make a Constraint which will try to check and collect errors
+    // make a Constraint which will try to parse and collect errors
     public static <T> Constraint
-            checking(Function<String, T> check, String messageOrKey, boolean isKey, String... extraMessageArgs) {
+            parsing(Function<String, T> parse, String messageOrKey, boolean isKey, String... extraMessageArgs) {
         return mkSimpleConstraint(((label, vString, messages) -> {
             logger.debug("checking for {}", vString);
 
             if (isEmptyStr(vString)) return null;
             else {
                 try {
-                    check.apply(vString);
+                    parse.apply(vString);
                     return null;
                 } catch (Exception ex) {
                     String msgTemplate = isKey ? messages.get(messageOrKey) : messageOrKey;
@@ -295,7 +303,7 @@ public class FrameworkUtils {
                     return String.format(msgTemplate, messageArgs.toArray());
                 }
             }
-        }), null);
+        }), new ExtensionMeta("anon", "try parse", null));
     }
 
     // make a compound Constraint, which checks whether any inputting constraints passed

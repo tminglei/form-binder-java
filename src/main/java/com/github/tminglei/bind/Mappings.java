@@ -50,7 +50,7 @@ public class Mappings implements Const {
                 mkSimpleConverter(s ->
                     isEmptyStr(s) ? false : Boolean.parseBoolean(s)
                 ), new MappingMeta(MAPPING_BOOLEAN, Boolean.class)
-            ).constraint(checking(Boolean::parseBoolean, "error.boolean", true))
+            ).constraint(parsing(Boolean::parseBoolean, "error.boolean", true))
                 .constraint(constraints);
         }
 
@@ -65,7 +65,7 @@ public class Mappings implements Const {
                 mkSimpleConverter(s ->
                     isEmptyStr(s) ? 0 : Integer.parseInt(s)
                 ), new MappingMeta(MAPPING_INT, Integer.class)
-            ).constraint(checking(Integer::parseInt, "error.number", true))
+            ).constraint(parsing(Integer::parseInt, "error.number", true))
                 .constraint(constraints);
         }
 
@@ -80,7 +80,7 @@ public class Mappings implements Const {
                 mkSimpleConverter(s ->
                     isEmptyStr(s) ? 0.0d : Double.parseDouble(s)
                 ), new MappingMeta(MAPPING_DOUBLE, Double.class)
-            ).constraint(checking(Double::parseDouble, "error.double", true))
+            ).constraint(parsing(Double::parseDouble, "error.double", true))
                 .constraint(constraints);
         }
 
@@ -95,7 +95,7 @@ public class Mappings implements Const {
                 mkSimpleConverter(s ->
                     isEmptyStr(s) ? 0.0f : Float.parseFloat(s)
                 ), new MappingMeta(MAPPING_FLOAT, Float.class)
-            ).constraint(checking(Float::parseFloat, "error.float", true))
+            ).constraint(parsing(Float::parseFloat, "error.float", true))
                 .constraint(constraints);
         }
 
@@ -110,7 +110,7 @@ public class Mappings implements Const {
                 mkSimpleConverter(s ->
                     isEmptyStr(s) ? 0l : Long.parseLong(s)
                 ), new MappingMeta(MAPPING_LONG, Long.class)
-            ).constraint(checking(Long::parseLong, "error.long", true))
+            ).constraint(parsing(Long::parseLong, "error.long", true))
                 .constraint(constraints);
         }
 
@@ -125,7 +125,7 @@ public class Mappings implements Const {
                 mkSimpleConverter(s ->
                     isEmptyStr(s) ? BigDecimal.ZERO : new BigDecimal(s)
                 ), new MappingMeta(MAPPING_BIG_DECIMAL, BigDecimal.class)
-            ).constraint(checking(BigDecimal::new, "error.bigdecimal", true))
+            ).constraint(parsing(BigDecimal::new, "error.bigdecimal", true))
                 .constraint(constraints);
         }
 
@@ -140,7 +140,7 @@ public class Mappings implements Const {
                 mkSimpleConverter(s ->
                     isEmptyStr(s) ? BigInteger.ZERO : new BigInteger(s)
                 ), new MappingMeta(MAPPING_BIG_INTEGER, BigInteger.class)
-            ).constraint(checking(BigInteger::new, "error.bigint", true))
+            ).constraint(parsing(BigInteger::new, "error.bigint", true))
                 .constraint(constraints);
         }
 
@@ -155,7 +155,7 @@ public class Mappings implements Const {
                 mkSimpleConverter(s ->
                     isEmptyStr(s) ? null : UUID.fromString(s)
                 ), new MappingMeta(MAPPING_UUID, UUID.class)
-            ).constraint(checking(UUID::fromString, "error.uuid", true))
+            ).constraint(parsing(UUID::fromString, "error.uuid", true))
                 .constraint(constraints);
         }
 
@@ -181,8 +181,8 @@ public class Mappings implements Const {
                     }
                 }), new MappingMeta(MAPPING_DATE, LocalDate.class)
             ).constraint(anyPassed(
-                    checking(s -> new Date(Long.parseLong(s)), "'%s' not a date long", false),
-                    checking(formatter::parse, "error.pattern", true, pattern)
+                    parsing(s -> new Date(Long.parseLong(s)), "'%s' not a date long", false),
+                    parsing(formatter::parse, "error.pattern", true, pattern)
                 )).constraint(constraints);
         }
 
@@ -208,8 +208,8 @@ public class Mappings implements Const {
                     }
                 }), new MappingMeta(MAPPING_DATE_TIME, LocalDateTime.class)
             ).constraint(anyPassed(
-                    checking(s -> new Date(Long.parseLong(s)), "'%s' not a date long", false),
-                    checking(formatter::parse, "error.pattern", true, pattern)
+                    parsing(s -> new Date(Long.parseLong(s)), "'%s' not a date long", false),
+                    parsing(formatter::parse, "error.pattern", true, pattern)
                 )).constraint(constraints);
         }
 
@@ -235,8 +235,8 @@ public class Mappings implements Const {
                     }
                 }), new MappingMeta(MAPPING_TIME, LocalTime.class)
             ).constraint(anyPassed(
-                    checking(s -> new Date(Long.parseLong(s)), "'%s' not a date long", false),
-                    checking(formatter::parse, "error.pattern", true, pattern)
+                    parsing(s -> new Date(Long.parseLong(s)), "'%s' not a date long", false),
+                    parsing(formatter::parse, "error.pattern", true, pattern)
                 )).constraint(constraints);
         }
 
