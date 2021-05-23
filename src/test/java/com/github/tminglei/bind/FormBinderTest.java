@@ -132,14 +132,15 @@ public class FormBinderTest {
     public void testBind_WithRoot() {
         System.out.println(green(">> bind - with root"));
 
-        Map<String, String> data = newmap(
-                entry("id", "133"),
-                entry("body", "{\"data\": {\"email\":null, \"price\":337.5, \"count\":5}, \"touched\": [\"email\", \"price\"]}")
-        );
+//        Map<String, String> data = newmap(
+//                entry("id", "133"),
+//                entry("body", "{\"data\": {\"email\":null, \"price\":337.5, \"count\":5}, \"touched\": [\"email\", \"price\"]}")
+//        );
+        Map<String, String> data = newmap(entry("", "{\"id\":133, \"body\":{\"data\": {\"email\":null, \"price\":337.5, \"count\":5}, \"touched\": [\"email\", \"price\"]}}"));
         Mapping<BindObject> mappingx = mapping
                 .options(o -> o.skipUntouched(true))
                 .options(o -> o.touchedChecker(prefixTouched("body.data", "body.touched")))
-                .processor(expandJson("body"));
+                .processor(expandJson(""));
 
         BindObject bindObj = new FormBinder(messages).bind(mappingx, data, "body");
 

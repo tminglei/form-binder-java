@@ -20,6 +20,7 @@ import static com.github.tminglei.bind.FrameworkUtils.*;
  */
 public class Processors implements Const {
     private static final Logger logger = LoggerFactory.getLogger(Processors.class);
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     private Processors() {}
 
@@ -114,7 +115,7 @@ public class Processors implements Const {
                 if (isEmptyStr(jsonStr)) {
                     logger.warn("json string is '{}'", jsonStr);
                 } else {
-                    JsonNode json = new ObjectMapper().readTree(jsonStr);
+                    JsonNode json = objectMapper.readTree(jsonStr);
                     newData.putAll(json2map(thePrefix, json));
                 }
                 return newData;
